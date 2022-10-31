@@ -62,7 +62,7 @@ class FileSystemController extends ChangeNotifier {
     folder.remove(entity);
     f.append(entity);
 
-    var file = File("${Directory.current.path}/_private/structure.json");
+    // var file = File("${Directory.current.path}/_private/structure.json");
     file.writeAsStringSync(json.encode(folder.toJson()));
 
     notifyListeners();
@@ -91,9 +91,12 @@ class FileSystemController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Directory executableDir = File(Platform.resolvedExecutable).parent;
+
+  late final file = File("${executableDir.path}/_private/structure.json");
+
   init() async {
-    Directory executableDir = File(Platform.resolvedExecutable).parent;
-    var file = File("${executableDir.path}/_private/structure.json");
+    // var file = File("${executableDir.path}/_private/structure.json");
     if (!file.existsSync()) {
       file.writeAsString(
           '{"folderName":"root","path":"","iconPath":"assets/icons/folder.png","children":[]}');
@@ -129,7 +132,7 @@ class FileSystemController extends ChangeNotifier {
     int lengthAfter = folder.children.length;
     if (lengthAfter != lengthBefore) {
       widgetStatus.add(WidgetStatus());
-      var file = File("${Directory.current.path}/_private/structure.json");
+      // var file = File("${Directory.current.path}/_private/structure.json");
       file.writeAsStringSync(json.encode(folder.toJson()));
       notifyListeners();
     }
