@@ -15,18 +15,28 @@ dependencies:
   window_manager: ^0.2.7
   provider: ^6.0.3
   shared_preferences: ^2.0.15
+  loading_indicator: ^3.1.0
+  flutter_quill: ^6.1.1
+  desktop_drop: ^0.3.3
+  contextmenu: ^3.0.0
   flutter_localizations:
     sdk: flutter
+  flutter_svg: ^1.1.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
   ffigen: ^6.0.1
+
   
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/icons/file.png
+    - assets/icons/folder.png
 
   fonts:
     - family: 思源
