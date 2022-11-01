@@ -83,7 +83,27 @@ class NativeImpl implements Native {
         argNames: [],
       );
 
+  Future<int> createStorageDirectory({required String s, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner
+            .wire_create_storage_directory(port_, _platform.api2wire_String(s)),
+        parseSuccessData: _wire2api_i32,
+        constMeta: kCreateStorageDirectoryConstMeta,
+        argValues: [s],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "create_storage_directory",
+        argNames: ["s"],
+      );
+
 // Section: wire2api
+
+  int _wire2api_i32(dynamic raw) {
+    return raw as int;
+  }
 
   int _wire2api_u64(dynamic raw) {
     return castInt(raw);
@@ -96,10 +116,26 @@ class NativeImpl implements Native {
 
 // Section: api2wire
 
+@protected
+int api2wire_u8(int raw) {
+  return raw;
+}
+
 class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   NativePlatform(ffi.DynamicLibrary dylib) : super(NativeWire(dylib));
 // Section: api2wire
 
+  @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_String(String raw) {
+    return api2wire_uint_8_list(utf8.encoder.convert(raw));
+  }
+
+  @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_uint_8_list(Uint8List raw) {
+    final ans = inner.new_uint_8_list_0(raw.length);
+    ans.ref.ptr.asTypedList(raw.length).setAll(0, raw);
+    return ans;
+  }
 // Section: api_fill_to_wire
 
 }
@@ -194,6 +230,38 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_decrement =
       _wire_decrementPtr.asFunction<void Function(int)>();
 
+  void wire_create_storage_directory(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> s,
+  ) {
+    return _wire_create_storage_directory(
+      port_,
+      s,
+    );
+  }
+
+  late final _wire_create_storage_directoryPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_create_storage_directory');
+  late final _wire_create_storage_directory = _wire_create_storage_directoryPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
+    int len,
+  ) {
+    return _new_uint_8_list_0(
+      len,
+    );
+  }
+
+  late final _new_uint_8_list_0Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<wire_uint_8_list> Function(
+              ffi.Int32)>>('new_uint_8_list_0');
+  late final _new_uint_8_list_0 = _new_uint_8_list_0Ptr
+      .asFunction<ffi.Pointer<wire_uint_8_list> Function(int)>();
+
   void free_WireSyncReturnStruct(
     WireSyncReturnStruct val,
   ) {
@@ -207,6 +275,13 @@ class NativeWire implements FlutterRustBridgeWireBase {
           'free_WireSyncReturnStruct');
   late final _free_WireSyncReturnStruct = _free_WireSyncReturnStructPtr
       .asFunction<void Function(WireSyncReturnStruct)>();
+}
+
+class wire_uint_8_list extends ffi.Struct {
+  external ffi.Pointer<ffi.Uint8> ptr;
+
+  @ffi.Int32()
+  external int len;
 }
 
 typedef DartPostCObjectFnType = ffi.Pointer<

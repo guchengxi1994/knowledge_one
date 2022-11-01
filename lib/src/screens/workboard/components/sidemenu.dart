@@ -21,7 +21,7 @@ class SideMenu extends StatelessWidget {
           children: [
             Text(
               "日常工作",
-              style: AppStyle.sidebarLabelStyle,
+              style: AppStyle.sidebarLabelStyle2,
             ),
             const SizedBox(
               height: 8,

@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 class AppStyle {
   AppStyle._();
 
+  static const double iconSize = 40;
+
+  static Color selectedBackgroundColor = Colors.blueAccent.withOpacity(0.5);
+  static Color selectedBackgroundColorWhenGragging =
+      Colors.blueAccent.withOpacity(0.7);
+
   /// 页面最小尺寸
   static const double appMinWidth = 1280;
   static const double appMinHeight = 800;
@@ -20,6 +26,8 @@ class AppStyle {
       const TextStyle(color: Color.fromARGB(255, 88, 88, 88), fontSize: 14);
   static TextStyle sidebarLabelStyle =
       const TextStyle(color: Color.fromARGB(255, 209, 209, 209), fontSize: 14);
+  static TextStyle sidebarLabelStyle2 =
+      const TextStyle(color: Color.fromARGB(255, 180, 180, 180), fontSize: 14);
 
   static Color appBlue = const Color.fromARGB(255, 40, 40, 255);
 

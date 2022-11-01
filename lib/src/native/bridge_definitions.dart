@@ -22,4 +22,8 @@ abstract class Native {
   Future<int> decrement({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kDecrementConstMeta;
+
+  Future<int> createStorageDirectory({required String s, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta;
 }

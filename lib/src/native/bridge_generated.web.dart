@@ -17,6 +17,15 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> with FlutterRustB
   Future<void> setup() => inner.init;
 // Section: api2wire
 
+  @protected
+  String api2wire_String(String raw) {
+    return raw;
+  }
+
+  @protected
+  Uint8List api2wire_uint_8_list(Uint8List raw) {
+    return raw;
+  }
 }
 
 // Section: WASM wire module
@@ -36,6 +45,8 @@ class NativeWasmModule implements WasmModule {
   external void wire_increment(NativePortType port_);
 
   external void wire_decrement(NativePortType port_);
+
+  external void wire_create_storage_directory(NativePortType port_, String s);
 }
 
 // Section: WASM wire connector
@@ -50,4 +61,6 @@ class NativeWire extends FlutterRustBridgeWasmWireBase<NativeWasmModule> {
   void wire_increment(NativePortType port_) => wasmModule.wire_increment(port_);
 
   void wire_decrement(NativePortType port_) => wasmModule.wire_decrement(port_);
+
+  void wire_create_storage_directory(NativePortType port_, String s) => wasmModule.wire_create_storage_directory(port_, s);
 }

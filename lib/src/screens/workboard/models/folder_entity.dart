@@ -5,7 +5,7 @@ class FolderEntity<T extends BaseFileEntity> extends BaseFileEntity {
   FolderEntity(
       {required String folderName,
       String path = "",
-      String iconPath = "assets/images/folder.png",
+      String iconPath = "assets/icons/folder.png",
       required this.children})
       : super(name: folderName, path: path, iconPath: iconPath);
 
@@ -55,7 +55,7 @@ class FolderEntity<T extends BaseFileEntity> extends BaseFileEntity {
         children: [],
         folderName: json['folderName'],
         path: json["path"] ?? "",
-        iconPath: json["iconPath"] ?? "assets/images/folder.png");
+        iconPath: json["iconPath"] ?? "assets/icons/folder.png");
 
     for (Map<String, dynamic> i in json['children']) {
       if (i['children'] != null) {

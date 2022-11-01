@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/routers.dart';
+import 'package:knowledge_one/src/native/native.dart';
 import 'package:window_manager/window_manager.dart';
 import 'app_style.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,10 +10,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Directory executableDir = File(Platform.resolvedExecutable).parent;
-  var folder = Directory("${executableDir.path}/_private");
-  if (!folder.existsSync()) {
-    await folder.create();
-  }
+  // var folder = Directory("${executableDir.path}/_private");
+  // if (!folder.existsSync()) {
+  //   await folder.create();
+  // }
+  await api.createStorageDirectory(s: executableDir.path);
 
   await windowManager.ensureInitialized();
   windowManager.setTitle("KnowledgeOne");

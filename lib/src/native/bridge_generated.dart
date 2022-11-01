@@ -68,7 +68,28 @@ class NativeImpl implements Native {
         argNames: [],
       );
 
+  Future<int> createStorageDirectory({required String s, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_create_storage_directory(port_, _platform.api2wire_String(s)),
+        parseSuccessData: _wire2api_i32,
+        constMeta: kCreateStorageDirectoryConstMeta,
+        argValues: [
+          s
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "create_storage_directory",
+        argNames: [
+          "s"
+        ],
+      );
+
 // Section: wire2api
+
+  int _wire2api_i32(dynamic raw) {
+    return raw as int;
+  }
 
   int _wire2api_u64(dynamic raw) {
     return castInt(raw);
@@ -80,3 +101,8 @@ class NativeImpl implements Native {
 }
 
 // Section: api2wire
+
+@protected
+int api2wire_u8(int raw) {
+  return raw;
+}

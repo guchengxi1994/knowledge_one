@@ -70,7 +70,7 @@ class FileSystemController extends ChangeNotifier {
 
   navigateTo(FolderEntity f) {
     widgetStatus.clear();
-    for (final i in f.children) {
+    for (final _ in f.children) {
       widgetStatus.add(WidgetStatus());
     }
     folder = f;
@@ -85,7 +85,7 @@ class FileSystemController extends ChangeNotifier {
     folderList.removeLast();
     folder = folderList.last;
     widgetStatus.clear();
-    for (final i in folder.children) {
+    for (final _ in folder.children) {
       widgetStatus.add(WidgetStatus());
     }
     notifyListeners();
@@ -122,6 +122,7 @@ class FileSystemController extends ChangeNotifier {
     folder = FolderEntity(folderName: folderName, children: children);
 
     folderList.add(folder);
+    notifyListeners();
   }
 
   List<BaseFileEntity> get currentFolderElements => folder.children;
@@ -136,5 +137,21 @@ class FileSystemController extends ChangeNotifier {
       file.writeAsStringSync(json.encode(folder.toJson()));
       notifyListeners();
     }
+  }
+
+  String _getCurrentDirPath() {
+    String s = "";
+    for (final i in folderList) {
+      s += "${i.name}/";
+    }
+    return s;
+  }
+
+  String get currentDirPath => _getCurrentDirPath();
+
+  removeFromCurrentFolder(BaseFileEntity entity) {
+    folder.children.remove(entity);
+    file.writeAsStringSync(json.encode(folderList.first.toJson()));
+    notifyListeners();
   }
 }
