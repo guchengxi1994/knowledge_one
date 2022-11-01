@@ -90,9 +90,6 @@ class _FolderWidgetState extends State<FolderWidget> {
               .read<FileSystemController>()
               .changeClickPoint(details.localPosition);
         },
-        onSecondaryTap: () {
-          debugPrint("右键文件夹");
-        },
         child: Draggable(
             onDragEnd: (details) async {
               // print(details.offset);

@@ -9,6 +9,6 @@ class Routers {
 
   static Map<String, WidgetBuilder> routers = {
     mainScreen: (context) => const WorkboardScreen(),
-    splashScreen: (context) => const SplashPage()
+    splashScreen: (context) => const SplashPage(),
   };
 }

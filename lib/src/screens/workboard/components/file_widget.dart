@@ -1,6 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:contextmenu/contextmenu.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
+import 'package:knowledge_one/src/screens/markdown_edit/markdown_edit_screen.dart';
+import 'package:knowledge_one/src/screens/quill_eidt/quill_edit_screen.dart';
 import 'package:knowledge_one/src/screens/workboard/providers/file_system_controller.dart';
 import 'package:provider/provider.dart';
 import '../models/models.dart';
@@ -108,7 +112,6 @@ class _FileWidgetState extends State<FileWidget> {
                     );
                   });
               if (result == 1) {
-                // ignore: use_build_context_synchronously
                 context
                     .read<FileSystemController>()
                     .moveToFolder(widget.index, entity);
@@ -124,9 +127,43 @@ class _FileWidgetState extends State<FileWidget> {
             color: AppStyle.appBlue,
           ),
           child: ContextMenuArea(
-            width: 150,
+            width: 300,
             builder: (ctx) {
               return [
+                ListTile(
+                  leading: Icon(
+                    Icons.file_open,
+                    color: AppStyle.appBlue,
+                  ),
+                  title: const Text('以Markdown打开'),
+                  onTap: () async {
+                    await Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (c) {
+                      return MarkdownEditScreen(
+                        filePath: widget.entity.path!,
+                        fileName: widget.entity.name,
+                      );
+                    }));
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.file_open,
+                    color: AppStyle.appBlue,
+                  ),
+                  title: const Text('以富文本打开'),
+                  onTap: () async {
+                    await Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (c) {
+                      return QuillEditScreen(
+                        filePath: widget.entity.path!,
+                        fileName: widget.entity.name,
+                      );
+                    }));
+                    Navigator.of(ctx).pop();
+                  },
+                ),
                 ListTile(
                   leading: const Icon(
                     Icons.delete,
