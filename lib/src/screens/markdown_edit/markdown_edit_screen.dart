@@ -38,12 +38,22 @@ class MarkdownScreen extends StatefulWidget {
   State<MarkdownScreen> createState() => _MarkdownScreenState();
 }
 
-class _MarkdownScreenState extends State<MarkdownScreen> {
+class _MarkdownScreenState extends State<MarkdownScreen>
+    with TickerProviderStateMixin {
   late String mdData = "";
   var loadFuture;
-  // r"!\[(.*?)\]\((.*?)\)"
-  // r"^\!\[.*\][(][a-z]|[A-Z]{1}:.*[)]"
   late final reg = RegExp(r"!\[(.*?)\]\([a-z|A-Z]{1}:(.*?)\)");
+  final TextEditingController textEditingController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
+  final FocusNode focusNode = FocusNode();
+  double fontSize = 14;
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    scrollController.dispose();
+    super.dispose();
+  }
 
   loadData() async {
     try {
@@ -51,6 +61,7 @@ class _MarkdownScreenState extends State<MarkdownScreen> {
       String result = await f.readAsString();
       result = result.replaceAll(reg, "***本地资源无法渲染***");
       mdData = result;
+      textEditingController.text = result;
     } catch (_) {}
   }
 
@@ -62,9 +73,17 @@ class _MarkdownScreenState extends State<MarkdownScreen> {
 
   @override
   Widget build(BuildContext context) {
+    late String suf = "";
+    if (context.watch<MarkdownEditController>().mode == MdEditingMode.writing) {
+      suf = "(创作中)";
+    } else {
+      suf = "(阅读中)";
+    }
+
     return Scaffold(
       body: buildBody(),
       appBar: AppBar(
+        actions: _buildAppbarAction(),
         leading: IconButton(
             onPressed: () {
               Navigator.of(context).pop();
@@ -78,11 +97,30 @@ class _MarkdownScreenState extends State<MarkdownScreen> {
         elevation: 0,
         centerTitle: false,
         title: Text(
-          widget.fileName,
+          "${widget.fileName} $suf",
           style: const TextStyle(color: Colors.black),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildAppbarAction() {
+    return [
+      IconButton(
+        tooltip: "切换模式",
+        onPressed: () async {
+          context.read<MarkdownEditController>().changeMode();
+          setState(() {
+            mdData = textEditingController.text;
+          });
+        },
+        icon: Image.asset("assets/icons/switch.png"),
+        iconSize: 30,
+      ),
+      const SizedBox(
+        width: 20,
+      )
+    ];
   }
 
   buildBody() {
@@ -96,7 +134,26 @@ class _MarkdownScreenState extends State<MarkdownScreen> {
                 data: mdData,
               );
             }
-            return Container();
+            return GestureDetector(
+              onTap: () {
+                FocusScope.of(context).requestFocus(focusNode);
+              },
+              child: SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.only(
+                    bottom: 100, left: 10, right: 10, top: 20),
+                child: TextField(
+                    focusNode: focusNode,
+                    style: TextStyle(fontSize: fontSize),
+                    key: const ValueKey<String>("md_editor"),
+                    maxLines: null,
+                    controller: textEditingController,
+                    toolbarOptions: const ToolbarOptions(
+                        copy: true, paste: true, cut: true, selectAll: true),
+                    decoration:
+                        const InputDecoration.collapsed(hintText: "请输入")),
+              ),
+            );
           } else {
             return const Center(
               child: CircularProgressIndicator(),

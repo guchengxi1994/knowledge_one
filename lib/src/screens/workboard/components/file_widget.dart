@@ -4,8 +4,10 @@ import 'package:contextmenu/contextmenu.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
 import 'package:knowledge_one/src/screens/markdown_edit/markdown_edit_screen.dart';
+import 'package:knowledge_one/src/screens/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:knowledge_one/src/screens/quill_eidt/quill_edit_screen.dart';
 import 'package:knowledge_one/src/screens/workboard/providers/file_system_controller.dart';
+import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 import '../models/models.dart';
 import 'base_file_widget.dart';
@@ -164,6 +166,24 @@ class _FileWidgetState extends State<FileWidget> {
                     Navigator.of(ctx).pop();
                   },
                 ),
+                if (!DevUtils.isLinux)
+                  ListTile(
+                    leading: Icon(
+                      Icons.file_open,
+                      color: AppStyle.appBlue,
+                    ),
+                    title: const Text('以PDF Previewer打开'),
+                    onTap: () async {
+                      await Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (c) {
+                        return PdfViewerScreen(
+                          filePath: widget.entity.path!,
+                          fileName: widget.entity.name,
+                        );
+                      }));
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
                 ListTile(
                   leading: const Icon(
                     Icons.delete,

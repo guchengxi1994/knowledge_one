@@ -28,6 +28,114 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
     super.dispose();
   }
 
+  List<Widget> _buildAppbarActions() {
+    return [
+      IconButton(
+          tooltip: "创建新文件",
+          onPressed: () async {
+            final result = await showCupertinoDialog(
+                context: context,
+                builder: (context) {
+                  return CupertinoAlertDialog(
+                    title: const Text("创建新文件"),
+                    content: Material(
+                      child: Container(
+                          padding: const EdgeInsets.only(left: 5, bottom: 5),
+                          width: 200,
+                          height: 30,
+                          color: Colors.transparent,
+                          child: TextField(
+                            style: const TextStyle(fontSize: 14),
+                            controller: textEditingController,
+                            decoration: const InputDecoration(
+                              hintText: "请输入文件名",
+                              border: InputBorder.none,
+                            ),
+                          )),
+                    ),
+                    actions: [
+                      CupertinoButton(
+                          child: const Text("确定"),
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(textEditingController.text);
+                          }),
+                      CupertinoButton(
+                          child: const Text("取消"),
+                          onPressed: () {
+                            Navigator.of(context).pop('');
+                          })
+                    ],
+                  );
+                });
+
+            if (result != "") {
+              context
+                  .read<FileSystemController>()
+                  .addToCurrentFolder(FileEntity(fileName: result));
+            }
+          },
+          icon: const Icon(
+            Icons.add,
+            color: Colors.black,
+            size: 30,
+          )),
+      IconButton(
+          tooltip: "创建新文件夹",
+          onPressed: () async {
+            final result = await showCupertinoDialog(
+                context: context,
+                builder: (context) {
+                  return CupertinoAlertDialog(
+                    title: const Text("创建新文件夹"),
+                    content: Material(
+                      child: Container(
+                          padding: const EdgeInsets.only(left: 5, bottom: 5),
+                          width: 200,
+                          height: 30,
+                          color: Colors.transparent,
+                          child: TextField(
+                            style: const TextStyle(fontSize: 14),
+                            controller: textEditingController,
+                            decoration: const InputDecoration(
+                              hintText: "请输入文件夹名",
+                              border: InputBorder.none,
+                            ),
+                          )),
+                    ),
+                    actions: [
+                      CupertinoButton(
+                          child: const Text("确定"),
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pop(textEditingController.text);
+                          }),
+                      CupertinoButton(
+                          child: const Text("取消"),
+                          onPressed: () {
+                            Navigator.of(context).pop('');
+                          })
+                    ],
+                  );
+                });
+
+            if (result != "") {
+              context.read<FileSystemController>().addToCurrentFolder(
+                  FolderEntity<BaseFileEntity>(
+                      folderName: result, children: []));
+            }
+          },
+          icon: const Icon(
+            Icons.folder_open,
+            color: Colors.black,
+            size: 30,
+          )),
+      const SizedBox(
+        width: 20,
+      )
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,61 +143,7 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
         child: AppBar(
-          actions: [
-            IconButton(
-                onPressed: () async {
-                  final result = await showCupertinoDialog(
-                      context: context,
-                      builder: (context) {
-                        return CupertinoAlertDialog(
-                          title: const Text("创建新文件夹"),
-                          content: Material(
-                            child: Container(
-                                padding:
-                                    const EdgeInsets.only(left: 5, bottom: 5),
-                                width: 200,
-                                height: 30,
-                                color: Colors.transparent,
-                                child: TextField(
-                                  style: const TextStyle(fontSize: 14),
-                                  controller: textEditingController,
-                                  decoration: const InputDecoration(
-                                    hintText: "请输入文件夹名",
-                                    border: InputBorder.none,
-                                  ),
-                                )),
-                          ),
-                          actions: [
-                            CupertinoButton(
-                                child: const Text("确定"),
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(textEditingController.text);
-                                }),
-                            CupertinoButton(
-                                child: const Text("取消"),
-                                onPressed: () {
-                                  Navigator.of(context).pop('');
-                                })
-                          ],
-                        );
-                      });
-
-                  if (result != "") {
-                    context.read<FileSystemController>().addToCurrentFolder(
-                        FolderEntity<BaseFileEntity>(
-                            folderName: result, children: []));
-                  }
-                },
-                icon: const Icon(
-                  Icons.add,
-                  color: Colors.black,
-                  size: 30,
-                )),
-            const SizedBox(
-              width: 20,
-            )
-          ],
+          actions: _buildAppbarActions(),
           elevation: 0,
           backgroundColor: Colors.white,
           leading: IconButton(
