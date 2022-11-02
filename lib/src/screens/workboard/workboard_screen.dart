@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:knowledge_one/src/screens/workboard/components/demo_page.dart';
+import 'package:knowledge_one/src/screens/workboard/providers/todo_controller.dart';
+import 'package:knowledge_one/src/screens/workboard/sub_screens/todo_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/file_system_controller.dart';
@@ -22,7 +23,8 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
       providers: [
         ChangeNotifierProvider(
             create: (_) => PageChangeController(controller: pageController)),
-        ChangeNotifierProvider(create: (_) => FileSystemController()..init())
+        ChangeNotifierProvider(create: (_) => FileSystemController()..init()),
+        ChangeNotifierProvider(create: (_) => TodoController()..init())
       ],
       builder: (context, child) {
         return Container(
@@ -39,7 +41,7 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     children: const [
                       FileManagementScreen(),
-                      DemoPage2(),
+                      TodoScreen(),
                     ],
                   ),
                 )
