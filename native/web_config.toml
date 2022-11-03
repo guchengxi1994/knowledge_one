@@ -1,0 +1,9 @@
+title = "toml config file"
+
+[database]
+name = "knowledge_one"
+address = "localhost"
+port = "3306"
+username = "root"
+password = "123456"
+database = "knowledge_one"

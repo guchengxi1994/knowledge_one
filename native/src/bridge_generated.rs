@@ -72,6 +72,29 @@ fn wire_create_storage_directory_impl(port_: MessagePort, s: impl Wire2Api<Strin
         },
     )
 }
+fn wire_init_mysql_impl(port_: MessagePort, conf_path: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "init_mysql",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_conf_path = conf_path.wire2api();
+            move |task_callback| Ok(init_mysql(api_conf_path))
+        },
+    )
+}
+fn wire_get_status_types_impl(port_: MessagePort) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_status_types",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || move |task_callback| Ok(get_status_types()),
+    )
+}
 // Section: wrapper structs
 
 // Section: static checks
@@ -106,13 +129,6 @@ impl Wire2Api<u8> for u8 {
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
-
-/// cbindgen:ignore
-#[cfg(target_family = "wasm")]
-#[path = "bridge_generated.web.rs"]
-mod web;
-#[cfg(target_family = "wasm")]
-pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

@@ -10,11 +10,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Directory executableDir = File(Platform.resolvedExecutable).parent;
-  // var folder = Directory("${executableDir.path}/_private");
-  // if (!folder.existsSync()) {
-  //   await folder.create();
-  // }
   await api.createStorageDirectory(s: executableDir.path);
+
+  await api.initMysql(confPath: "${executableDir.path}/web_config.toml");
+
+  // final results = await api.getStatusTypes();
+  // debugPrint(results.toString());
 
   await windowManager.ensureInitialized();
   windowManager.setTitle("KnowledgeOne");

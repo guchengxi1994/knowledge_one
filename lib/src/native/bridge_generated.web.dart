@@ -47,6 +47,10 @@ class NativeWasmModule implements WasmModule {
   external void wire_decrement(NativePortType port_);
 
   external void wire_create_storage_directory(NativePortType port_, String s);
+
+  external void wire_init_mysql(NativePortType port_, String conf_path);
+
+  external void wire_get_status_types(NativePortType port_);
 }
 
 // Section: WASM wire connector
@@ -63,4 +67,8 @@ class NativeWire extends FlutterRustBridgeWasmWireBase<NativeWasmModule> {
   void wire_decrement(NativePortType port_) => wasmModule.wire_decrement(port_);
 
   void wire_create_storage_directory(NativePortType port_, String s) => wasmModule.wire_create_storage_directory(port_, s);
+
+  void wire_init_mysql(NativePortType port_, String conf_path) => wasmModule.wire_init_mysql(port_, conf_path);
+
+  void wire_get_status_types(NativePortType port_) => wasmModule.wire_get_status_types(port_);
 }

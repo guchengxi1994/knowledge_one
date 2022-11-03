@@ -99,7 +99,46 @@ class NativeImpl implements Native {
         argNames: ["s"],
       );
 
+  Future<void> initMysql({required String confPath, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner
+            .wire_init_mysql(port_, _platform.api2wire_String(confPath)),
+        parseSuccessData: _wire2api_unit,
+        constMeta: kInitMysqlConstMeta,
+        argValues: [confPath],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "init_mysql",
+        argNames: ["confPath"],
+      );
+
+  Future<List<String>> getStatusTypes({dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_get_status_types(port_),
+        parseSuccessData: _wire2api_StringList,
+        constMeta: kGetStatusTypesConstMeta,
+        argValues: [],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetStatusTypesConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_status_types",
+        argNames: [],
+      );
+
 // Section: wire2api
+
+  String _wire2api_String(dynamic raw) {
+    return raw as String;
+  }
+
+  List<String> _wire2api_StringList(dynamic raw) {
+    return (raw as List<dynamic>).cast<String>();
+  }
 
   int _wire2api_i32(dynamic raw) {
     return raw as int;
@@ -107,6 +146,14 @@ class NativeImpl implements Native {
 
   int _wire2api_u64(dynamic raw) {
     return castInt(raw);
+  }
+
+  int _wire2api_u8(dynamic raw) {
+    return raw as int;
+  }
+
+  Uint8List _wire2api_uint_8_list(dynamic raw) {
+    return raw as Uint8List;
   }
 
   void _wire2api_unit(dynamic raw) {
@@ -246,6 +293,37 @@ class NativeWire implements FlutterRustBridgeWireBase {
               ffi.Pointer<wire_uint_8_list>)>>('wire_create_storage_directory');
   late final _wire_create_storage_directory = _wire_create_storage_directoryPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_init_mysql(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> conf_path,
+  ) {
+    return _wire_init_mysql(
+      port_,
+      conf_path,
+    );
+  }
+
+  late final _wire_init_mysqlPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_init_mysql');
+  late final _wire_init_mysql = _wire_init_mysqlPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_status_types(
+    int port_,
+  ) {
+    return _wire_get_status_types(
+      port_,
+    );
+  }
+
+  late final _wire_get_status_typesPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_get_status_types');
+  late final _wire_get_status_types =
+      _wire_get_status_typesPtr.asFunction<void Function(int)>();
 
   ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
     int len,

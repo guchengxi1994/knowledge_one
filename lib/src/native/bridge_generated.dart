@@ -85,7 +85,45 @@ class NativeImpl implements Native {
         ],
       );
 
+  Future<void> initMysql({required String confPath, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_init_mysql(port_, _platform.api2wire_String(confPath)),
+        parseSuccessData: _wire2api_unit,
+        constMeta: kInitMysqlConstMeta,
+        argValues: [
+          confPath
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "init_mysql",
+        argNames: [
+          "confPath"
+        ],
+      );
+
+  Future<List<String>> getStatusTypes({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_get_status_types(port_),
+        parseSuccessData: _wire2api_StringList,
+        constMeta: kGetStatusTypesConstMeta,
+        argValues: [],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetStatusTypesConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_status_types",
+        argNames: [],
+      );
+
 // Section: wire2api
+
+  String _wire2api_String(dynamic raw) {
+    return raw as String;
+  }
+
+  List<String> _wire2api_StringList(dynamic raw) {
+    return (raw as List<dynamic>).cast<String>();
+  }
 
   int _wire2api_i32(dynamic raw) {
     return raw as int;
@@ -93,6 +131,14 @@ class NativeImpl implements Native {
 
   int _wire2api_u64(dynamic raw) {
     return castInt(raw);
+  }
+
+  int _wire2api_u8(dynamic raw) {
+    return raw as int;
+  }
+
+  Uint8List _wire2api_uint_8_list(dynamic raw) {
+    return raw as Uint8List;
   }
 
   void _wire2api_unit(dynamic raw) {

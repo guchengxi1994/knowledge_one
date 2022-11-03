@@ -26,6 +26,16 @@ pub fn wire_create_storage_directory(port_: MessagePort, s: String) {
     wire_create_storage_directory_impl(port_, s)
 }
 
+#[wasm_bindgen]
+pub fn wire_init_mysql(port_: MessagePort, conf_path: String) {
+    wire_init_mysql_impl(port_, conf_path)
+}
+
+#[wasm_bindgen]
+pub fn wire_get_status_types(port_: MessagePort) {
+    wire_get_status_types_impl(port_)
+}
+
 // Section: allocate functions
 
 // Section: impl Wire2Api

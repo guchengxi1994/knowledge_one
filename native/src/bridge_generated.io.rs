@@ -26,6 +26,16 @@ pub extern "C" fn wire_create_storage_directory(port_: i64, s: *mut wire_uint_8_
     wire_create_storage_directory_impl(port_, s)
 }
 
+#[no_mangle]
+pub extern "C" fn wire_init_mysql(port_: i64, conf_path: *mut wire_uint_8_list) {
+    wire_init_mysql_impl(port_, conf_path)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_get_status_types(port_: i64) {
+    wire_get_status_types_impl(port_)
+}
+
 // Section: allocate functions
 
 #[no_mangle]

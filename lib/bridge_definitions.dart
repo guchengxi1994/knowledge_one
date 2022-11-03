@@ -26,4 +26,12 @@ abstract class Native {
   Future<int> createStorageDirectory({required String s, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta;
+
+  Future<void> initMysql({required String confPath, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta;
+
+  Future<List<String>> getStatusTypes({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetStatusTypesConstMeta;
 }

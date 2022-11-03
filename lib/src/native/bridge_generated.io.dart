@@ -115,6 +115,30 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_create_storage_directoryPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_create_storage_directory');
   late final _wire_create_storage_directory = _wire_create_storage_directoryPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
+  void wire_init_mysql(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> conf_path,
+  ) {
+    return _wire_init_mysql(
+      port_,
+      conf_path,
+    );
+  }
+
+  late final _wire_init_mysqlPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_init_mysql');
+  late final _wire_init_mysql = _wire_init_mysqlPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_status_types(
+    int port_,
+  ) {
+    return _wire_get_status_types(
+      port_,
+    );
+  }
+
+  late final _wire_get_status_typesPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_get_status_types');
+  late final _wire_get_status_types = _wire_get_status_typesPtr.asFunction<void Function(int)>();
+
   ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
     int len,
   ) {
