@@ -14,7 +14,7 @@ pub fn init_mysql_db() {
         let ipaddr: String = crate::DATABASE_ADDR.lock().unwrap().to_string();
         let database: String = crate::DATABASE_DATABASE.lock().unwrap().to_string();
         let url = format!("mysql://{}:{}@{}:{}/{}", username, password, ipaddr, port, database);
-        let ops: Opts = Opts::from(url);
+        let ops: Opts = Opts::from_url(&url).unwrap();
         let pool = Pool::new(ops).unwrap();
         MYSQL_DATA_SOURCE.pool = Some(pool);
         print!("数据库连接初始化完成")

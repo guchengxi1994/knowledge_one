@@ -64,3 +64,7 @@ pub fn get_status_types() ->Vec<String>{
     } 
     res
 }
+
+pub fn get_todos() ->Vec<model::todo::TodoDetails>{
+    model::todo::TodoDetails::get_all()
+}

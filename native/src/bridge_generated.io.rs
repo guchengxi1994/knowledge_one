@@ -36,6 +36,11 @@ pub extern "C" fn wire_get_status_types(port_: i64) {
     wire_get_status_types_impl(port_)
 }
 
+#[no_mangle]
+pub extern "C" fn wire_get_todos(port_: i64) {
+    wire_get_todos_impl(port_)
+}
+
 // Section: allocate functions
 
 #[no_mangle]

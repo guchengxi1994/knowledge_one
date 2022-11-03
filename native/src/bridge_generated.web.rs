@@ -36,6 +36,11 @@ pub fn wire_get_status_types(port_: MessagePort) {
     wire_get_status_types_impl(port_)
 }
 
+#[wasm_bindgen]
+pub fn wire_get_todos(port_: MessagePort) {
+    wire_get_todos_impl(port_)
+}
+
 // Section: allocate functions
 
 // Section: impl Wire2Api

@@ -115,6 +115,19 @@ class NativeImpl implements Native {
         argNames: [],
       );
 
+  Future<List<TodoDetails>> getTodos({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_get_todos(port_),
+        parseSuccessData: _wire2api_list_todo_details,
+        constMeta: kGetTodosConstMeta,
+        argValues: [],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetTodosConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_todos",
+        argNames: [],
+      );
+
 // Section: wire2api
 
   String _wire2api_String(dynamic raw) {
@@ -127,6 +140,33 @@ class NativeImpl implements Native {
 
   int _wire2api_i32(dynamic raw) {
     return raw as int;
+  }
+
+  int _wire2api_i64(dynamic raw) {
+    return castInt(raw);
+  }
+
+  List<TodoDetails> _wire2api_list_todo_details(dynamic raw) {
+    return (raw as List<dynamic>).map(_wire2api_todo_details).toList();
+  }
+
+  String? _wire2api_opt_String(dynamic raw) {
+    return raw == null ? null : _wire2api_String(raw);
+  }
+
+  TodoDetails _wire2api_todo_details(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return TodoDetails(
+      todoId: _wire2api_i64(arr[0]),
+      todoName: _wire2api_opt_String(arr[1]),
+      todoContent: _wire2api_opt_String(arr[2]),
+      todoStatusName: _wire2api_opt_String(arr[3]),
+      todoFrom: _wire2api_opt_String(arr[4]),
+      todoTo: _wire2api_opt_String(arr[5]),
+      taskName: _wire2api_opt_String(arr[6]),
+      taskId: _wire2api_i64(arr[7]),
+    );
   }
 
   int _wire2api_u64(dynamic raw) {

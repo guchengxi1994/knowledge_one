@@ -17,6 +17,8 @@ use flutter_rust_bridge::*;
 
 // Section: imports
 
+use crate::database::model::todo::TodoDetails;
+
 // Section: wire functions
 
 fn wire_main_impl(port_: MessagePort) {
@@ -95,6 +97,16 @@ fn wire_get_status_types_impl(port_: MessagePort) {
         move || move |task_callback| Ok(get_status_types()),
     )
 }
+fn wire_get_todos_impl(port_: MessagePort) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_todos",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || move |task_callback| Ok(get_todos()),
+    )
+}
 // Section: wrapper structs
 
 // Section: static checks
@@ -124,11 +136,35 @@ impl Wire2Api<u8> for u8 {
 
 // Section: impl IntoDart
 
+impl support::IntoDart for TodoDetails {
+    fn into_dart(self) -> support::DartAbi {
+        vec![
+            self.todo_id.into_dart(),
+            self.todo_name.into_dart(),
+            self.todo_content.into_dart(),
+            self.todo_status_name.into_dart(),
+            self.todo_from.into_dart(),
+            self.todo_to.into_dart(),
+            self.task_name.into_dart(),
+            self.task_id.into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for TodoDetails {}
+
 // Section: executor
 
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
+
+/// cbindgen:ignore
+#[cfg(target_family = "wasm")]
+#[path = "bridge_generated.web.rs"]
+mod web;
+#[cfg(target_family = "wasm")]
+pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

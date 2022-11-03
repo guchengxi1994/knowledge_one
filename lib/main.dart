@@ -14,7 +14,7 @@ void main() async {
 
   await api.initMysql(confPath: "${executableDir.path}/web_config.toml");
 
-  // final results = await api.getStatusTypes();
+  // final results = await api.getTodos();
   // debugPrint(results.toString());
 
   await windowManager.ensureInitialized();

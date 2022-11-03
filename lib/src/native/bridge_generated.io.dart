@@ -139,6 +139,17 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_get_status_typesPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_get_status_types');
   late final _wire_get_status_types = _wire_get_status_typesPtr.asFunction<void Function(int)>();
 
+  void wire_get_todos(
+    int port_,
+  ) {
+    return _wire_get_todos(
+      port_,
+    );
+  }
+
+  late final _wire_get_todosPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_get_todos');
+  late final _wire_get_todos = _wire_get_todosPtr.asFunction<void Function(int)>();
+
   ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
     int len,
   ) {

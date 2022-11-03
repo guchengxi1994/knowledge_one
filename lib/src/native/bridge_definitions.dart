@@ -34,4 +34,30 @@ abstract class Native {
   Future<List<String>> getStatusTypes({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetStatusTypesConstMeta;
+
+  Future<List<TodoDetails>> getTodos({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetTodosConstMeta;
+}
+
+class TodoDetails {
+  final int todoId;
+  final String? todoName;
+  final String? todoContent;
+  final String? todoStatusName;
+  final String? todoFrom;
+  final String? todoTo;
+  final String? taskName;
+  final int taskId;
+
+  TodoDetails({
+    required this.todoId,
+    this.todoName,
+    this.todoContent,
+    this.todoStatusName,
+    this.todoFrom,
+    this.todoTo,
+    this.taskName,
+    required this.taskId,
+  });
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:knowledge_one/src/native.dart';
 import 'package:knowledge_one/src/screens/workboard/models/models.dart';
+import 'package:knowledge_one/src/native/bridge_definitions.dart'
+    show TodoDetails;
 
 class TodoItem<BaseItemDetails> {
   bool deletable;
@@ -13,47 +16,48 @@ class TodoItem<BaseItemDetails> {
       required this.deletable});
 }
 
+List<TodoItem<BaseItemDetails>> generateFromTodoDetails(
+    List<TodoDetails> detailList) {
+  List<TodoItem<BaseItemDetails>> result = [];
+  List<int> taskIds = detailList.map((e) => e.taskId).toSet().toList();
+  int count = 0;
+  for (final i in taskIds) {
+    List<TodoDetails> related =
+        detailList.where((element) => element.taskId == i).toList();
+    TodoItem<BaseItemDetails> todo = TodoItem(
+        columnName: related.first.taskName!,
+        todos: [],
+        index: count,
+        deletable: true);
+    int todoCount = 0;
+    for (final r in related) {
+      todo.todos.add(BaseItemDetails(
+          index: todoCount,
+          status: r.todoStatusName!,
+          content: r.todoContent ?? "未定义",
+          from: DateTime.parse(r.todoFrom!),
+          to: DateTime.parse(r.todoTo!)));
+      todoCount++;
+    }
+    result.add(todo);
+    count++;
+  }
+
+  return result;
+}
+
 class TodoController extends ChangeNotifier {
   List<TodoItem<BaseItemDetails>> todoItems = [];
 
   // 初始化列表
   init() async {
-    todoItems.add(TodoItem(
-        columnName: "test",
-        todos: [
-          BaseItemDetails(
-              index: 0,
-              status: ItemDetailsStatus.delay,
-              content: "测试1",
-              from: DateTime.now(),
-              to: DateTime.now()),
-          BaseItemDetails(
-              index: 1,
-              status: ItemDetailsStatus.delay,
-              content: "测试2",
-              from: DateTime.now(),
-              to: DateTime.now())
-        ],
-        index: 1,
-        deletable: true));
-    todoItems.add(TodoItem(
-        columnName: "已完成",
-        todos: [
-          BaseItemDetails(
-              index: 0,
-              status: ItemDetailsStatus.delay,
-              content: "完成1",
-              from: DateTime.now(),
-              to: DateTime.now()),
-          BaseItemDetails(
-              index: 1,
-              status: ItemDetailsStatus.delay,
-              content: "完成2",
-              from: DateTime.now(),
-              to: DateTime.now())
-        ],
-        index: 0,
-        deletable: false));
+    List<TodoDetails> details = await api.getTodos();
+    todoItems = generateFromTodoDetails(details);
+    todoItems.insert(
+        0, TodoItem(columnName: "已完成", todos: [], index: 0, deletable: false));
+    for (int i = 0; i < todoItems.length; i++) {
+      todoItems[i].index = i;
+    }
     notifyListeners();
   }
 
