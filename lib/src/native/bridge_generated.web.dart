@@ -23,24 +23,6 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> with FlutterRustB
   }
 
   @protected
-  List<dynamic> api2wire_box_autoadd_native_file_summary(NativeFileSummary raw) {
-    return api2wire_native_file_summary(raw);
-  }
-
-  @protected
-  List<dynamic> api2wire_native_file_summary(NativeFileSummary raw) {
-    return [
-      api2wire_opt_String(raw.fileName),
-      api2wire_opt_String(raw.filePath)
-    ];
-  }
-
-  @protected
-  String? api2wire_opt_String(String? raw) {
-    return raw == null ? null : api2wire_String(raw);
-  }
-
-  @protected
   Uint8List api2wire_uint_8_list(Uint8List raw) {
     return raw;
   }
@@ -68,13 +50,15 @@ class NativeWasmModule implements WasmModule {
 
   external void wire_init_mysql(NativePortType port_, String conf_path);
 
+  external void wire_init_mysql2(NativePortType port_, String conf_path);
+
   external void wire_get_status_types(NativePortType port_);
 
   external void wire_get_todos(NativePortType port_);
 
   external void wire_get_files(NativePortType port_);
 
-  external void wire_new_file(NativePortType port_, List<dynamic> f);
+  external void wire_test_sqlx(NativePortType port_);
 }
 
 // Section: WASM wire connector
@@ -94,11 +78,13 @@ class NativeWire extends FlutterRustBridgeWasmWireBase<NativeWasmModule> {
 
   void wire_init_mysql(NativePortType port_, String conf_path) => wasmModule.wire_init_mysql(port_, conf_path);
 
+  void wire_init_mysql2(NativePortType port_, String conf_path) => wasmModule.wire_init_mysql2(port_, conf_path);
+
   void wire_get_status_types(NativePortType port_) => wasmModule.wire_get_status_types(port_);
 
   void wire_get_todos(NativePortType port_) => wasmModule.wire_get_todos(port_);
 
   void wire_get_files(NativePortType port_) => wasmModule.wire_get_files(port_);
 
-  void wire_new_file(NativePortType port_, List<dynamic> f) => wasmModule.wire_new_file(port_, f);
+  void wire_test_sqlx(NativePortType port_) => wasmModule.wire_test_sqlx(port_);
 }

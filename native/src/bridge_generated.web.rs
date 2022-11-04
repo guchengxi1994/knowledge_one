@@ -32,6 +32,11 @@ pub fn wire_init_mysql(port_: MessagePort, conf_path: String) {
 }
 
 #[wasm_bindgen]
+pub fn wire_init_mysql2(port_: MessagePort, conf_path: String) {
+    wire_init_mysql2_impl(port_, conf_path)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_status_types(port_: MessagePort) {
     wire_get_status_types_impl(port_)
 }
@@ -47,8 +52,8 @@ pub fn wire_get_files(port_: MessagePort) {
 }
 
 #[wasm_bindgen]
-pub fn wire_new_file(port_: MessagePort, f: JsValue) {
-    wire_new_file_impl(port_, f)
+pub fn wire_test_sqlx(port_: MessagePort) {
+    wire_test_sqlx_impl(port_)
 }
 
 // Section: allocate functions
@@ -58,27 +63,6 @@ pub fn wire_new_file(port_: MessagePort, f: JsValue) {
 impl Wire2Api<String> for String {
     fn wire2api(self) -> String {
         self
-    }
-}
-
-impl Wire2Api<NativeFileSummary> for JsValue {
-    fn wire2api(self) -> NativeFileSummary {
-        let self_ = self.dyn_into::<JsArray>().unwrap();
-        assert_eq!(
-            self_.length(),
-            2,
-            "Expected 2 elements, got {}",
-            self_.length()
-        );
-        NativeFileSummary {
-            file_name: self_.get(0).wire2api(),
-            file_path: self_.get(1).wire2api(),
-        }
-    }
-}
-impl Wire2Api<Option<String>> for Option<String> {
-    fn wire2api(self) -> Option<String> {
-        self.map(Wire2Api::wire2api)
     }
 }
 
@@ -92,11 +76,6 @@ impl Wire2Api<Vec<u8>> for Box<[u8]> {
 impl Wire2Api<String> for JsValue {
     fn wire2api(self) -> String {
         self.as_string().expect("non-UTF-8 string, or not a string")
-    }
-}
-impl Wire2Api<Option<String>> for JsValue {
-    fn wire2api(self) -> Option<String> {
-        (!self.is_undefined() && !self.is_null()).then(|| self.wire2api())
     }
 }
 impl Wire2Api<u8> for JsValue {

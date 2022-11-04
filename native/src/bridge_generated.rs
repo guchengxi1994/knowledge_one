@@ -18,7 +18,6 @@ use flutter_rust_bridge::*;
 // Section: imports
 
 use crate::database::model::file::FileDetails;
-use crate::database::model::file::NativeFileSummary;
 use crate::database::model::todo::TodoDetails;
 use crate::database::model::todo_status::TodoStatus;
 
@@ -90,6 +89,19 @@ fn wire_init_mysql_impl(port_: MessagePort, conf_path: impl Wire2Api<String> + U
         },
     )
 }
+fn wire_init_mysql2_impl(port_: MessagePort, conf_path: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "init_mysql2",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_conf_path = conf_path.wire2api();
+            move |task_callback| Ok(init_mysql2(api_conf_path))
+        },
+    )
+}
 fn wire_get_status_types_impl(port_: MessagePort) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
@@ -120,17 +132,14 @@ fn wire_get_files_impl(port_: MessagePort) {
         move || move |task_callback| Ok(get_files()),
     )
 }
-fn wire_new_file_impl(port_: MessagePort, f: impl Wire2Api<NativeFileSummary> + UnwindSafe) {
+fn wire_test_sqlx_impl(port_: MessagePort) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
-            debug_name: "new_file",
+            debug_name: "test_sqlx",
             port: Some(port_),
             mode: FfiCallMode::Normal,
         },
-        move || {
-            let api_f = f.wire2api();
-            move |task_callback| Ok(new_file(api_f))
-        },
+        move || move |task_callback| test_sqlx(),
     )
 }
 // Section: wrapper structs

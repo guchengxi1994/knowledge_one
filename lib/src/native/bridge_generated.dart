@@ -102,6 +102,23 @@ class NativeImpl implements Native {
         ],
       );
 
+  Future<void> initMysql2({required String confPath, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_init_mysql2(port_, _platform.api2wire_String(confPath)),
+        parseSuccessData: _wire2api_unit,
+        constMeta: kInitMysql2ConstMeta,
+        argValues: [
+          confPath
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kInitMysql2ConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "init_mysql2",
+        argNames: [
+          "confPath"
+        ],
+      );
+
   Future<List<TodoStatus>> getStatusTypes({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_get_status_types(port_),
         parseSuccessData: _wire2api_list_todo_status,
@@ -141,21 +158,17 @@ class NativeImpl implements Native {
         argNames: [],
       );
 
-  Future<int> newFile({required NativeFileSummary f, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => _platform.inner.wire_new_file(port_, _platform.api2wire_box_autoadd_native_file_summary(f)),
-        parseSuccessData: _wire2api_i64,
-        constMeta: kNewFileConstMeta,
-        argValues: [
-          f
-        ],
+  Future<List<TodoStatus>> testSqlx({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_test_sqlx(port_),
+        parseSuccessData: _wire2api_list_todo_status,
+        constMeta: kTestSqlxConstMeta,
+        argValues: [],
         hint: hint,
       ));
 
-  FlutterRustBridgeTaskConstMeta get kNewFileConstMeta => const FlutterRustBridgeTaskConstMeta(
-        debugName: "new_file",
-        argNames: [
-          "f"
-        ],
+  FlutterRustBridgeTaskConstMeta get kTestSqlxConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "test_sqlx",
+        argNames: [],
       );
 
 // Section: wire2api

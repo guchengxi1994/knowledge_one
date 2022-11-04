@@ -115,6 +115,22 @@ class NativeImpl implements Native {
         argNames: ["confPath"],
       );
 
+  Future<void> initMysql2({required String confPath, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner
+            .wire_init_mysql2(port_, _platform.api2wire_String(confPath)),
+        parseSuccessData: _wire2api_unit,
+        constMeta: kInitMysql2ConstMeta,
+        argValues: [confPath],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kInitMysql2ConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "init_mysql2",
+        argNames: ["confPath"],
+      );
+
   Future<List<TodoStatus>> getStatusTypes({dynamic hint}) =>
       _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_get_status_types(port_),
@@ -174,6 +190,21 @@ class NativeImpl implements Native {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "new_file",
         argNames: ["f"],
+      );
+
+  Future<List<TodoStatus>> testSqlx({dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_test_sqlx(port_),
+        parseSuccessData: _wire2api_list_todo_status,
+        constMeta: kTestSqlxConstMeta,
+        argValues: [],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kTestSqlxConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "test_sqlx",
+        argNames: [],
       );
 
 // Section: wire2api
@@ -439,6 +470,23 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_init_mysql = _wire_init_mysqlPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
+  void wire_init_mysql2(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> conf_path,
+  ) {
+    return _wire_init_mysql2(
+      port_,
+      conf_path,
+    );
+  }
+
+  late final _wire_init_mysql2Ptr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_init_mysql2');
+  late final _wire_init_mysql2 = _wire_init_mysql2Ptr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
   void wire_get_status_types(
     int port_,
   ) {
@@ -497,6 +545,20 @@ class NativeWire implements FlutterRustBridgeWireBase {
               ffi.Pointer<wire_NativeFileSummary>)>>('wire_new_file');
   late final _wire_new_file = _wire_new_filePtr
       .asFunction<void Function(int, ffi.Pointer<wire_NativeFileSummary>)>();
+
+  void wire_test_sqlx(
+    int port_,
+  ) {
+    return _wire_test_sqlx(
+      port_,
+    );
+  }
+
+  late final _wire_test_sqlxPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_test_sqlx');
+  late final _wire_test_sqlx =
+      _wire_test_sqlxPtr.asFunction<void Function(int)>();
 
   ffi.Pointer<wire_NativeFileSummary> new_box_autoadd_native_file_summary_0() {
     return _new_box_autoadd_native_file_summary_0();

@@ -1,9 +1,10 @@
 use mysql::prelude::Queryable;
 use serde::{Deserialize, Serialize};
+use sqlx;
 
 use crate::database::connection::get_mysql_conn_pool;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize,sqlx::FromRow)]
 pub struct TodoStatus {
     pub todo_status_id: i64,
     pub todo_status_name: Option<String>,
@@ -24,4 +25,14 @@ impl TodoStatus {
         );
         results.unwrap()
     }
+
+    pub async fn sqlx_test()->Vec<TodoStatus>{
+        let pool = crate::database::sqlx_connection::POOL.read().await;
+        // "SELECT todo_status_id,todo_status_name,todo_status_color from todo_status"
+        let result = sqlx::query_as::<sqlx::MySql,TodoStatus>(r#"SELECT todo_status_id,todo_status_name,todo_status_color from todo_status"#).fetch_all(pool.get_pool()).await;
+        result.unwrap()   
+    }
 }
+
+
+
