@@ -29,6 +29,7 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^20.3.52
   drag_and_drop_lists: ^0.3.3
   flutter_colorpicker: ^1.0.3
+  flutter_smart_dialog: ^4.5.5+2
 
 dev_dependencies:
   flutter_test:

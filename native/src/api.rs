@@ -56,15 +56,20 @@ pub fn init_mysql(conf_path:String) {
 }
 
 
-pub fn get_status_types() ->Vec<String>{
+pub fn get_status_types() ->Vec<model::todo_status::TodoStatus>{
     let t = model::todo_status::TodoStatus::get_all_status_types();
-    let mut res:Vec<String> = Vec::new();
-    for v in t {
-        res.push(v.todo_status_name.unwrap());
-    } 
-    res
+    t
 }
 
 pub fn get_todos() ->Vec<model::todo::TodoDetails>{
     model::todo::TodoDetails::get_all()
+}
+
+pub fn get_files()->Vec<model::file::FileDetails>{
+    model::file::FileDetails::get_all_file_details()
+}
+
+pub fn new_file(mut f: model::file::NativeFileSummary)->i64{
+   let reuslt = f.create_new_file();
+   reuslt
 }

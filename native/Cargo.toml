@@ -14,6 +14,8 @@ serde = { version = "1.0", features = ["derive"] }
 mysql = "22.2.0"
 lazy_static = "*"
 toml = "*"
+ring = "0.16.20"
+data-encoding = "2.3.2"
 
 [build-dependencies]
 flutter_rust_bridge_codegen = "1"

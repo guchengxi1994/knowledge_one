@@ -41,6 +41,16 @@ pub fn wire_get_todos(port_: MessagePort) {
     wire_get_todos_impl(port_)
 }
 
+#[wasm_bindgen]
+pub fn wire_get_files(port_: MessagePort) {
+    wire_get_files_impl(port_)
+}
+
+#[wasm_bindgen]
+pub fn wire_new_file(port_: MessagePort, f: JsValue) {
+    wire_new_file_impl(port_, f)
+}
+
 // Section: allocate functions
 
 // Section: impl Wire2Api
@@ -48,6 +58,27 @@ pub fn wire_get_todos(port_: MessagePort) {
 impl Wire2Api<String> for String {
     fn wire2api(self) -> String {
         self
+    }
+}
+
+impl Wire2Api<NativeFileSummary> for JsValue {
+    fn wire2api(self) -> NativeFileSummary {
+        let self_ = self.dyn_into::<JsArray>().unwrap();
+        assert_eq!(
+            self_.length(),
+            2,
+            "Expected 2 elements, got {}",
+            self_.length()
+        );
+        NativeFileSummary {
+            file_name: self_.get(0).wire2api(),
+            file_path: self_.get(1).wire2api(),
+        }
+    }
+}
+impl Wire2Api<Option<String>> for Option<String> {
+    fn wire2api(self) -> Option<String> {
+        self.map(Wire2Api::wire2api)
     }
 }
 
@@ -61,6 +92,11 @@ impl Wire2Api<Vec<u8>> for Box<[u8]> {
 impl Wire2Api<String> for JsValue {
     fn wire2api(self) -> String {
         self.as_string().expect("non-UTF-8 string, or not a string")
+    }
+}
+impl Wire2Api<Option<String>> for JsValue {
+    fn wire2api(self) -> Option<String> {
+        (!self.is_undefined() && !self.is_null()).then(|| self.wire2api())
     }
 }
 impl Wire2Api<u8> for JsValue {

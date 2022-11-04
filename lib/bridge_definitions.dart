@@ -31,13 +31,51 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta;
 
-  Future<List<String>> getStatusTypes({dynamic hint});
+  Future<List<TodoStatus>> getStatusTypes({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetStatusTypesConstMeta;
 
   Future<List<TodoDetails>> getTodos({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetTodosConstMeta;
+
+  Future<List<FileDetails>> getFiles({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetFilesConstMeta;
+
+  Future<int> newFile({required NativeFileSummary f, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kNewFileConstMeta;
+}
+
+class FileDetails {
+  final int fileId;
+  final String? fileName;
+  final String? filePath;
+  final int isDeleted;
+  final String? createAt;
+  final String? updateAt;
+  final String? fileHash;
+
+  FileDetails({
+    required this.fileId,
+    this.fileName,
+    this.filePath,
+    required this.isDeleted,
+    this.createAt,
+    this.updateAt,
+    this.fileHash,
+  });
+}
+
+class NativeFileSummary {
+  final String? fileName;
+  final String? filePath;
+
+  NativeFileSummary({
+    this.fileName,
+    this.filePath,
+  });
 }
 
 class TodoDetails {
@@ -49,6 +87,7 @@ class TodoDetails {
   final String? todoTo;
   final String? taskName;
   final int taskId;
+  final String? todoStatusColor;
 
   TodoDetails({
     required this.todoId,
@@ -59,5 +98,18 @@ class TodoDetails {
     this.todoTo,
     this.taskName,
     required this.taskId,
+    this.todoStatusColor,
+  });
+}
+
+class TodoStatus {
+  final int todoStatusId;
+  final String? todoStatusName;
+  final String? todoStatusColor;
+
+  TodoStatus({
+    required this.todoStatusId,
+    this.todoStatusName,
+    this.todoStatusColor,
   });
 }

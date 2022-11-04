@@ -3,6 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
+import 'package:knowledge_one/src/native.dart';
+import 'package:knowledge_one/src/native/bridge_definitions.dart'
+    show NativeFileSummary;
+import 'package:knowledge_one/utils/utils.dart';
 
 import '../models/models.dart';
 
@@ -127,7 +131,13 @@ class FileSystemController extends ChangeNotifier {
 
   List<BaseFileEntity> get currentFolderElements => folder.children;
 
-  addToCurrentFolder(BaseFileEntity entity) {
+  addToCurrentFolder(BaseFileEntity entity) async {
+    int i = await api.newFile(
+        f: NativeFileSummary(fileName: entity.name, filePath: entity.path));
+    if (i == 1) {
+      SmartDialogUtils.error("归档失败");
+      return;
+    }
     int lengthBefore = folder.children.length;
     folder.append(entity);
     int lengthAfter = folder.children.length;

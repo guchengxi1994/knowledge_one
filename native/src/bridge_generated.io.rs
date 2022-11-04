@@ -41,7 +41,22 @@ pub extern "C" fn wire_get_todos(port_: i64) {
     wire_get_todos_impl(port_)
 }
 
+#[no_mangle]
+pub extern "C" fn wire_get_files(port_: i64) {
+    wire_get_files_impl(port_)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_new_file(port_: i64, f: *mut wire_NativeFileSummary) {
+    wire_new_file_impl(port_, f)
+}
+
 // Section: allocate functions
+
+#[no_mangle]
+pub extern "C" fn new_box_autoadd_native_file_summary_0() -> *mut wire_NativeFileSummary {
+    support::new_leak_box_ptr(wire_NativeFileSummary::new_with_null_ptr())
+}
 
 #[no_mangle]
 pub extern "C" fn new_uint_8_list_0(len: i32) -> *mut wire_uint_8_list {
@@ -60,6 +75,20 @@ impl Wire2Api<String> for *mut wire_uint_8_list {
         String::from_utf8_lossy(&vec).into_owned()
     }
 }
+impl Wire2Api<NativeFileSummary> for *mut wire_NativeFileSummary {
+    fn wire2api(self) -> NativeFileSummary {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<NativeFileSummary>::wire2api(*wrap).into()
+    }
+}
+impl Wire2Api<NativeFileSummary> for wire_NativeFileSummary {
+    fn wire2api(self) -> NativeFileSummary {
+        NativeFileSummary {
+            file_name: self.file_name.wire2api(),
+            file_path: self.file_path.wire2api(),
+        }
+    }
+}
 
 impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
     fn wire2api(self) -> Vec<u8> {
@@ -70,6 +99,13 @@ impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
     }
 }
 // Section: wire structs
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_NativeFileSummary {
+    file_name: *mut wire_uint_8_list,
+    file_path: *mut wire_uint_8_list,
+}
 
 #[repr(C)]
 #[derive(Clone)]
@@ -87,6 +123,15 @@ pub trait NewWithNullPtr {
 impl<T> NewWithNullPtr for *mut T {
     fn new_with_null_ptr() -> Self {
         std::ptr::null_mut()
+    }
+}
+
+impl NewWithNullPtr for wire_NativeFileSummary {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            file_name: core::ptr::null_mut(),
+            file_path: core::ptr::null_mut(),
+        }
     }
 }
 

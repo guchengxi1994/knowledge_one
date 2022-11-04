@@ -26,6 +26,7 @@ pub struct TodoDetails {
     pub todo_to: Option<String>,
     pub task_name: Option<String>,
     pub task_id: i64,
+    pub todo_status_color:Option<String>
 }
 
 impl TodoDetails {
@@ -41,7 +42,8 @@ impl TodoDetails {
         t1.todo_from,
         t1.todo_to,
         t3.task_name,
-        t3.task_id 
+        t3.task_id,
+        t2.todo_status_color  
     FROM
         todo AS t1
         LEFT JOIN todo_status AS t2 ON t2.todo_status_id = t1.todo_status_id
@@ -58,6 +60,7 @@ impl TodoDetails {
                 todo_to,
                 task_name,
                 task_id,
+                todo_status_color
             )| {
                 TodoDetails {
                     todo_id: todo_id,
@@ -68,6 +71,7 @@ impl TodoDetails {
                     todo_to: todo_to,
                     task_name: task_name,
                     task_id: task_id,
+                    todo_status_color:todo_status_color
                 }
             },
         );

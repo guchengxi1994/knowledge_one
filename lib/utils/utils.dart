@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+export './smart_dialog_utils.dart';
 
 part './platform_utils.dart';
 

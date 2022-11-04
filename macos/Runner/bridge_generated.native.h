@@ -11,6 +11,11 @@ typedef struct wire_uint_8_list {
   int32_t len;
 } wire_uint_8_list;
 
+typedef struct wire_NativeFileSummary {
+  struct wire_uint_8_list *file_name;
+  struct wire_uint_8_list *file_path;
+} wire_NativeFileSummary;
+
 typedef struct WireSyncReturnStruct {
   uint8_t *ptr;
   int32_t len;
@@ -35,6 +40,12 @@ void wire_get_status_types(int64_t port_);
 
 void wire_get_todos(int64_t port_);
 
+void wire_get_files(int64_t port_);
+
+void wire_new_file(int64_t port_, struct wire_NativeFileSummary *f);
+
+struct wire_NativeFileSummary *new_box_autoadd_native_file_summary_0(void);
+
 struct wire_uint_8_list *new_uint_8_list_0(int32_t len);
 
 void free_WireSyncReturnStruct(struct WireSyncReturnStruct val);
@@ -49,6 +60,9 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_init_mysql);
     dummy_var ^= ((int64_t) (void*) wire_get_status_types);
     dummy_var ^= ((int64_t) (void*) wire_get_todos);
+    dummy_var ^= ((int64_t) (void*) wire_get_files);
+    dummy_var ^= ((int64_t) (void*) wire_new_file);
+    dummy_var ^= ((int64_t) (void*) new_box_autoadd_native_file_summary_0);
     dummy_var ^= ((int64_t) (void*) new_uint_8_list_0);
     dummy_var ^= ((int64_t) (void*) free_WireSyncReturnStruct);
     dummy_var ^= ((int64_t) (void*) store_dart_post_cobject);

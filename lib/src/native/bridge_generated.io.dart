@@ -21,6 +21,18 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   }
 
   @protected
+  ffi.Pointer<wire_NativeFileSummary> api2wire_box_autoadd_native_file_summary(NativeFileSummary raw) {
+    final ptr = inner.new_box_autoadd_native_file_summary_0();
+    _api_fill_to_wire_native_file_summary(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
+  ffi.Pointer<wire_uint_8_list> api2wire_opt_String(String? raw) {
+    return raw == null ? ffi.nullptr : api2wire_String(raw);
+  }
+
+  @protected
   ffi.Pointer<wire_uint_8_list> api2wire_uint_8_list(Uint8List raw) {
     final ans = inner.new_uint_8_list_0(raw.length);
     ans.ref.ptr.asTypedList(raw.length).setAll(0, raw);
@@ -28,6 +40,14 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   }
 // Section: api_fill_to_wire
 
+  void _api_fill_to_wire_box_autoadd_native_file_summary(NativeFileSummary apiObj, ffi.Pointer<wire_NativeFileSummary> wireObj) {
+    _api_fill_to_wire_native_file_summary(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_native_file_summary(NativeFileSummary apiObj, wire_NativeFileSummary wireObj) {
+    wireObj.file_name = api2wire_opt_String(apiObj.fileName);
+    wireObj.file_path = api2wire_opt_String(apiObj.filePath);
+  }
 }
 
 // ignore_for_file: camel_case_types, non_constant_identifier_names, avoid_positional_boolean_parameters, annotate_overrides, constant_identifier_names
@@ -150,6 +170,37 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_get_todosPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_get_todos');
   late final _wire_get_todos = _wire_get_todosPtr.asFunction<void Function(int)>();
 
+  void wire_get_files(
+    int port_,
+  ) {
+    return _wire_get_files(
+      port_,
+    );
+  }
+
+  late final _wire_get_filesPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_get_files');
+  late final _wire_get_files = _wire_get_filesPtr.asFunction<void Function(int)>();
+
+  void wire_new_file(
+    int port_,
+    ffi.Pointer<wire_NativeFileSummary> f,
+  ) {
+    return _wire_new_file(
+      port_,
+      f,
+    );
+  }
+
+  late final _wire_new_filePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_NativeFileSummary>)>>('wire_new_file');
+  late final _wire_new_file = _wire_new_filePtr.asFunction<void Function(int, ffi.Pointer<wire_NativeFileSummary>)>();
+
+  ffi.Pointer<wire_NativeFileSummary> new_box_autoadd_native_file_summary_0() {
+    return _new_box_autoadd_native_file_summary_0();
+  }
+
+  late final _new_box_autoadd_native_file_summary_0Ptr = _lookup<ffi.NativeFunction<ffi.Pointer<wire_NativeFileSummary> Function()>>('new_box_autoadd_native_file_summary_0');
+  late final _new_box_autoadd_native_file_summary_0 = _new_box_autoadd_native_file_summary_0Ptr.asFunction<ffi.Pointer<wire_NativeFileSummary> Function()>();
+
   ffi.Pointer<wire_uint_8_list> new_uint_8_list_0(
     int len,
   ) {
@@ -178,6 +229,12 @@ class wire_uint_8_list extends ffi.Struct {
 
   @ffi.Int32()
   external int len;
+}
+
+class wire_NativeFileSummary extends ffi.Struct {
+  external ffi.Pointer<wire_uint_8_list> file_name;
+
+  external ffi.Pointer<wire_uint_8_list> file_path;
 }
 
 typedef DartPostCObjectFnType = ffi.Pointer<ffi.NativeFunction<ffi.Bool Function(DartPort, ffi.Pointer<ffi.Void>)>>;

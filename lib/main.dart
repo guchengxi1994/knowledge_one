@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/routers.dart';
 import 'package:knowledge_one/src/native/native.dart';
@@ -50,6 +51,8 @@ class MyApp extends StatelessWidget {
       initialRoute: Routers.splashScreen,
       routes: Routers.routers,
       navigatorKey: Routers.navigatorKey,
+      navigatorObservers: [FlutterSmartDialog.observer],
+      builder: FlutterSmartDialog.init(),
     );
   }
 }

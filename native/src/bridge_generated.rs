@@ -17,7 +17,10 @@ use flutter_rust_bridge::*;
 
 // Section: imports
 
+use crate::database::model::file::FileDetails;
+use crate::database::model::file::NativeFileSummary;
 use crate::database::model::todo::TodoDetails;
+use crate::database::model::todo_status::TodoStatus;
 
 // Section: wire functions
 
@@ -107,6 +110,29 @@ fn wire_get_todos_impl(port_: MessagePort) {
         move || move |task_callback| Ok(get_todos()),
     )
 }
+fn wire_get_files_impl(port_: MessagePort) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_files",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || move |task_callback| Ok(get_files()),
+    )
+}
+fn wire_new_file_impl(port_: MessagePort, f: impl Wire2Api<NativeFileSummary> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "new_file",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_f = f.wire2api();
+            move |task_callback| Ok(new_file(api_f))
+        },
+    )
+}
 // Section: wrapper structs
 
 // Section: static checks
@@ -136,6 +162,22 @@ impl Wire2Api<u8> for u8 {
 
 // Section: impl IntoDart
 
+impl support::IntoDart for FileDetails {
+    fn into_dart(self) -> support::DartAbi {
+        vec![
+            self.file_id.into_dart(),
+            self.file_name.into_dart(),
+            self.file_path.into_dart(),
+            self.is_deleted.into_dart(),
+            self.create_at.into_dart(),
+            self.update_at.into_dart(),
+            self.file_hash.into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for FileDetails {}
+
 impl support::IntoDart for TodoDetails {
     fn into_dart(self) -> support::DartAbi {
         vec![
@@ -147,11 +189,24 @@ impl support::IntoDart for TodoDetails {
             self.todo_to.into_dart(),
             self.task_name.into_dart(),
             self.task_id.into_dart(),
+            self.todo_status_color.into_dart(),
         ]
         .into_dart()
     }
 }
 impl support::IntoDartExceptPrimitive for TodoDetails {}
+
+impl support::IntoDart for TodoStatus {
+    fn into_dart(self) -> support::DartAbi {
+        vec![
+            self.todo_status_id.into_dart(),
+            self.todo_status_name.into_dart(),
+            self.todo_status_color.into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for TodoStatus {}
 
 // Section: executor
 

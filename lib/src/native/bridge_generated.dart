@@ -102,9 +102,9 @@ class NativeImpl implements Native {
         ],
       );
 
-  Future<List<String>> getStatusTypes({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+  Future<List<TodoStatus>> getStatusTypes({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_get_status_types(port_),
-        parseSuccessData: _wire2api_StringList,
+        parseSuccessData: _wire2api_list_todo_status,
         constMeta: kGetStatusTypesConstMeta,
         argValues: [],
         hint: hint,
@@ -128,14 +128,54 @@ class NativeImpl implements Native {
         argNames: [],
       );
 
+  Future<List<FileDetails>> getFiles({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_get_files(port_),
+        parseSuccessData: _wire2api_list_file_details,
+        constMeta: kGetFilesConstMeta,
+        argValues: [],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetFilesConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_files",
+        argNames: [],
+      );
+
+  Future<int> newFile({required NativeFileSummary f, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_new_file(port_, _platform.api2wire_box_autoadd_native_file_summary(f)),
+        parseSuccessData: _wire2api_i64,
+        constMeta: kNewFileConstMeta,
+        argValues: [
+          f
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kNewFileConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "new_file",
+        argNames: [
+          "f"
+        ],
+      );
+
 // Section: wire2api
 
   String _wire2api_String(dynamic raw) {
     return raw as String;
   }
 
-  List<String> _wire2api_StringList(dynamic raw) {
-    return (raw as List<dynamic>).cast<String>();
+  FileDetails _wire2api_file_details(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7) throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return FileDetails(
+      fileId: _wire2api_i64(arr[0]),
+      fileName: _wire2api_opt_String(arr[1]),
+      filePath: _wire2api_opt_String(arr[2]),
+      isDeleted: _wire2api_i64(arr[3]),
+      createAt: _wire2api_opt_String(arr[4]),
+      updateAt: _wire2api_opt_String(arr[5]),
+      fileHash: _wire2api_opt_String(arr[6]),
+    );
   }
 
   int _wire2api_i32(dynamic raw) {
@@ -146,8 +186,16 @@ class NativeImpl implements Native {
     return castInt(raw);
   }
 
+  List<FileDetails> _wire2api_list_file_details(dynamic raw) {
+    return (raw as List<dynamic>).map(_wire2api_file_details).toList();
+  }
+
   List<TodoDetails> _wire2api_list_todo_details(dynamic raw) {
     return (raw as List<dynamic>).map(_wire2api_todo_details).toList();
+  }
+
+  List<TodoStatus> _wire2api_list_todo_status(dynamic raw) {
+    return (raw as List<dynamic>).map(_wire2api_todo_status).toList();
   }
 
   String? _wire2api_opt_String(dynamic raw) {
@@ -156,7 +204,7 @@ class NativeImpl implements Native {
 
   TodoDetails _wire2api_todo_details(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 9) throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return TodoDetails(
       todoId: _wire2api_i64(arr[0]),
       todoName: _wire2api_opt_String(arr[1]),
@@ -166,6 +214,17 @@ class NativeImpl implements Native {
       todoTo: _wire2api_opt_String(arr[5]),
       taskName: _wire2api_opt_String(arr[6]),
       taskId: _wire2api_i64(arr[7]),
+      todoStatusColor: _wire2api_opt_String(arr[8]),
+    );
+  }
+
+  TodoStatus _wire2api_todo_status(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3) throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return TodoStatus(
+      todoStatusId: _wire2api_i64(arr[0]),
+      todoStatusName: _wire2api_opt_String(arr[1]),
+      todoStatusColor: _wire2api_opt_String(arr[2]),
     );
   }
 
