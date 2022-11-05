@@ -56,11 +56,6 @@ class _FileWidgetState extends State<FileWidget> {
         .read<FileSystemController>()
         .changeWidgetStatus(widget.index, WidgetStatus(dx: dx, dy: dy));
 
-    ///TODO
-    ///
-    /// [bug]
-    ///
-    /// 右键也可以拖拽
     return GestureDetector(
       onDoubleTap: () async {
         debugPrint(widget.entity.path);

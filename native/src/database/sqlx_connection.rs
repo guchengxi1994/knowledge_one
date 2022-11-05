@@ -4,8 +4,6 @@ use sqlx::{MySql, MySqlPool, Pool};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-use super::model::file::NativeFileSummary;
-
 
 /// 自定义连接池结构体
 pub struct MyPool(Option<Pool<MySql>>);

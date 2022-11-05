@@ -31,10 +31,6 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta;
 
-  Future<void> initMysql2({required String confPath, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kInitMysql2ConstMeta;
-
   Future<List<TodoStatus>> getStatusTypes({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetStatusTypesConstMeta;
@@ -47,9 +43,9 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kGetFilesConstMeta;
 
-  Future<List<TodoStatus>> testSqlx({dynamic hint});
+  Future<int> newFile({required NativeFileSummary f, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kTestSqlxConstMeta;
+  FlutterRustBridgeTaskConstMeta get kNewFileConstMeta;
 }
 
 class FileDetails {
@@ -69,6 +65,16 @@ class FileDetails {
     this.createAt,
     this.updateAt,
     this.fileHash,
+  });
+}
+
+class NativeFileSummary {
+  final String? fileName;
+  final String? filePath;
+
+  NativeFileSummary({
+    this.fileName,
+    this.filePath,
   });
 }
 

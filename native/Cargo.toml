@@ -11,7 +11,6 @@ crate-type = ["lib","staticlib","cdylib",]
 flutter_rust_bridge = "1"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-mysql = "22.2.0"
 lazy_static = "*"
 toml = "*"
 ring = "0.16.20"

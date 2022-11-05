@@ -27,7 +27,8 @@ impl FileDetails {
 }
 
 impl NativeFileSummary {
-    pub async fn create_new_file(&mut self) -> i64 {
+    #[tokio::main]
+    pub async fn create_new_file(&mut self) -> u64 {
         match self.file_path.clone() {
             Some(e) => {
                 let pool = crate::database::sqlx_connection::POOL.read().await;
@@ -41,23 +42,22 @@ impl NativeFileSummary {
                     .bind(file_hash)
                     .execute(pool.get_pool())
                     .await;
-                    println!("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
                     match sql {
                         Ok(result) => {
-                            println!("{:?}",result);
-                            return 1;
+                            // println!("{:?}",result);
+                            return result.last_insert_id();
                         },
-                        Err(err) => {
+                        Err(_) => {
                             // println!("{:?}",err);
-                            return  -1;
+                            return  0;
                         }
                     }
                 } else {
-                    return -1;
+                    return 0;
                 }
             }
             None => {
-                return -1;
+                return 0;
             }
         }
     }

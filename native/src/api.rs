@@ -1,9 +1,4 @@
-use crate::database::model;
-use crate::{
-    database::{connection::init_mysql_db, load_config::load_config},
-    storage, DATABASE_ADDR, DATABASE_DATABASE, DATABASE_PASSWORD, DATABASE_PORT, DATABASE_USERNAME,
-};
-use anyhow::{self, Ok};
+use crate::{database::{model, load_config::load_config}, storage};
 use futures::executor::block_on;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -31,34 +26,8 @@ pub fn create_storage_directory(s: String) -> i32 {
     storage::create_folder::create_storage_dir(s)
 }
 
+
 pub fn init_mysql(conf_path: String) {
-    let info = load_config(&conf_path);
-
-    DATABASE_ADDR
-        .lock()
-        .unwrap()
-        .push_str(&format!("{}", info.address));
-    DATABASE_PORT
-        .lock()
-        .unwrap()
-        .push_str(&format!("{}", info.port));
-    DATABASE_USERNAME
-        .lock()
-        .unwrap()
-        .push_str(&format!("{}", info.username));
-    DATABASE_PASSWORD
-        .lock()
-        .unwrap()
-        .push_str(&format!("{}", info.password));
-    DATABASE_DATABASE
-        .lock()
-        .unwrap()
-        .push_str(&format!("{}", info.database));
-    init_mysql_db();
-}
-
-
-pub fn init_mysql2(conf_path: String) {
     let info = load_config(&conf_path);
 
     let url = format!(
@@ -69,35 +38,29 @@ pub fn init_mysql2(conf_path: String) {
 }
 
 pub fn get_status_types() -> Vec<model::todo_status::TodoStatus> {
-    let t = model::todo_status::TodoStatus::get_all_status_types();
-    t
+    block_on(async {
+        let data = get_todustatus();
+        data
+    })
 }
 
 pub fn get_todos() -> Vec<model::todo::TodoDetails> {
     // model::todo::TodoDetails::get_all()
-    block_on(async {
-        model::todo::TodoDetails::get_all()
-    })
+    block_on(async { model::todo::TodoDetails::get_all() })
 }
 
 pub fn get_files() -> Vec<model::file::FileDetails> {
     model::file::FileDetails::get_all_file_details()
 }
 
-// pub async fn new_file(mut f: model::file::NativeFileSummary) -> i64 {
-//     let reuslt = f.create_new_file();
-//     reuslt.await
-// }
-
-pub fn test_sqlx() -> anyhow::Result<Vec<model::todo_status::TodoStatus>> {
+pub fn new_file(mut f: model::file::NativeFileSummary) -> u64 {
     block_on(async {
-        let data = get_test_sqlx();
-        Ok(data)
+        f.create_new_file()
     })
 }
 
 #[tokio::main]
-async fn get_test_sqlx() -> Vec<model::todo_status::TodoStatus> {
-    let result = model::todo_status::TodoStatus::sqlx_test().await;
+async fn get_todustatus() -> Vec<model::todo_status::TodoStatus> {
+    let result = model::todo_status::TodoStatus::get_all_status_types().await;
     return result;
 }

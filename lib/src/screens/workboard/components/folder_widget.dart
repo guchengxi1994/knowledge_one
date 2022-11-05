@@ -75,11 +75,6 @@ class _FolderWidgetState extends State<FolderWidget> {
         .read<FileSystemController>()
         .changeWidgetStatus(widget.index, WidgetStatus(dx: dx, dy: dy));
 
-    ///TODO
-    ///
-    /// [bug]
-    ///
-    /// 右键也可以拖拽
     return GestureDetector(
         onDoubleTap: () {
           context.read<FileSystemController>().navigateTo(widget.entity);
