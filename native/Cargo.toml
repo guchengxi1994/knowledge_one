@@ -20,6 +20,8 @@ futures = "0.3"
 sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls" , "mysql" ] }
 structopt = "0.3"
 tokio = { version = "1", features = ["full"] }
+nalgebra = "0.31.3"
+nalgebra-sparse = { version = "0.8.0", features = ["io"] }
 
 [build-dependencies]
 flutter_rust_bridge_codegen = "1"

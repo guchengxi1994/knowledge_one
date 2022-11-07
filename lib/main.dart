@@ -13,7 +13,7 @@ void main() async {
   Directory executableDir = File(Platform.resolvedExecutable).parent;
   await api.createStorageDirectory(s: executableDir.path);
 
-  await api.initMysql(confPath: "${executableDir.path}/web_config.toml");
+  await api.initMysql(confPath: "${executableDir.path}/db_config.toml");
 
   // final results = await api.testSqlx();
   // debugPrint(results.length.toString());

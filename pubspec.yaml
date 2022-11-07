@@ -30,6 +30,8 @@ dependencies:
   drag_and_drop_lists: ^0.3.3
   flutter_colorpicker: ^1.0.3
   flutter_smart_dialog: ^4.5.5+2
+  protobuf: ^2.1.0
+  grpc: ^3.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package file_changelog;
+
+service FileDiff{
+    rpc GenerateDiff(GenerateDiffRequest) returns (GenerateDiffResponse){}
+}
+
+// 请求信息
+message GenerateDiffRequest { string before = 1; string after = 2; string savePath = 3;}
+// 服务端响应信息
+message GenerateDiffResponse { int32 message = 1; }

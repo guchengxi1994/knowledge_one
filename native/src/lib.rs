@@ -4,6 +4,8 @@ mod api;
 mod bridge_generated;
 mod database;
 mod storage;
+#[deprecated = "performance"]
+mod file_changelog;
 
 #[macro_use]
 extern crate lazy_static;
