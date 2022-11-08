@@ -77,6 +77,35 @@ fn wire_create_storage_directory_impl(port_: MessagePort, s: impl Wire2Api<Strin
         },
     )
 }
+fn wire_get_file_hash_impl(port_: MessagePort, file_path: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_file_hash",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_file_path = file_path.wire2api();
+            move |task_callback| Ok(get_file_hash(api_file_path))
+        },
+    )
+}
+fn wire_delete_file_by_file_hash_impl(
+    port_: MessagePort,
+    file_hash: impl Wire2Api<String> + UnwindSafe,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "delete_file_by_file_hash",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_file_hash = file_hash.wire2api();
+            move |task_callback| Ok(delete_file_by_file_hash(api_file_hash))
+        },
+    )
+}
 fn wire_init_mysql_impl(port_: MessagePort, conf_path: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
@@ -154,6 +183,12 @@ where
     }
 }
 
+impl Wire2Api<i64> for i64 {
+    fn wire2api(self) -> i64 {
+        self
+    }
+}
+
 impl Wire2Api<u8> for u8 {
     fn wire2api(self) -> u8 {
         self
@@ -172,6 +207,7 @@ impl support::IntoDart for FileDetails {
             self.create_at.into_dart(),
             self.update_at.into_dart(),
             self.file_hash.into_dart(),
+            self.version_control.into_dart(),
         ]
         .into_dart()
     }

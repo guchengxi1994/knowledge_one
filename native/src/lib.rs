@@ -4,7 +4,7 @@ mod api;
 mod bridge_generated;
 mod database;
 mod storage;
-#[deprecated = "performance"]
+#[deprecated = "performance and unfixed bugs"]
 mod file_changelog;
 
 #[macro_use]

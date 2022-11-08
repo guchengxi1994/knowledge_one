@@ -99,6 +99,38 @@ class NativeImpl implements Native {
         argNames: ["s"],
       );
 
+  Future<String> getFileHash({required String filePath, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner
+            .wire_get_file_hash(port_, _platform.api2wire_String(filePath)),
+        parseSuccessData: _wire2api_String,
+        constMeta: kGetFileHashConstMeta,
+        argValues: [filePath],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetFileHashConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_file_hash",
+        argNames: ["filePath"],
+      );
+
+  Future<int> deleteFileByFileHash({required String fileHash, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_delete_file_by_file_hash(
+            port_, _platform.api2wire_String(fileHash)),
+        parseSuccessData: _wire2api_i64,
+        constMeta: kDeleteFileByFileHashConstMeta,
+        argValues: [fileHash],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kDeleteFileByFileHashConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "delete_file_by_file_hash",
+        argNames: ["fileHash"],
+      );
+
   Future<void> initMysql({required String confPath, dynamic hint}) =>
       _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner
@@ -164,7 +196,7 @@ class NativeImpl implements Native {
       _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_new_file(
             port_, _platform.api2wire_box_autoadd_native_file_summary(f)),
-        parseSuccessData: _wire2api_u64,
+        parseSuccessData: _wire2api_i64,
         constMeta: kNewFileConstMeta,
         argValues: [f],
         hint: hint,
@@ -178,22 +210,27 @@ class NativeImpl implements Native {
 
 // Section: wire2api
 
+  DateTime _wire2api_Chrono_Utc(dynamic raw) {
+    return wire2apiTimestamp(ts: _wire2api_i64(raw), isUtc: true);
+  }
+
   String _wire2api_String(dynamic raw) {
     return raw as String;
   }
 
   FileDetails _wire2api_file_details(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return FileDetails(
       fileId: _wire2api_i64(arr[0]),
       fileName: _wire2api_opt_String(arr[1]),
       filePath: _wire2api_opt_String(arr[2]),
       isDeleted: _wire2api_i64(arr[3]),
-      createAt: _wire2api_opt_String(arr[4]),
-      updateAt: _wire2api_opt_String(arr[5]),
+      createAt: _wire2api_Chrono_Utc(arr[4]),
+      updateAt: _wire2api_Chrono_Utc(arr[5]),
       fileHash: _wire2api_opt_String(arr[6]),
+      versionControl: _wire2api_i64(arr[7]),
     );
   }
 
@@ -291,6 +328,11 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   }
 
   @protected
+  int api2wire_i64(int raw) {
+    return raw;
+  }
+
+  @protected
   ffi.Pointer<wire_uint_8_list> api2wire_opt_String(String? raw) {
     return raw == null ? ffi.nullptr : api2wire_String(raw);
   }
@@ -312,6 +354,8 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
       NativeFileSummary apiObj, wire_NativeFileSummary wireObj) {
     wireObj.file_name = api2wire_opt_String(apiObj.fileName);
     wireObj.file_path = api2wire_opt_String(apiObj.filePath);
+    wireObj.file_hash = api2wire_opt_String(apiObj.fileHash);
+    wireObj.version_control = api2wire_i64(apiObj.versionControl);
   }
 }
 
@@ -420,6 +464,40 @@ class NativeWire implements FlutterRustBridgeWireBase {
           ffi.Void Function(ffi.Int64,
               ffi.Pointer<wire_uint_8_list>)>>('wire_create_storage_directory');
   late final _wire_create_storage_directory = _wire_create_storage_directoryPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_file_hash(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_path,
+  ) {
+    return _wire_get_file_hash(
+      port_,
+      file_path,
+    );
+  }
+
+  late final _wire_get_file_hashPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(
+              ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_get_file_hash');
+  late final _wire_get_file_hash = _wire_get_file_hashPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_delete_file_by_file_hash(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_hash,
+  ) {
+    return _wire_delete_file_by_file_hash(
+      port_,
+      file_hash,
+    );
+  }
+
+  late final _wire_delete_file_by_file_hashPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_delete_file_by_file_hash');
+  late final _wire_delete_file_by_file_hash = _wire_delete_file_by_file_hashPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_init_mysql(
@@ -550,6 +628,11 @@ class wire_NativeFileSummary extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> file_name;
 
   external ffi.Pointer<wire_uint_8_list> file_path;
+
+  external ffi.Pointer<wire_uint_8_list> file_hash;
+
+  @ffi.Int64()
+  external int version_control;
 }
 
 typedef DartPostCObjectFnType = ffi.Pointer<

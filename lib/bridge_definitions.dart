@@ -27,22 +27,37 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta;
 
+  /// 获取文件hash值
+  Future<String> getFileHash({required String filePath, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetFileHashConstMeta;
+
+  /// 根据文件hash值软删除文件
+  Future<int> deleteFileByFileHash({required String fileHash, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kDeleteFileByFileHashConstMeta;
+
+  /// 初始化数据库，创建数据库连接池
   Future<void> initMysql({required String confPath, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta;
 
+  /// 获取所有状态
   Future<List<TodoStatus>> getStatusTypes({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetStatusTypesConstMeta;
 
+  /// 获取所有todo
   Future<List<TodoDetails>> getTodos({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetTodosConstMeta;
 
+  /// 获取所有文件
   Future<List<FileDetails>> getFiles({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetFilesConstMeta;
 
+  /// 创建文件
   Future<int> newFile({required NativeFileSummary f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kNewFileConstMeta;
@@ -53,28 +68,34 @@ class FileDetails {
   final String? fileName;
   final String? filePath;
   final int isDeleted;
-  final String? createAt;
-  final String? updateAt;
+  final DateTime createAt;
+  final DateTime updateAt;
   final String? fileHash;
+  final int versionControl;
 
   FileDetails({
     required this.fileId,
     this.fileName,
     this.filePath,
     required this.isDeleted,
-    this.createAt,
-    this.updateAt,
+    required this.createAt,
+    required this.updateAt,
     this.fileHash,
+    required this.versionControl,
   });
 }
 
 class NativeFileSummary {
   final String? fileName;
   final String? filePath;
+  final String? fileHash;
+  final int versionControl;
 
   NativeFileSummary({
     this.fileName,
     this.filePath,
+    this.fileHash,
+    required this.versionControl,
   });
 }
 

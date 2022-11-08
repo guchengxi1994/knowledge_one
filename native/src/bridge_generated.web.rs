@@ -27,6 +27,16 @@ pub fn wire_create_storage_directory(port_: MessagePort, s: String) {
 }
 
 #[wasm_bindgen]
+pub fn wire_get_file_hash(port_: MessagePort, file_path: String) {
+    wire_get_file_hash_impl(port_, file_path)
+}
+
+#[wasm_bindgen]
+pub fn wire_delete_file_by_file_hash(port_: MessagePort, file_hash: String) {
+    wire_delete_file_by_file_hash_impl(port_, file_hash)
+}
+
+#[wasm_bindgen]
 pub fn wire_init_mysql(port_: MessagePort, conf_path: String) {
     wire_init_mysql_impl(port_, conf_path)
 }
@@ -66,13 +76,15 @@ impl Wire2Api<NativeFileSummary> for JsValue {
         let self_ = self.dyn_into::<JsArray>().unwrap();
         assert_eq!(
             self_.length(),
-            2,
-            "Expected 2 elements, got {}",
+            4,
+            "Expected 4 elements, got {}",
             self_.length()
         );
         NativeFileSummary {
             file_name: self_.get(0).wire2api(),
             file_path: self_.get(1).wire2api(),
+            file_hash: self_.get(2).wire2api(),
+            version_control: self_.get(3).wire2api(),
         }
     }
 }
@@ -92,6 +104,11 @@ impl Wire2Api<Vec<u8>> for Box<[u8]> {
 impl Wire2Api<String> for JsValue {
     fn wire2api(self) -> String {
         self.as_string().expect("non-UTF-8 string, or not a string")
+    }
+}
+impl Wire2Api<i64> for JsValue {
+    fn wire2api(self) -> i64 {
+        ::std::convert::TryInto::try_into(self.dyn_into::<js_sys::BigInt>().unwrap()).unwrap()
     }
 }
 impl Wire2Api<Option<String>> for JsValue {

@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/routers.dart';
+import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/src/native/native.dart';
+import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'app_style.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -34,25 +36,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('zh', 'CN'),
-        Locale('zh', 'HK'),
-        Locale('en', 'US'),
-      ],
-      theme: ThemeData(fontFamily: "思源"),
-      locale: const Locale('zh'),
-      debugShowCheckedModeBanner: false,
-      initialRoute: Routers.splashScreen,
-      routes: Routers.routers,
-      navigatorKey: Routers.navigatorKey,
-      navigatorObservers: [FlutterSmartDialog.observer],
-      builder: FlutterSmartDialog.init(),
+    return MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => RPCController())],
+      builder: (context, child) {
+        return MaterialApp(
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('zh', 'CN'),
+            Locale('zh', 'HK'),
+            Locale('en', 'US'),
+          ],
+          theme: ThemeData(fontFamily: "思源"),
+          locale: const Locale('zh'),
+          debugShowCheckedModeBanner: false,
+          initialRoute: Routers.splashScreen,
+          routes: Routers.routers,
+          navigatorKey: Routers.navigatorKey,
+          navigatorObservers: [FlutterSmartDialog.observer],
+          builder: FlutterSmartDialog.init(),
+        );
+      },
     );
   }
 }

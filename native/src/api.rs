@@ -1,4 +1,7 @@
-use crate::{database::{model, load_config::load_config}, storage};
+use crate::{
+    database::{load_config::load_config, model},
+    storage,
+};
 use futures::executor::block_on;
 use std::sync::atomic::{AtomicU64, Ordering};
 
@@ -26,7 +29,17 @@ pub fn create_storage_directory(s: String) -> i32 {
     storage::create_folder::create_storage_dir(s)
 }
 
+/// 获取文件hash值
+pub fn get_file_hash(file_path: String) -> String {
+    crate::storage::file_hash::get_file_hash(file_path)
+}
 
+/// 根据文件hash值软删除文件
+pub fn delete_file_by_file_hash(file_hash: String) -> i64 {
+    block_on(async { model::file::delete_file_by_file_hash(file_hash) })
+}
+
+/// 初始化数据库，创建数据库连接池
 pub fn init_mysql(conf_path: String) {
     let info = load_config(&conf_path);
 
@@ -37,6 +50,7 @@ pub fn init_mysql(conf_path: String) {
     crate::database::sqlx_connection::init(url);
 }
 
+/// 获取所有状态
 pub fn get_status_types() -> Vec<model::todo_status::TodoStatus> {
     block_on(async {
         let data = get_todustatus();
@@ -44,19 +58,20 @@ pub fn get_status_types() -> Vec<model::todo_status::TodoStatus> {
     })
 }
 
+/// 获取所有todo
 pub fn get_todos() -> Vec<model::todo::TodoDetails> {
     // model::todo::TodoDetails::get_all()
     block_on(async { model::todo::TodoDetails::get_all() })
 }
 
+/// 获取所有文件
 pub fn get_files() -> Vec<model::file::FileDetails> {
     model::file::FileDetails::get_all_file_details()
 }
 
-pub fn new_file(mut f: model::file::NativeFileSummary) -> u64 {
-    block_on(async {
-        f.create_new_file()
-    })
+/// 创建文件
+pub fn new_file(mut f: model::file::NativeFileSummary) -> i64 {
+    block_on(async { f.create_new_file() })
 }
 
 #[tokio::main]

@@ -132,18 +132,34 @@ class FileSystemController extends ChangeNotifier {
   List<BaseFileEntity> get currentFolderElements => folder.children;
 
   addToCurrentFolder(BaseFileEntity entity) async {
-    int i = await api.newFile(
-        f: NativeFileSummary(fileName: entity.name, filePath: entity.path));
-    if (i == 1) {
-      SmartDialogUtils.error("归档失败");
-      return;
+    if (entity is FileEntity) {
+      final fileHash = await api.getFileHash(filePath: entity.path!);
+
+      int i = await api.newFile(
+          f: NativeFileSummary(
+              fileName: entity.name,
+              filePath: entity.path,
+              fileHash: fileHash,
+              versionControl: 0));
+      if (i == 0) {
+        SmartDialogUtils.error("归档失败");
+        return;
+      } else if (i == -1) {
+        SmartDialogUtils.warning("文件已存在");
+        return;
+      }
+
+      entity.fileHash = fileHash;
     }
+
     int lengthBefore = folder.children.length;
     folder.append(entity);
     int lengthAfter = folder.children.length;
     if (lengthAfter != lengthBefore) {
       widgetStatus.add(WidgetStatus());
-      // var file = File("${Directory.current.path}/_private/structure.json");
+
+      /// TODO
+      /// 这里多层文件夹可能有个bug
       file.writeAsStringSync(json.encode(folder.toJson()));
       notifyListeners();
     }

@@ -28,10 +28,17 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> with FlutterRustB
   }
 
   @protected
+  Object api2wire_i64(int raw) {
+    return castNativeBigInt(raw);
+  }
+
+  @protected
   List<dynamic> api2wire_native_file_summary(NativeFileSummary raw) {
     return [
       api2wire_opt_String(raw.fileName),
-      api2wire_opt_String(raw.filePath)
+      api2wire_opt_String(raw.filePath),
+      api2wire_opt_String(raw.fileHash),
+      api2wire_i64(raw.versionControl)
     ];
   }
 
@@ -66,6 +73,10 @@ class NativeWasmModule implements WasmModule {
 
   external void wire_create_storage_directory(NativePortType port_, String s);
 
+  external void wire_get_file_hash(NativePortType port_, String file_path);
+
+  external void wire_delete_file_by_file_hash(NativePortType port_, String file_hash);
+
   external void wire_init_mysql(NativePortType port_, String conf_path);
 
   external void wire_get_status_types(NativePortType port_);
@@ -91,6 +102,10 @@ class NativeWire extends FlutterRustBridgeWasmWireBase<NativeWasmModule> {
   void wire_decrement(NativePortType port_) => wasmModule.wire_decrement(port_);
 
   void wire_create_storage_directory(NativePortType port_, String s) => wasmModule.wire_create_storage_directory(port_, s);
+
+  void wire_get_file_hash(NativePortType port_, String file_path) => wasmModule.wire_get_file_hash(port_, file_path);
+
+  void wire_delete_file_by_file_hash(NativePortType port_, String file_hash) => wasmModule.wire_delete_file_by_file_hash(port_, file_hash);
 
   void wire_init_mysql(NativePortType port_, String conf_path) => wasmModule.wire_init_mysql(port_, conf_path);
 

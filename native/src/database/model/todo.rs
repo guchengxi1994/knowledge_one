@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use sqlx::types::chrono;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug )]
 pub struct Todo {
     pub todo_id: i64,
     pub task_id: i64,
@@ -10,8 +11,8 @@ pub struct Todo {
     pub todo_from: Option<String>,
     pub todo_to: Option<String>,
     pub is_deleted: i64,
-    pub create_at: Option<String>,
-    pub update_at: Option<String>,
+    pub create_at: chrono::DateTime<chrono::Utc>,
+    pub update_at: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, sqlx::FromRow)]

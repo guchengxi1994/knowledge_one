@@ -27,6 +27,16 @@ pub extern "C" fn wire_create_storage_directory(port_: i64, s: *mut wire_uint_8_
 }
 
 #[no_mangle]
+pub extern "C" fn wire_get_file_hash(port_: i64, file_path: *mut wire_uint_8_list) {
+    wire_get_file_hash_impl(port_, file_path)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_delete_file_by_file_hash(port_: i64, file_hash: *mut wire_uint_8_list) {
+    wire_delete_file_by_file_hash_impl(port_, file_hash)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_init_mysql(port_: i64, conf_path: *mut wire_uint_8_list) {
     wire_init_mysql_impl(port_, conf_path)
 }
@@ -81,11 +91,14 @@ impl Wire2Api<NativeFileSummary> for *mut wire_NativeFileSummary {
         Wire2Api::<NativeFileSummary>::wire2api(*wrap).into()
     }
 }
+
 impl Wire2Api<NativeFileSummary> for wire_NativeFileSummary {
     fn wire2api(self) -> NativeFileSummary {
         NativeFileSummary {
             file_name: self.file_name.wire2api(),
             file_path: self.file_path.wire2api(),
+            file_hash: self.file_hash.wire2api(),
+            version_control: self.version_control.wire2api(),
         }
     }
 }
@@ -105,6 +118,8 @@ impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
 pub struct wire_NativeFileSummary {
     file_name: *mut wire_uint_8_list,
     file_path: *mut wire_uint_8_list,
+    file_hash: *mut wire_uint_8_list,
+    version_control: i64,
 }
 
 #[repr(C)]
@@ -131,6 +146,8 @@ impl NewWithNullPtr for wire_NativeFileSummary {
         Self {
             file_name: core::ptr::null_mut(),
             file_path: core::ptr::null_mut(),
+            file_hash: core::ptr::null_mut(),
+            version_control: Default::default(),
         }
     }
 }

@@ -28,6 +28,11 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   }
 
   @protected
+  int api2wire_i64(int raw) {
+    return raw;
+  }
+
+  @protected
   ffi.Pointer<wire_uint_8_list> api2wire_opt_String(String? raw) {
     return raw == null ? ffi.nullptr : api2wire_String(raw);
   }
@@ -47,6 +52,8 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   void _api_fill_to_wire_native_file_summary(NativeFileSummary apiObj, wire_NativeFileSummary wireObj) {
     wireObj.file_name = api2wire_opt_String(apiObj.fileName);
     wireObj.file_path = api2wire_opt_String(apiObj.filePath);
+    wireObj.file_hash = api2wire_opt_String(apiObj.fileHash);
+    wireObj.version_control = api2wire_i64(apiObj.versionControl);
   }
 }
 
@@ -134,6 +141,32 @@ class NativeWire implements FlutterRustBridgeWireBase {
 
   late final _wire_create_storage_directoryPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_create_storage_directory');
   late final _wire_create_storage_directory = _wire_create_storage_directoryPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_file_hash(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_path,
+  ) {
+    return _wire_get_file_hash(
+      port_,
+      file_path,
+    );
+  }
+
+  late final _wire_get_file_hashPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_get_file_hash');
+  late final _wire_get_file_hash = _wire_get_file_hashPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_delete_file_by_file_hash(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_hash,
+  ) {
+    return _wire_delete_file_by_file_hash(
+      port_,
+      file_hash,
+    );
+  }
+
+  late final _wire_delete_file_by_file_hashPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_delete_file_by_file_hash');
+  late final _wire_delete_file_by_file_hash = _wire_delete_file_by_file_hashPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_init_mysql(
     int port_,
@@ -235,6 +268,11 @@ class wire_NativeFileSummary extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> file_name;
 
   external ffi.Pointer<wire_uint_8_list> file_path;
+
+  external ffi.Pointer<wire_uint_8_list> file_hash;
+
+  @ffi.Int64()
+  external int version_control;
 }
 
 typedef DartPostCObjectFnType = ffi.Pointer<ffi.NativeFunction<ffi.Bool Function(DartPort, ffi.Pointer<ffi.Void>)>>;

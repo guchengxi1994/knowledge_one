@@ -1,14 +1,18 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:contextmenu/contextmenu.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
+import 'package:knowledge_one/src/native.dart';
 import 'package:knowledge_one/src/screens/markdown_edit/markdown_edit_screen.dart';
 import 'package:knowledge_one/src/screens/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:knowledge_one/src/screens/quill_eidt/quill_edit_screen.dart';
 import 'package:knowledge_one/src/screens/workboard/providers/file_system_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/models.dart';
 import 'base_file_widget.dart';
 import 'preview_dialog.dart';
@@ -130,9 +134,35 @@ class _FileWidgetState extends State<FileWidget> {
                 ListTile(
                   leading: Icon(
                     Icons.file_open,
-                    color: AppStyle.appBlue,
+                    color: AppStyle.appGreen,
                   ),
-                  title: const Text('以Markdown打开'),
+                  title: const Text('以系统默认程序打开'),
+                  onTap: () async {
+                    final Uri uri = Uri.file(widget.entity.path!);
+                    try {
+                      if (!File(uri.toFilePath()).existsSync()) {
+                        // throw '$uri does not exist!';
+                        SmartDialogUtils.error("文件已不存在,请删除");
+                        return;
+                      }
+                      if (!await launchUrl(uri)) {
+                        // throw 'Could not launch $uri';
+                        SmartDialogUtils.error("无法打开文件");
+                        return;
+                      }
+                    } catch (_) {
+                      SmartDialogUtils.error("仅支持英文路径😅");
+                    }
+
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.file_open,
+                    color: AppStyle.appGreen,
+                  ),
+                  title: const Text('以内置Markdown打开'),
                   onTap: () async {
                     await Navigator.of(context)
                         .push(MaterialPageRoute(builder: (c) {
@@ -147,9 +177,9 @@ class _FileWidgetState extends State<FileWidget> {
                 ListTile(
                   leading: Icon(
                     Icons.file_open,
-                    color: AppStyle.appBlue,
+                    color: AppStyle.appGreen,
                   ),
-                  title: const Text('以富文本打开'),
+                  title: const Text('以内置富文本打开'),
                   onTap: () async {
                     await Navigator.of(context)
                         .push(MaterialPageRoute(builder: (c) {
@@ -165,9 +195,9 @@ class _FileWidgetState extends State<FileWidget> {
                   ListTile(
                     leading: Icon(
                       Icons.file_open,
-                      color: AppStyle.appBlue,
+                      color: AppStyle.appGreen,
                     ),
-                    title: const Text('以PDF Previewer打开'),
+                    title: const Text('以内置PDF Previewer打开'),
                     onTap: () async {
                       await Navigator.of(context)
                           .push(MaterialPageRoute(builder: (c) {
@@ -180,18 +210,41 @@ class _FileWidgetState extends State<FileWidget> {
                     },
                   ),
                 ListTile(
+                  leading: Icon(
+                    Icons.verified,
+                    color: AppStyle.appBlue,
+                  ),
+                  title: const Text('启用版本追踪'),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                ListTile(
                   leading: const Icon(
                     Icons.delete,
                     color: Colors.red,
                   ),
                   title: const Text('删除'),
-                  onTap: () {
+                  onTap: () async {
+                    // debugPrint(widget.entity.fileHash);
+                    if (widget.entity.fileHash == null) {
+                      SmartDialogUtils.error("文件Hash不存在");
+                      Navigator.of(ctx).pop();
+                      return;
+                    }
+                    final r = await api.deleteFileByFileHash(
+                        fileHash: widget.entity.fileHash!);
+                    if (r == 1) {
+                      SmartDialogUtils.error("删除失败");
+                      Navigator.of(ctx).pop();
+                      return;
+                    }
                     context
                         .read<FileSystemController>()
                         .removeFromCurrentFolder(widget.entity);
                     Navigator.of(ctx).pop();
                   },
-                )
+                ),
               ];
             },
             child: MouseRegion(

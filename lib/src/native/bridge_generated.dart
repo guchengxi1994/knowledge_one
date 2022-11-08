@@ -85,6 +85,40 @@ class NativeImpl implements Native {
         ],
       );
 
+  Future<String> getFileHash({required String filePath, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_get_file_hash(port_, _platform.api2wire_String(filePath)),
+        parseSuccessData: _wire2api_String,
+        constMeta: kGetFileHashConstMeta,
+        argValues: [
+          filePath
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetFileHashConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_file_hash",
+        argNames: [
+          "filePath"
+        ],
+      );
+
+  Future<int> deleteFileByFileHash({required String fileHash, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_delete_file_by_file_hash(port_, _platform.api2wire_String(fileHash)),
+        parseSuccessData: _wire2api_i64,
+        constMeta: kDeleteFileByFileHashConstMeta,
+        argValues: [
+          fileHash
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kDeleteFileByFileHashConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "delete_file_by_file_hash",
+        argNames: [
+          "fileHash"
+        ],
+      );
+
   Future<void> initMysql({required String confPath, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_init_mysql(port_, _platform.api2wire_String(confPath)),
         parseSuccessData: _wire2api_unit,
@@ -143,7 +177,7 @@ class NativeImpl implements Native {
 
   Future<int> newFile({required NativeFileSummary f, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_new_file(port_, _platform.api2wire_box_autoadd_native_file_summary(f)),
-        parseSuccessData: _wire2api_u64,
+        parseSuccessData: _wire2api_i64,
         constMeta: kNewFileConstMeta,
         argValues: [
           f
@@ -160,21 +194,26 @@ class NativeImpl implements Native {
 
 // Section: wire2api
 
+  DateTime _wire2api_Chrono_Naive(dynamic raw) {
+    return wire2apiTimestamp(ts: _wire2api_i64(raw), isUtc: true);
+  }
+
   String _wire2api_String(dynamic raw) {
     return raw as String;
   }
 
   FileDetails _wire2api_file_details(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 7) throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return FileDetails(
       fileId: _wire2api_i64(arr[0]),
       fileName: _wire2api_opt_String(arr[1]),
       filePath: _wire2api_opt_String(arr[2]),
       isDeleted: _wire2api_i64(arr[3]),
-      createAt: _wire2api_opt_String(arr[4]),
-      updateAt: _wire2api_opt_String(arr[5]),
+      createAt: _wire2api_opt_Chrono_Naive(arr[4]),
+      updateAt: _wire2api_opt_Chrono_Naive(arr[5]),
       fileHash: _wire2api_opt_String(arr[6]),
+      versionControl: _wire2api_i64(arr[7]),
     );
   }
 
@@ -196,6 +235,10 @@ class NativeImpl implements Native {
 
   List<TodoStatus> _wire2api_list_todo_status(dynamic raw) {
     return (raw as List<dynamic>).map(_wire2api_todo_status).toList();
+  }
+
+  DateTime? _wire2api_opt_Chrono_Naive(dynamic raw) {
+    return raw == null ? null : _wire2api_Chrono_Naive(raw);
   }
 
   String? _wire2api_opt_String(dynamic raw) {

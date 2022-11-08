@@ -30,6 +30,7 @@ class AppStyle {
       const TextStyle(color: Color.fromARGB(255, 180, 180, 180), fontSize: 14);
 
   static Color appBlue = const Color.fromARGB(255, 40, 40, 255);
+  static Color appGreen = const Color.fromARGB(255, 40, 255, 115);
 
   static const double fileWidgetSize = 70;
 }
