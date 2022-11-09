@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package file_changelog;
+
+// 请求信息
+message RestoreRequest {
+    // 最终的文件路径
+  string filePath = 1;
+  // 中间经历的diff文件路径
+  repeated string diffs = 2;
+}
+// 服务端响应信息
+message RestoreResponse { string message = 1; }
+
+service FileRestore{
+    rpc Restore(RestoreRequest) returns (RestoreResponse){}
+}
