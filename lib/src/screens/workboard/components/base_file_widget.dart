@@ -28,9 +28,13 @@ class BaseFileWidget<T extends BaseFileEntity> extends StatelessWidget {
           const SizedBox(
             height: 5,
           ),
-          Text(
-            data.name,
-            overflow: TextOverflow.ellipsis,
+          Tooltip(
+            // margin: const EdgeInsets.only(top: 20),
+            message: data.name,
+            child: Text(
+              data.name,
+              overflow: TextOverflow.ellipsis,
+            ),
           )
         ],
       ),

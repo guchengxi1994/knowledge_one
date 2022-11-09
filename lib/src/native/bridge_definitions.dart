@@ -68,8 +68,8 @@ class FileDetails {
   final String? fileName;
   final String? filePath;
   final int isDeleted;
-  final DateTime? createAt;
-  final DateTime? updateAt;
+  final DateTime createAt;
+  final DateTime updateAt;
   final String? fileHash;
   final int versionControl;
 
@@ -78,8 +78,8 @@ class FileDetails {
     this.fileName,
     this.filePath,
     required this.isDeleted,
-    this.createAt,
-    this.updateAt,
+    required this.createAt,
+    required this.updateAt,
     this.fileHash,
     required this.versionControl,
   });

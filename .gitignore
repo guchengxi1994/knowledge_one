@@ -46,5 +46,5 @@ app.*.map.json
 *.mtx
 
 # just support desktop
-/ios/
-/android/
+ios/
+android/

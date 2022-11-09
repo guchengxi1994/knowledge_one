@@ -194,7 +194,7 @@ class NativeImpl implements Native {
 
 // Section: wire2api
 
-  DateTime _wire2api_Chrono_Naive(dynamic raw) {
+  DateTime _wire2api_Chrono_Utc(dynamic raw) {
     return wire2apiTimestamp(ts: _wire2api_i64(raw), isUtc: true);
   }
 
@@ -210,8 +210,8 @@ class NativeImpl implements Native {
       fileName: _wire2api_opt_String(arr[1]),
       filePath: _wire2api_opt_String(arr[2]),
       isDeleted: _wire2api_i64(arr[3]),
-      createAt: _wire2api_opt_Chrono_Naive(arr[4]),
-      updateAt: _wire2api_opt_Chrono_Naive(arr[5]),
+      createAt: _wire2api_Chrono_Utc(arr[4]),
+      updateAt: _wire2api_Chrono_Utc(arr[5]),
       fileHash: _wire2api_opt_String(arr[6]),
       versionControl: _wire2api_i64(arr[7]),
     );
@@ -235,10 +235,6 @@ class NativeImpl implements Native {
 
   List<TodoStatus> _wire2api_list_todo_status(dynamic raw) {
     return (raw as List<dynamic>).map(_wire2api_todo_status).toList();
-  }
-
-  DateTime? _wire2api_opt_Chrono_Naive(dynamic raw) {
-    return raw == null ? null : _wire2api_Chrono_Naive(raw);
   }
 
   String? _wire2api_opt_String(dynamic raw) {

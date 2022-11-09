@@ -20,14 +20,9 @@ import 'preview_dialog.dart';
 // ignore: must_be_immutable
 class FileWidget extends StatefulWidget {
   FileWidget(
-      {Key? key,
-      required this.index,
-      this.onDoubleClick,
-      this.tooltip,
-      required this.entity})
+      {Key? key, required this.index, this.onDoubleClick, required this.entity})
       : super(key: key);
   VoidCallback? onDoubleClick;
-  String? tooltip;
   int index;
   FileEntity entity;
 
@@ -248,12 +243,25 @@ class _FileWidgetState extends State<FileWidget> {
               ];
             },
             child: MouseRegion(
+              onHover: (event) {},
               onEnter: (event) {
+                if (event.localPosition.dx > AppStyle.fileWidgetSize - 5 &&
+                    event.localPosition.dy > AppStyle.fileWidgetSize - 5 &&
+                    event.localPosition.dx < 5 &&
+                    event.localPosition.dy < 5) {
+                  return;
+                }
                 context
                     .read<FileSystemController>()
                     .changeCurrentWidgetId(widget.index);
               },
               onExit: (event) {
+                if (event.localPosition.dx > AppStyle.fileWidgetSize - 5 &&
+                    event.localPosition.dy > AppStyle.fileWidgetSize - 5 &&
+                    event.localPosition.dx < 5 &&
+                    event.localPosition.dy < 5) {
+                  return;
+                }
                 context.read<FileSystemController>().changeCurrentWidgetId(-1);
               },
               child: Container(
@@ -267,12 +275,15 @@ class _FileWidgetState extends State<FileWidget> {
                         borderRadius: BorderRadius.circular((1)), // 圆角
                       )
                     : null,
-                child: Tooltip(
-                  margin: const EdgeInsets.only(top: 20),
-                  message: widget.tooltip ?? widget.entity.name,
-                  child: BaseFileWidget(
-                    data: widget.entity,
-                  ),
+                // child: Tooltip(
+                //   margin: const EdgeInsets.only(top: 20),
+                //   message: widget.tooltip ?? widget.entity.name,
+                //   child: BaseFileWidget(
+                //     data: widget.entity,
+                //   ),
+                // ),
+                child: BaseFileWidget(
+                  data: widget.entity,
                 ),
               ),
             ),
