@@ -50,6 +50,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.9.0"
+  blurred:
+    dependency: transitive
+    description:
+      path: "."
+      ref: master
+      resolved-ref: adfd4006c3d7a4c647662a93993d57d02b3a0b8d
+      url: "https://github.com/guchengxi1994/blurred"
+    source: git
+    version: "1.1.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -237,6 +246,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.3"
+  flutter_graph:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "6435bae343e7e8f07fce8d9acd5a5ca8862f017e"
+      url: "https://github.com/guchengxi1994/flutter_graph"
+    source: git
+    version: "0.0.0"
   flutter_inappwebview_quill:
     dependency: transitive
     description:

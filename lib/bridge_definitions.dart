@@ -7,25 +7,13 @@ import 'dart:async';
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 
 abstract class Native {
-  Future<void> main({dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kMainConstMeta;
-
-  Future<int> getCounter({dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kGetCounterConstMeta;
-
-  Future<int> increment({dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kIncrementConstMeta;
-
-  Future<int> decrement({dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kDecrementConstMeta;
-
   Future<int> createStorageDirectory({required String s, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta;
+
+  Future<int> createDiffDirectory({required String s, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCreateDiffDirectoryConstMeta;
 
   /// 获取文件hash值
   Future<String> getFileHash({required String filePath, dynamic hint});
@@ -36,6 +24,17 @@ abstract class Native {
   Future<int> deleteFileByFileHash({required String fileHash, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kDeleteFileByFileHashConstMeta;
+
+  /// 改变版本控制
+  Future<int> changeVersionControl({required String fileHash, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kChangeVersionControlConstMeta;
+
+  /// 手动更新新版本 （右键绑定新版本）
+  Future<void> createNewVersion(
+      {required NativeFileNewVersion model, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCreateNewVersionConstMeta;
 
   /// 初始化数据库，创建数据库连接池
   Future<void> initMysql({required String confPath, dynamic hint});
@@ -82,6 +81,24 @@ class FileDetails {
     required this.updateAt,
     this.fileHash,
     required this.versionControl,
+  });
+}
+
+class NativeFileNewVersion {
+  final String prevFilePath;
+  final String prevFileHash;
+  final String prevFileName;
+  final String newVersionFilePath;
+  final String newVersionFileHash;
+  final String newVersionFileName;
+
+  NativeFileNewVersion({
+    required this.prevFilePath,
+    required this.prevFileHash,
+    required this.prevFileName,
+    required this.newVersionFilePath,
+    required this.newVersionFileHash,
+    required this.newVersionFileName,
   });
 }
 

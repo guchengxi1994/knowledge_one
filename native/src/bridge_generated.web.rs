@@ -2,28 +2,13 @@ use super::*;
 // Section: wire functions
 
 #[wasm_bindgen]
-pub fn wire_main(port_: MessagePort) {
-    wire_main_impl(port_)
-}
-
-#[wasm_bindgen]
-pub fn wire_get_counter(port_: MessagePort) {
-    wire_get_counter_impl(port_)
-}
-
-#[wasm_bindgen]
-pub fn wire_increment(port_: MessagePort) {
-    wire_increment_impl(port_)
-}
-
-#[wasm_bindgen]
-pub fn wire_decrement(port_: MessagePort) {
-    wire_decrement_impl(port_)
-}
-
-#[wasm_bindgen]
 pub fn wire_create_storage_directory(port_: MessagePort, s: String) {
     wire_create_storage_directory_impl(port_, s)
+}
+
+#[wasm_bindgen]
+pub fn wire_create_diff_directory(port_: MessagePort, s: String) {
+    wire_create_diff_directory_impl(port_, s)
 }
 
 #[wasm_bindgen]
@@ -34,6 +19,16 @@ pub fn wire_get_file_hash(port_: MessagePort, file_path: String) {
 #[wasm_bindgen]
 pub fn wire_delete_file_by_file_hash(port_: MessagePort, file_hash: String) {
     wire_delete_file_by_file_hash_impl(port_, file_hash)
+}
+
+#[wasm_bindgen]
+pub fn wire_change_version_control(port_: MessagePort, file_hash: String) {
+    wire_change_version_control_impl(port_, file_hash)
+}
+
+#[wasm_bindgen]
+pub fn wire_create_new_version(port_: MessagePort, model: JsValue) {
+    wire_create_new_version_impl(port_, model)
 }
 
 #[wasm_bindgen]
@@ -71,6 +66,25 @@ impl Wire2Api<String> for String {
     }
 }
 
+impl Wire2Api<NativeFileNewVersion> for JsValue {
+    fn wire2api(self) -> NativeFileNewVersion {
+        let self_ = self.dyn_into::<JsArray>().unwrap();
+        assert_eq!(
+            self_.length(),
+            6,
+            "Expected 6 elements, got {}",
+            self_.length()
+        );
+        NativeFileNewVersion {
+            prev_file_path: self_.get(0).wire2api(),
+            prev_file_hash: self_.get(1).wire2api(),
+            prev_file_name: self_.get(2).wire2api(),
+            new_version_file_path: self_.get(3).wire2api(),
+            new_version_file_hash: self_.get(4).wire2api(),
+            new_version_file_name: self_.get(5).wire2api(),
+        }
+    }
+}
 impl Wire2Api<NativeFileSummary> for JsValue {
     fn wire2api(self) -> NativeFileSummary {
         let self_ = self.dyn_into::<JsArray>().unwrap();

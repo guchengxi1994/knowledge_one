@@ -23,6 +23,11 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> with FlutterRustB
   }
 
   @protected
+  List<dynamic> api2wire_box_autoadd_native_file_new_version(NativeFileNewVersion raw) {
+    return api2wire_native_file_new_version(raw);
+  }
+
+  @protected
   List<dynamic> api2wire_box_autoadd_native_file_summary(NativeFileSummary raw) {
     return api2wire_native_file_summary(raw);
   }
@@ -30,6 +35,18 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> with FlutterRustB
   @protected
   Object api2wire_i64(int raw) {
     return castNativeBigInt(raw);
+  }
+
+  @protected
+  List<dynamic> api2wire_native_file_new_version(NativeFileNewVersion raw) {
+    return [
+      api2wire_String(raw.prevFilePath),
+      api2wire_String(raw.prevFileHash),
+      api2wire_String(raw.prevFileName),
+      api2wire_String(raw.newVersionFilePath),
+      api2wire_String(raw.newVersionFileHash),
+      api2wire_String(raw.newVersionFileName)
+    ];
   }
 
   @protected
@@ -63,19 +80,17 @@ external NativeWasmModule get wasmModule;
 class NativeWasmModule implements WasmModule {
   external Object /* Promise */ call([String? moduleName]);
   external NativeWasmModule bind(dynamic thisArg, String moduleName);
-  external void wire_main(NativePortType port_);
-
-  external void wire_get_counter(NativePortType port_);
-
-  external void wire_increment(NativePortType port_);
-
-  external void wire_decrement(NativePortType port_);
-
   external void wire_create_storage_directory(NativePortType port_, String s);
+
+  external void wire_create_diff_directory(NativePortType port_, String s);
 
   external void wire_get_file_hash(NativePortType port_, String file_path);
 
   external void wire_delete_file_by_file_hash(NativePortType port_, String file_hash);
+
+  external void wire_change_version_control(NativePortType port_, String file_hash);
+
+  external void wire_create_new_version(NativePortType port_, List<dynamic> model);
 
   external void wire_init_mysql(NativePortType port_, String conf_path);
 
@@ -93,19 +108,17 @@ class NativeWasmModule implements WasmModule {
 class NativeWire extends FlutterRustBridgeWasmWireBase<NativeWasmModule> {
   NativeWire(FutureOr<WasmModule> module) : super(WasmModule.cast<NativeWasmModule>(module));
 
-  void wire_main(NativePortType port_) => wasmModule.wire_main(port_);
-
-  void wire_get_counter(NativePortType port_) => wasmModule.wire_get_counter(port_);
-
-  void wire_increment(NativePortType port_) => wasmModule.wire_increment(port_);
-
-  void wire_decrement(NativePortType port_) => wasmModule.wire_decrement(port_);
-
   void wire_create_storage_directory(NativePortType port_, String s) => wasmModule.wire_create_storage_directory(port_, s);
+
+  void wire_create_diff_directory(NativePortType port_, String s) => wasmModule.wire_create_diff_directory(port_, s);
 
   void wire_get_file_hash(NativePortType port_, String file_path) => wasmModule.wire_get_file_hash(port_, file_path);
 
   void wire_delete_file_by_file_hash(NativePortType port_, String file_hash) => wasmModule.wire_delete_file_by_file_hash(port_, file_hash);
+
+  void wire_change_version_control(NativePortType port_, String file_hash) => wasmModule.wire_change_version_control(port_, file_hash);
+
+  void wire_create_new_version(NativePortType port_, List<dynamic> model) => wasmModule.wire_create_new_version(port_, model);
 
   void wire_init_mysql(NativePortType port_, String conf_path) => wasmModule.wire_init_mysql(port_, conf_path);
 

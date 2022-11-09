@@ -22,7 +22,7 @@ class BaseFileWidget<T extends BaseFileEntity> extends StatelessWidget {
             height: AppStyle.iconSize,
             child: Image.asset(
               data.iconPath!,
-              fit: BoxFit.cover,
+              fit: BoxFit.fitHeight,
             ),
           ),
           const SizedBox(

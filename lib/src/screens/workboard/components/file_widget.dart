@@ -3,8 +3,10 @@
 import 'dart:io';
 
 import 'package:contextmenu/contextmenu.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
+import 'package:knowledge_one/bridge_definitions.dart' show NativeFileSummary;
 import 'package:knowledge_one/src/native.dart';
 import 'package:knowledge_one/src/screens/markdown_edit/markdown_edit_screen.dart';
 import 'package:knowledge_one/src/screens/pdf_viewer/pdf_viewer_screen.dart';
@@ -34,10 +36,12 @@ class _FileWidgetState extends State<FileWidget> {
   late double dx = 0;
   late double dy = 0;
   final iconSize = AppStyle.fileWidgetSize;
+  late FileEntity currentEntity;
 
   @override
   void initState() {
     super.initState();
+    currentEntity = widget.entity;
   }
 
   @override
@@ -57,7 +61,7 @@ class _FileWidgetState extends State<FileWidget> {
 
     return GestureDetector(
       onDoubleTap: () async {
-        debugPrint(widget.entity.path);
+        debugPrint(currentEntity.path);
         await showGeneralDialog(
             context: context,
             pageBuilder: (context, animation, secondaryAnimation) {
@@ -65,7 +69,7 @@ class _FileWidgetState extends State<FileWidget> {
                 child: PreviewDialog(
                   width: 800,
                   height: 600,
-                  filePath: widget.entity.path!,
+                  filePath: currentEntity.path!,
                 ),
               );
             });
@@ -92,7 +96,7 @@ class _FileWidgetState extends State<FileWidget> {
                   builder: (context) {
                     return AlertDialog(
                       title: Text(
-                          '是不是要把"${widget.entity.name}"移入"${entity.name}"中?'),
+                          '是不是要把"${currentEntity.name}"移入"${entity.name}"中?'),
                       actions: [
                         TextButton(
                             onPressed: () {
@@ -133,7 +137,7 @@ class _FileWidgetState extends State<FileWidget> {
                   ),
                   title: const Text('以系统默认程序打开'),
                   onTap: () async {
-                    final Uri uri = Uri.file(widget.entity.path!);
+                    final Uri uri = Uri.file(currentEntity.path!);
                     try {
                       if (!File(uri.toFilePath()).existsSync()) {
                         // throw '$uri does not exist!';
@@ -162,8 +166,8 @@ class _FileWidgetState extends State<FileWidget> {
                     await Navigator.of(context)
                         .push(MaterialPageRoute(builder: (c) {
                       return MarkdownEditScreen(
-                        filePath: widget.entity.path!,
-                        fileName: widget.entity.name,
+                        filePath: currentEntity.path!,
+                        fileName: currentEntity.name,
                       );
                     }));
                     Navigator.of(ctx).pop();
@@ -179,8 +183,8 @@ class _FileWidgetState extends State<FileWidget> {
                     await Navigator.of(context)
                         .push(MaterialPageRoute(builder: (c) {
                       return QuillEditScreen(
-                        filePath: widget.entity.path!,
-                        fileName: widget.entity.name,
+                        filePath: currentEntity.path!,
+                        fileName: currentEntity.name,
                       );
                     }));
                     Navigator.of(ctx).pop();
@@ -197,8 +201,8 @@ class _FileWidgetState extends State<FileWidget> {
                       await Navigator.of(context)
                           .push(MaterialPageRoute(builder: (c) {
                         return PdfViewerScreen(
-                          filePath: widget.entity.path!,
-                          fileName: widget.entity.name,
+                          filePath: currentEntity.path!,
+                          fileName: currentEntity.name,
                         );
                       }));
                       Navigator.of(ctx).pop();
@@ -210,10 +214,61 @@ class _FileWidgetState extends State<FileWidget> {
                     color: AppStyle.appBlue,
                   ),
                   title: const Text('启用版本追踪'),
-                  onTap: () {
+                  onTap: () async {
+                    if (currentEntity.fileHash == null) {
+                      SmartDialogUtils.error("文件Hash值为空");
+                    }
+
+                    if (currentEntity.versionControl != 1) {
+                      final r = await api.changeVersionControl(
+                          fileHash: currentEntity.fileHash!);
+                      if (r == 1) {
+                        SmartDialogUtils.error("失败");
+                      } else {
+                        setState(() {
+                          currentEntity.versionControl = 1;
+                          currentEntity.iconPath = "assets/icons/vc_file.png";
+                        });
+                        context
+                            .read<FileSystemController>()
+                            .changeVersionControlStatus(currentEntity);
+                      }
+                    } else {
+                      SmartDialogUtils.message("已开启版本控制");
+                    }
                     Navigator.of(ctx).pop();
                   },
                 ),
+                if (currentEntity.versionControl == 1)
+                  ListTile(
+                    leading: Icon(
+                      Icons.verified_user,
+                      color: AppStyle.appBlue,
+                    ),
+                    title: const Text('上传新版本文件'),
+                    onTap: () async {
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles();
+                      if (result != null) {
+                        // File file = File(result.files.single.path);
+                        String filePath = result.files.single.path!;
+                        String fileName = result.files.single.name;
+                        debugPrint(filePath);
+
+                        /// TODO
+
+                        // NativeFileNewVersion nativeFileNewVersion =
+                        //     NativeFileNewVersion(
+                        //         prevFilePath: prevFilePath,
+                        //         prevFileHash: prevFileHash,
+                        //         prevFileName: prevFileName,
+                        //         newVersionFilePath: newVersionFilePath,
+                        //         newVersionFileHash: newVersionFileHash,
+                        //         newVersionFileName: newVersionFileName);
+                      }
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
                 ListTile(
                   leading: const Icon(
                     Icons.delete,
@@ -221,14 +276,14 @@ class _FileWidgetState extends State<FileWidget> {
                   ),
                   title: const Text('删除'),
                   onTap: () async {
-                    // debugPrint(widget.entity.fileHash);
-                    if (widget.entity.fileHash == null) {
+                    // debugPrint(currentEntity.fileHash);
+                    if (currentEntity.fileHash == null) {
                       SmartDialogUtils.error("文件Hash不存在");
                       Navigator.of(ctx).pop();
                       return;
                     }
                     final r = await api.deleteFileByFileHash(
-                        fileHash: widget.entity.fileHash!);
+                        fileHash: currentEntity.fileHash!);
                     if (r == 1) {
                       SmartDialogUtils.error("删除失败");
                       Navigator.of(ctx).pop();
@@ -243,25 +298,12 @@ class _FileWidgetState extends State<FileWidget> {
               ];
             },
             child: MouseRegion(
-              onHover: (event) {},
               onEnter: (event) {
-                if (event.localPosition.dx > AppStyle.fileWidgetSize - 5 &&
-                    event.localPosition.dy > AppStyle.fileWidgetSize - 5 &&
-                    event.localPosition.dx < 5 &&
-                    event.localPosition.dy < 5) {
-                  return;
-                }
                 context
                     .read<FileSystemController>()
                     .changeCurrentWidgetId(widget.index);
               },
               onExit: (event) {
-                if (event.localPosition.dx > AppStyle.fileWidgetSize - 5 &&
-                    event.localPosition.dy > AppStyle.fileWidgetSize - 5 &&
-                    event.localPosition.dx < 5 &&
-                    event.localPosition.dy < 5) {
-                  return;
-                }
                 context.read<FileSystemController>().changeCurrentWidgetId(-1);
               },
               child: Container(
@@ -283,7 +325,7 @@ class _FileWidgetState extends State<FileWidget> {
                 //   ),
                 // ),
                 child: BaseFileWidget(
-                  data: widget.entity,
+                  data: currentEntity,
                 ),
               ),
             ),

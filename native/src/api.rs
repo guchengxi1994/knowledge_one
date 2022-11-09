@@ -3,30 +3,13 @@ use crate::{
     storage,
 };
 use futures::executor::block_on;
-use std::sync::atomic::{AtomicU64, Ordering};
-
-pub fn main() {
-    println!("Hello from native!");
-}
-
-static COUNTER: AtomicU64 = AtomicU64::new(0);
-
-pub fn get_counter() -> u64 {
-    COUNTER.load(Ordering::SeqCst)
-}
-
-pub fn increment() -> u64 {
-    COUNTER.fetch_add(1, Ordering::SeqCst);
-    COUNTER.load(Ordering::SeqCst)
-}
-
-pub fn decrement() -> u64 {
-    COUNTER.fetch_sub(1, Ordering::SeqCst);
-    COUNTER.load(Ordering::SeqCst)
-}
 
 pub fn create_storage_directory(s: String) -> i32 {
     storage::create_folder::create_storage_dir(s)
+}
+
+pub fn create_diff_directory(s: String) -> i32 {
+    storage::create_folder::create_diff_dir(s)
 }
 
 /// 获取文件hash值
@@ -37,6 +20,18 @@ pub fn get_file_hash(file_path: String) -> String {
 /// 根据文件hash值软删除文件
 pub fn delete_file_by_file_hash(file_hash: String) -> i64 {
     block_on(async { model::file::delete_file_by_file_hash(file_hash) })
+}
+
+/// 改变版本控制
+pub fn change_version_control(file_hash: String) -> i64 {
+    block_on(async { model::file::set_version_control_by_file_hash(file_hash) })
+}
+
+/// 手动更新新版本 （右键绑定新版本）
+pub fn create_new_version(model:crate::database::model::changelog::NativeFileNewVersion){
+    block_on(async {
+        model.create_new_version()
+    })  
 }
 
 /// 初始化数据库，创建数据库连接池

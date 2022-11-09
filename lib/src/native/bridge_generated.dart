@@ -16,58 +16,6 @@ class NativeImpl implements Native {
   /// Only valid on web/WASM platforms.
   factory NativeImpl.wasm(FutureOr<WasmModule> module) => NativeImpl(module as ExternalLibrary);
   NativeImpl.raw(this._platform);
-  Future<void> main({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => _platform.inner.wire_main(port_),
-        parseSuccessData: _wire2api_unit,
-        constMeta: kMainConstMeta,
-        argValues: [],
-        hint: hint,
-      ));
-
-  FlutterRustBridgeTaskConstMeta get kMainConstMeta => const FlutterRustBridgeTaskConstMeta(
-        debugName: "main",
-        argNames: [],
-      );
-
-  Future<int> getCounter({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => _platform.inner.wire_get_counter(port_),
-        parseSuccessData: _wire2api_u64,
-        constMeta: kGetCounterConstMeta,
-        argValues: [],
-        hint: hint,
-      ));
-
-  FlutterRustBridgeTaskConstMeta get kGetCounterConstMeta => const FlutterRustBridgeTaskConstMeta(
-        debugName: "get_counter",
-        argNames: [],
-      );
-
-  Future<int> increment({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => _platform.inner.wire_increment(port_),
-        parseSuccessData: _wire2api_u64,
-        constMeta: kIncrementConstMeta,
-        argValues: [],
-        hint: hint,
-      ));
-
-  FlutterRustBridgeTaskConstMeta get kIncrementConstMeta => const FlutterRustBridgeTaskConstMeta(
-        debugName: "increment",
-        argNames: [],
-      );
-
-  Future<int> decrement({dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => _platform.inner.wire_decrement(port_),
-        parseSuccessData: _wire2api_u64,
-        constMeta: kDecrementConstMeta,
-        argValues: [],
-        hint: hint,
-      ));
-
-  FlutterRustBridgeTaskConstMeta get kDecrementConstMeta => const FlutterRustBridgeTaskConstMeta(
-        debugName: "decrement",
-        argNames: [],
-      );
-
   Future<int> createStorageDirectory({required String s, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_create_storage_directory(port_, _platform.api2wire_String(s)),
         parseSuccessData: _wire2api_i32,
@@ -80,6 +28,23 @@ class NativeImpl implements Native {
 
   FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta => const FlutterRustBridgeTaskConstMeta(
         debugName: "create_storage_directory",
+        argNames: [
+          "s"
+        ],
+      );
+
+  Future<int> createDiffDirectory({required String s, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_create_diff_directory(port_, _platform.api2wire_String(s)),
+        parseSuccessData: _wire2api_i32,
+        constMeta: kCreateDiffDirectoryConstMeta,
+        argValues: [
+          s
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kCreateDiffDirectoryConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "create_diff_directory",
         argNames: [
           "s"
         ],
@@ -116,6 +81,40 @@ class NativeImpl implements Native {
         debugName: "delete_file_by_file_hash",
         argNames: [
           "fileHash"
+        ],
+      );
+
+  Future<int> changeVersionControl({required String fileHash, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_change_version_control(port_, _platform.api2wire_String(fileHash)),
+        parseSuccessData: _wire2api_i64,
+        constMeta: kChangeVersionControlConstMeta,
+        argValues: [
+          fileHash
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kChangeVersionControlConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "change_version_control",
+        argNames: [
+          "fileHash"
+        ],
+      );
+
+  Future<void> createNewVersion({required NativeFileNewVersion model, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_create_new_version(port_, _platform.api2wire_box_autoadd_native_file_new_version(model)),
+        parseSuccessData: _wire2api_unit,
+        constMeta: kCreateNewVersionConstMeta,
+        argValues: [
+          model
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kCreateNewVersionConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "create_new_version",
+        argNames: [
+          "model"
         ],
       );
 
@@ -265,10 +264,6 @@ class NativeImpl implements Native {
       todoStatusName: _wire2api_opt_String(arr[1]),
       todoStatusColor: _wire2api_opt_String(arr[2]),
     );
-  }
-
-  int _wire2api_u64(dynamic raw) {
-    return castInt(raw);
   }
 
   int _wire2api_u8(dynamic raw) {

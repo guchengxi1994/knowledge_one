@@ -2,28 +2,13 @@ use super::*;
 // Section: wire functions
 
 #[no_mangle]
-pub extern "C" fn wire_main(port_: i64) {
-    wire_main_impl(port_)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_get_counter(port_: i64) {
-    wire_get_counter_impl(port_)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_increment(port_: i64) {
-    wire_increment_impl(port_)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_decrement(port_: i64) {
-    wire_decrement_impl(port_)
-}
-
-#[no_mangle]
 pub extern "C" fn wire_create_storage_directory(port_: i64, s: *mut wire_uint_8_list) {
     wire_create_storage_directory_impl(port_, s)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_create_diff_directory(port_: i64, s: *mut wire_uint_8_list) {
+    wire_create_diff_directory_impl(port_, s)
 }
 
 #[no_mangle]
@@ -34,6 +19,16 @@ pub extern "C" fn wire_get_file_hash(port_: i64, file_path: *mut wire_uint_8_lis
 #[no_mangle]
 pub extern "C" fn wire_delete_file_by_file_hash(port_: i64, file_hash: *mut wire_uint_8_list) {
     wire_delete_file_by_file_hash_impl(port_, file_hash)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_change_version_control(port_: i64, file_hash: *mut wire_uint_8_list) {
+    wire_change_version_control_impl(port_, file_hash)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_create_new_version(port_: i64, model: *mut wire_NativeFileNewVersion) {
+    wire_create_new_version_impl(port_, model)
 }
 
 #[no_mangle]
@@ -64,6 +59,11 @@ pub extern "C" fn wire_new_file(port_: i64, f: *mut wire_NativeFileSummary) {
 // Section: allocate functions
 
 #[no_mangle]
+pub extern "C" fn new_box_autoadd_native_file_new_version_0() -> *mut wire_NativeFileNewVersion {
+    support::new_leak_box_ptr(wire_NativeFileNewVersion::new_with_null_ptr())
+}
+
+#[no_mangle]
 pub extern "C" fn new_box_autoadd_native_file_summary_0() -> *mut wire_NativeFileSummary {
     support::new_leak_box_ptr(wire_NativeFileSummary::new_with_null_ptr())
 }
@@ -85,6 +85,12 @@ impl Wire2Api<String> for *mut wire_uint_8_list {
         String::from_utf8_lossy(&vec).into_owned()
     }
 }
+impl Wire2Api<NativeFileNewVersion> for *mut wire_NativeFileNewVersion {
+    fn wire2api(self) -> NativeFileNewVersion {
+        let wrap = unsafe { support::box_from_leak_ptr(self) };
+        Wire2Api::<NativeFileNewVersion>::wire2api(*wrap).into()
+    }
+}
 impl Wire2Api<NativeFileSummary> for *mut wire_NativeFileSummary {
     fn wire2api(self) -> NativeFileSummary {
         let wrap = unsafe { support::box_from_leak_ptr(self) };
@@ -92,6 +98,18 @@ impl Wire2Api<NativeFileSummary> for *mut wire_NativeFileSummary {
     }
 }
 
+impl Wire2Api<NativeFileNewVersion> for wire_NativeFileNewVersion {
+    fn wire2api(self) -> NativeFileNewVersion {
+        NativeFileNewVersion {
+            prev_file_path: self.prev_file_path.wire2api(),
+            prev_file_hash: self.prev_file_hash.wire2api(),
+            prev_file_name: self.prev_file_name.wire2api(),
+            new_version_file_path: self.new_version_file_path.wire2api(),
+            new_version_file_hash: self.new_version_file_hash.wire2api(),
+            new_version_file_name: self.new_version_file_name.wire2api(),
+        }
+    }
+}
 impl Wire2Api<NativeFileSummary> for wire_NativeFileSummary {
     fn wire2api(self) -> NativeFileSummary {
         NativeFileSummary {
@@ -112,6 +130,17 @@ impl Wire2Api<Vec<u8>> for *mut wire_uint_8_list {
     }
 }
 // Section: wire structs
+
+#[repr(C)]
+#[derive(Clone)]
+pub struct wire_NativeFileNewVersion {
+    prev_file_path: *mut wire_uint_8_list,
+    prev_file_hash: *mut wire_uint_8_list,
+    prev_file_name: *mut wire_uint_8_list,
+    new_version_file_path: *mut wire_uint_8_list,
+    new_version_file_hash: *mut wire_uint_8_list,
+    new_version_file_name: *mut wire_uint_8_list,
+}
 
 #[repr(C)]
 #[derive(Clone)]
@@ -138,6 +167,19 @@ pub trait NewWithNullPtr {
 impl<T> NewWithNullPtr for *mut T {
     fn new_with_null_ptr() -> Self {
         std::ptr::null_mut()
+    }
+}
+
+impl NewWithNullPtr for wire_NativeFileNewVersion {
+    fn new_with_null_ptr() -> Self {
+        Self {
+            prev_file_path: core::ptr::null_mut(),
+            prev_file_hash: core::ptr::null_mut(),
+            prev_file_name: core::ptr::null_mut(),
+            new_version_file_path: core::ptr::null_mut(),
+            new_version_file_hash: core::ptr::null_mut(),
+            new_version_file_name: core::ptr::null_mut(),
+        }
     }
 }
 

@@ -21,6 +21,13 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   }
 
   @protected
+  ffi.Pointer<wire_NativeFileNewVersion> api2wire_box_autoadd_native_file_new_version(NativeFileNewVersion raw) {
+    final ptr = inner.new_box_autoadd_native_file_new_version_0();
+    _api_fill_to_wire_native_file_new_version(raw, ptr.ref);
+    return ptr;
+  }
+
+  @protected
   ffi.Pointer<wire_NativeFileSummary> api2wire_box_autoadd_native_file_summary(NativeFileSummary raw) {
     final ptr = inner.new_box_autoadd_native_file_summary_0();
     _api_fill_to_wire_native_file_summary(raw, ptr.ref);
@@ -45,8 +52,21 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
   }
 // Section: api_fill_to_wire
 
+  void _api_fill_to_wire_box_autoadd_native_file_new_version(NativeFileNewVersion apiObj, ffi.Pointer<wire_NativeFileNewVersion> wireObj) {
+    _api_fill_to_wire_native_file_new_version(apiObj, wireObj.ref);
+  }
+
   void _api_fill_to_wire_box_autoadd_native_file_summary(NativeFileSummary apiObj, ffi.Pointer<wire_NativeFileSummary> wireObj) {
     _api_fill_to_wire_native_file_summary(apiObj, wireObj.ref);
+  }
+
+  void _api_fill_to_wire_native_file_new_version(NativeFileNewVersion apiObj, wire_NativeFileNewVersion wireObj) {
+    wireObj.prev_file_path = api2wire_String(apiObj.prevFilePath);
+    wireObj.prev_file_hash = api2wire_String(apiObj.prevFileHash);
+    wireObj.prev_file_name = api2wire_String(apiObj.prevFileName);
+    wireObj.new_version_file_path = api2wire_String(apiObj.newVersionFilePath);
+    wireObj.new_version_file_hash = api2wire_String(apiObj.newVersionFileHash);
+    wireObj.new_version_file_name = api2wire_String(apiObj.newVersionFileName);
   }
 
   void _api_fill_to_wire_native_file_summary(NativeFileSummary apiObj, wire_NativeFileSummary wireObj) {
@@ -85,50 +105,6 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _store_dart_post_cobjectPtr = _lookup<ffi.NativeFunction<ffi.Void Function(DartPostCObjectFnType)>>('store_dart_post_cobject');
   late final _store_dart_post_cobject = _store_dart_post_cobjectPtr.asFunction<void Function(DartPostCObjectFnType)>();
 
-  void wire_main(
-    int port_,
-  ) {
-    return _wire_main(
-      port_,
-    );
-  }
-
-  late final _wire_mainPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_main');
-  late final _wire_main = _wire_mainPtr.asFunction<void Function(int)>();
-
-  void wire_get_counter(
-    int port_,
-  ) {
-    return _wire_get_counter(
-      port_,
-    );
-  }
-
-  late final _wire_get_counterPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_get_counter');
-  late final _wire_get_counter = _wire_get_counterPtr.asFunction<void Function(int)>();
-
-  void wire_increment(
-    int port_,
-  ) {
-    return _wire_increment(
-      port_,
-    );
-  }
-
-  late final _wire_incrementPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_increment');
-  late final _wire_increment = _wire_incrementPtr.asFunction<void Function(int)>();
-
-  void wire_decrement(
-    int port_,
-  ) {
-    return _wire_decrement(
-      port_,
-    );
-  }
-
-  late final _wire_decrementPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_decrement');
-  late final _wire_decrement = _wire_decrementPtr.asFunction<void Function(int)>();
-
   void wire_create_storage_directory(
     int port_,
     ffi.Pointer<wire_uint_8_list> s,
@@ -141,6 +117,19 @@ class NativeWire implements FlutterRustBridgeWireBase {
 
   late final _wire_create_storage_directoryPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_create_storage_directory');
   late final _wire_create_storage_directory = _wire_create_storage_directoryPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_create_diff_directory(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> s,
+  ) {
+    return _wire_create_diff_directory(
+      port_,
+      s,
+    );
+  }
+
+  late final _wire_create_diff_directoryPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_create_diff_directory');
+  late final _wire_create_diff_directory = _wire_create_diff_directoryPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_get_file_hash(
     int port_,
@@ -167,6 +156,32 @@ class NativeWire implements FlutterRustBridgeWireBase {
 
   late final _wire_delete_file_by_file_hashPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_delete_file_by_file_hash');
   late final _wire_delete_file_by_file_hash = _wire_delete_file_by_file_hashPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_change_version_control(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_hash,
+  ) {
+    return _wire_change_version_control(
+      port_,
+      file_hash,
+    );
+  }
+
+  late final _wire_change_version_controlPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_change_version_control');
+  late final _wire_change_version_control = _wire_change_version_controlPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_create_new_version(
+    int port_,
+    ffi.Pointer<wire_NativeFileNewVersion> model,
+  ) {
+    return _wire_create_new_version(
+      port_,
+      model,
+    );
+  }
+
+  late final _wire_create_new_versionPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_NativeFileNewVersion>)>>('wire_create_new_version');
+  late final _wire_create_new_version = _wire_create_new_versionPtr.asFunction<void Function(int, ffi.Pointer<wire_NativeFileNewVersion>)>();
 
   void wire_init_mysql(
     int port_,
@@ -227,6 +242,13 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_new_filePtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_NativeFileSummary>)>>('wire_new_file');
   late final _wire_new_file = _wire_new_filePtr.asFunction<void Function(int, ffi.Pointer<wire_NativeFileSummary>)>();
 
+  ffi.Pointer<wire_NativeFileNewVersion> new_box_autoadd_native_file_new_version_0() {
+    return _new_box_autoadd_native_file_new_version_0();
+  }
+
+  late final _new_box_autoadd_native_file_new_version_0Ptr = _lookup<ffi.NativeFunction<ffi.Pointer<wire_NativeFileNewVersion> Function()>>('new_box_autoadd_native_file_new_version_0');
+  late final _new_box_autoadd_native_file_new_version_0 = _new_box_autoadd_native_file_new_version_0Ptr.asFunction<ffi.Pointer<wire_NativeFileNewVersion> Function()>();
+
   ffi.Pointer<wire_NativeFileSummary> new_box_autoadd_native_file_summary_0() {
     return _new_box_autoadd_native_file_summary_0();
   }
@@ -262,6 +284,20 @@ class wire_uint_8_list extends ffi.Struct {
 
   @ffi.Int32()
   external int len;
+}
+
+class wire_NativeFileNewVersion extends ffi.Struct {
+  external ffi.Pointer<wire_uint_8_list> prev_file_path;
+
+  external ffi.Pointer<wire_uint_8_list> prev_file_hash;
+
+  external ffi.Pointer<wire_uint_8_list> prev_file_name;
+
+  external ffi.Pointer<wire_uint_8_list> new_version_file_path;
+
+  external ffi.Pointer<wire_uint_8_list> new_version_file_hash;
+
+  external ffi.Pointer<wire_uint_8_list> new_version_file_name;
 }
 
 class wire_NativeFileSummary extends ffi.Struct {

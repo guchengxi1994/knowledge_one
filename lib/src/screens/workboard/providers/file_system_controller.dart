@@ -67,7 +67,7 @@ class FileSystemController extends ChangeNotifier {
     f.append(entity);
 
     // var file = File("${Directory.current.path}/_private/structure.json");
-    file.writeAsStringSync(json.encode(folder.toJson()));
+    file.writeAsStringSync(json.encode(folderList.first.toJson()));
 
     notifyListeners();
   }
@@ -111,10 +111,16 @@ class FileSystemController extends ChangeNotifier {
     final jsonResult = json.decode(jsonStr);
     String folderName = jsonResult['folderName'];
     List<BaseFileEntity> children = [];
+
+    /// TODO 连接数据库进行优化
     for (final i in jsonResult['children']) {
       // children.add(i.toJson());
       // print(i['children']);
       if (i['children'] == null) {
+        if (i["versionControl"] == 1) {
+          i['iconPath'] = "assets/icons/vc_file.png";
+        }
+
         children.add(FileEntity.fromJson(i));
       } else {
         children.add(FolderEntity.fromJson(i));
@@ -158,11 +164,19 @@ class FileSystemController extends ChangeNotifier {
     if (lengthAfter != lengthBefore) {
       widgetStatus.add(WidgetStatus());
 
-      /// TODO
-      /// 这里多层文件夹可能有个bug
-      file.writeAsStringSync(json.encode(folder.toJson()));
+      file.writeAsStringSync(json.encode(folderList.first.toJson()));
       notifyListeners();
     }
+  }
+
+  changeVersionControlStatus(FileEntity entity) {
+    // folder.children.remove(entity);
+    final id = folder.children.indexOf(entity);
+    folder.children.removeAt(id);
+    entity.versionControl = 1;
+    folder.children.insert(id, entity);
+    file.writeAsStringSync(json.encode(folderList.first.toJson()));
+    notifyListeners();
   }
 
   String _getCurrentDirPath() {
