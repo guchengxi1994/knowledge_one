@@ -16,6 +16,7 @@ if "%input1%"=="run" (
     if exist "dist/file_changelog.exe" (
         echo "file exists"
         copy dist\file_changelog.exe ..\..\build\windows\runner\Debug\file_changelog.exe /y 
+        copy dist\file_changelog.exe ..\..\build\windows\runner\release\file_changelog.exe /y 
     ) else (
         echo "file not find"
     )
