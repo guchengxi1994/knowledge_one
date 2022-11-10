@@ -363,21 +363,22 @@ class _FileWidgetState extends State<FileWidget> {
                 context.read<FileSystemController>().changeCurrentWidgetId(-1);
               },
               child: Container(
-                color: context.select<FileSystemController, int>(
-                            (value) => value.currentWidgetId) ==
-                        widget.index
-                    ? AppStyle.selectedBackgroundColor
-                    : Colors.transparent,
-                // decoration: context.select<FileSystemController, int>(
+                // color: context.select<FileSystemController, int>(
                 //             (value) => value.currentWidgetId) ==
                 //         widget.index
-                //     ? BoxDecoration(
-                //         color: AppStyle.selectedBackgroundColor, // 背景色
-                //         // border: Border.all(
-                //         //     color: Colors.blue, width: 0.5), // border
-                //         // borderRadius: BorderRadius.circular((1)), // 圆角
-                //       )
-                //     : null,
+                //     ? AppStyle.selectedBackgroundColor
+                //     : Colors.transparent,
+                decoration: BoxDecoration(
+                  color: AppStyle.selectedBackgroundColor, // 背景色
+                  border: Border.all(
+                      color: context.select<FileSystemController, int>(
+                                  (value) => value.currentWidgetId) ==
+                              widget.index
+                          ? Colors.blue
+                          : Colors.transparent,
+                      width: 0.5), // border
+                  borderRadius: BorderRadius.circular((1)), // 圆角
+                ),
                 child: BaseFileWidget(
                   data: currentEntity,
                 ),
