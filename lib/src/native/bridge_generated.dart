@@ -101,9 +101,9 @@ class NativeImpl implements Native {
         ],
       );
 
-  Future<void> createNewVersion({required NativeFileNewVersion model, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+  Future<int> createNewVersion({required NativeFileNewVersion model, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_create_new_version(port_, _platform.api2wire_box_autoadd_native_file_new_version(model)),
-        parseSuccessData: _wire2api_unit,
+        parseSuccessData: _wire2api_i64,
         constMeta: kCreateNewVersionConstMeta,
         argValues: [
           model
@@ -115,6 +115,23 @@ class NativeImpl implements Native {
         debugName: "create_new_version",
         argNames: [
           "model"
+        ],
+      );
+
+  Future<List<FileChangelog>?> getFileLogs({required String fileHash, dynamic hint}) => _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_get_file_logs(port_, _platform.api2wire_String(fileHash)),
+        parseSuccessData: _wire2api_opt_list_file_changelog,
+        constMeta: kGetFileLogsConstMeta,
+        argValues: [
+          fileHash
+        ],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetFileLogsConstMeta => const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_file_logs",
+        argNames: [
+          "fileHash"
         ],
       );
 
@@ -201,6 +218,23 @@ class NativeImpl implements Native {
     return raw as String;
   }
 
+  FileChangelog _wire2api_file_changelog(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 10) throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    return FileChangelog(
+      changelogId: _wire2api_i64(arr[0]),
+      fileId: _wire2api_i64(arr[1]),
+      versionId: _wire2api_opt_String(arr[2]),
+      prevVersionId: _wire2api_opt_String(arr[3]),
+      isDeleted: _wire2api_i64(arr[4]),
+      createAt: _wire2api_Chrono_Utc(arr[5]),
+      updateAt: _wire2api_Chrono_Utc(arr[6]),
+      fileLength: _wire2api_i64(arr[7]),
+      filePath: _wire2api_opt_String(arr[8]),
+      diffPath: _wire2api_opt_String(arr[9]),
+    );
+  }
+
   FileDetails _wire2api_file_details(dynamic raw) {
     final arr = raw as List<dynamic>;
     if (arr.length != 8) throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
@@ -224,6 +258,10 @@ class NativeImpl implements Native {
     return castInt(raw);
   }
 
+  List<FileChangelog> _wire2api_list_file_changelog(dynamic raw) {
+    return (raw as List<dynamic>).map(_wire2api_file_changelog).toList();
+  }
+
   List<FileDetails> _wire2api_list_file_details(dynamic raw) {
     return (raw as List<dynamic>).map(_wire2api_file_details).toList();
   }
@@ -238,6 +276,10 @@ class NativeImpl implements Native {
 
   String? _wire2api_opt_String(dynamic raw) {
     return raw == null ? null : _wire2api_String(raw);
+  }
+
+  List<FileChangelog>? _wire2api_opt_list_file_changelog(dynamic raw) {
+    return raw == null ? null : _wire2api_list_file_changelog(raw);
   }
 
   TodoDetails _wire2api_todo_details(dynamic raw) {

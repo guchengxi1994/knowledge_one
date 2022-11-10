@@ -11,6 +11,14 @@ class RPCController extends ChangeNotifier {
     return validRPCs[t] != null;
   }
 
+  startFileChangelogTracingRPC() async {
+    final path = File(Platform.resolvedExecutable).parent;
+    late String tracingExe = "${path.path}/file_changelog.exe";
+
+    final process = await Process.start(tracingExe, []);
+    addRPC(RPCTypes.fileChangeLog, process.pid);
+  }
+
   addRPC(RPCTypes t, int rpcProcessId) {
     validRPCs[t] = rpcProcessId;
     notifyListeners();

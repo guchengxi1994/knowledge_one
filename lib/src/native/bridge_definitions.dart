@@ -31,9 +31,14 @@ abstract class Native {
   FlutterRustBridgeTaskConstMeta get kChangeVersionControlConstMeta;
 
   /// 手动更新新版本 （右键绑定新版本）
-  Future<void> createNewVersion({required NativeFileNewVersion model, dynamic hint});
+  Future<int> createNewVersion({required NativeFileNewVersion model, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kCreateNewVersionConstMeta;
+
+  /// 根据现在的hash值获取变更记录
+  Future<List<FileChangelog>?> getFileLogs({required String fileHash, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetFileLogsConstMeta;
 
   /// 初始化数据库，创建数据库连接池
   Future<void> initMysql({required String confPath, dynamic hint});
@@ -59,6 +64,32 @@ abstract class Native {
   Future<int> newFile({required NativeFileSummary f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kNewFileConstMeta;
+}
+
+class FileChangelog {
+  final int changelogId;
+  final int fileId;
+  final String? versionId;
+  final String? prevVersionId;
+  final int isDeleted;
+  final DateTime createAt;
+  final DateTime updateAt;
+  final int fileLength;
+  final String? filePath;
+  final String? diffPath;
+
+  FileChangelog({
+    required this.changelogId,
+    required this.fileId,
+    this.versionId,
+    this.prevVersionId,
+    required this.isDeleted,
+    required this.createAt,
+    required this.updateAt,
+    required this.fileLength,
+    this.filePath,
+    this.diffPath,
+  });
 }
 
 class FileDetails {
@@ -90,6 +121,7 @@ class NativeFileNewVersion {
   final String newVersionFilePath;
   final String newVersionFileHash;
   final String newVersionFileName;
+  final String? diffPath;
 
   NativeFileNewVersion({
     required this.prevFilePath,
@@ -98,6 +130,7 @@ class NativeFileNewVersion {
     required this.newVersionFilePath,
     required this.newVersionFileHash,
     required this.newVersionFileName,
+    this.diffPath,
   });
 }
 

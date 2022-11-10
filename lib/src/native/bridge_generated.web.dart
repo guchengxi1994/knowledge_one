@@ -45,7 +45,8 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> with FlutterRustB
       api2wire_String(raw.prevFileName),
       api2wire_String(raw.newVersionFilePath),
       api2wire_String(raw.newVersionFileHash),
-      api2wire_String(raw.newVersionFileName)
+      api2wire_String(raw.newVersionFileName),
+      api2wire_opt_String(raw.diffPath)
     ];
   }
 
@@ -92,6 +93,8 @@ class NativeWasmModule implements WasmModule {
 
   external void wire_create_new_version(NativePortType port_, List<dynamic> model);
 
+  external void wire_get_file_logs(NativePortType port_, String file_hash);
+
   external void wire_init_mysql(NativePortType port_, String conf_path);
 
   external void wire_get_status_types(NativePortType port_);
@@ -119,6 +122,8 @@ class NativeWire extends FlutterRustBridgeWasmWireBase<NativeWasmModule> {
   void wire_change_version_control(NativePortType port_, String file_hash) => wasmModule.wire_change_version_control(port_, file_hash);
 
   void wire_create_new_version(NativePortType port_, List<dynamic> model) => wasmModule.wire_create_new_version(port_, model);
+
+  void wire_get_file_logs(NativePortType port_, String file_hash) => wasmModule.wire_get_file_logs(port_, file_hash);
 
   void wire_init_mysql(NativePortType port_, String conf_path) => wasmModule.wire_init_mysql(port_, conf_path);
 

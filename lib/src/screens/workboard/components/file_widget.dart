@@ -5,9 +5,12 @@ import 'dart:io';
 import 'package:contextmenu/contextmenu.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/app_style.dart';
-import 'package:knowledge_one/bridge_definitions.dart' show NativeFileSummary;
+import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/src/native.dart';
+import 'package:knowledge_one/src/native/bridge_definitions.dart';
+import 'package:knowledge_one/src/rpc/file_diff.pbgrpc.dart';
 import 'package:knowledge_one/src/screens/markdown_edit/markdown_edit_screen.dart';
 import 'package:knowledge_one/src/screens/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:knowledge_one/src/screens/quill_eidt/quill_edit_screen.dart';
@@ -37,6 +40,7 @@ class _FileWidgetState extends State<FileWidget> {
   late double dy = 0;
   final iconSize = AppStyle.fileWidgetSize;
   late FileEntity currentEntity;
+  late final path = File(Platform.resolvedExecutable).parent;
 
   @override
   void initState() {
@@ -242,31 +246,83 @@ class _FileWidgetState extends State<FileWidget> {
                 if (currentEntity.versionControl == 1)
                   ListTile(
                     leading: Icon(
+                      Icons.search,
+                      color: AppStyle.appBlue,
+                    ),
+                    title: const Text('查看修改链路'),
+                    onTap: () async {
+                      Navigator.of(ctx).pop();
+                      final result = await api.getFileLogs(
+                          fileHash: currentEntity.fileHash!);
+                      if (result != null) {
+                        debugPrint("length:${result.length}");
+                      }
+                    },
+                  ),
+                if (currentEntity.versionControl == 1)
+                  ListTile(
+                    leading: Icon(
                       Icons.verified_user,
                       color: AppStyle.appBlue,
                     ),
                     title: const Text('上传新版本文件'),
                     onTap: () async {
+                      Navigator.of(ctx).pop();
                       FilePickerResult? result =
                           await FilePicker.platform.pickFiles();
+
                       if (result != null) {
                         // File file = File(result.files.single.path);
                         String filePath = result.files.single.path!;
                         String fileName = result.files.single.name;
                         debugPrint(filePath);
 
-                        /// TODO
+                        /// 这里启动 rpc
+                        await context
+                            .read<RPCController>()
+                            .startFileChangelogTracingRPC();
+                        final channel = ClientChannel(
+                          'localhost',
+                          port: 15556,
+                          options: const ChannelOptions(
+                              credentials: ChannelCredentials.insecure()),
+                        );
+                        final stub = FileDiffClient(channel);
+                        try {
+                          await stub.generateDiff(GenerateDiffRequest()
+                            ..after = filePath
+                            ..before = currentEntity.path!
+                            ..savePath = "${path.path}/test.mtx");
 
-                        // NativeFileNewVersion nativeFileNewVersion =
-                        //     NativeFileNewVersion(
-                        //         prevFilePath: prevFilePath,
-                        //         prevFileHash: prevFileHash,
-                        //         prevFileName: prevFileName,
-                        //         newVersionFilePath: newVersionFilePath,
-                        //         newVersionFileHash: newVersionFileHash,
-                        //         newVersionFileName: newVersionFileName);
+                          final newFileHash =
+                              await api.getFileHash(filePath: filePath);
+
+                          NativeFileNewVersion nativeFileNewVersion =
+                              NativeFileNewVersion(
+                                  prevFilePath: currentEntity.path!,
+                                  prevFileHash: currentEntity.fileHash!,
+                                  prevFileName: currentEntity.name,
+                                  newVersionFilePath: filePath,
+                                  newVersionFileHash: newFileHash,
+                                  newVersionFileName: fileName,
+                                  diffPath: "${path.path}/test.mtx");
+                          final r = await api.createNewVersion(
+                              model: nativeFileNewVersion);
+                          debugPrint(r.toString());
+                          if (r != 0) {
+                            SmartDialogUtils.error("失败");
+                          } else {
+                            SmartDialogUtils.ok("成功");
+                            setState(() {
+                              currentEntity.fileHash = newFileHash;
+                            });
+                          }
+                        } catch (e) {
+                          // print('Caught error: $e');
+                          SmartDialogUtils.message("失败");
+                        }
+                        await channel.shutdown();
                       }
-                      Navigator.of(ctx).pop();
                     },
                   ),
                 ListTile(
@@ -307,23 +363,21 @@ class _FileWidgetState extends State<FileWidget> {
                 context.read<FileSystemController>().changeCurrentWidgetId(-1);
               },
               child: Container(
-                decoration: context.select<FileSystemController, int>(
+                color: context.select<FileSystemController, int>(
                             (value) => value.currentWidgetId) ==
                         widget.index
-                    ? BoxDecoration(
-                        color: AppStyle.selectedBackgroundColor, // 背景色
-                        border: Border.all(
-                            color: Colors.blue, width: 0.5), // border
-                        borderRadius: BorderRadius.circular((1)), // 圆角
-                      )
-                    : null,
-                // child: Tooltip(
-                //   margin: const EdgeInsets.only(top: 20),
-                //   message: widget.tooltip ?? widget.entity.name,
-                //   child: BaseFileWidget(
-                //     data: widget.entity,
-                //   ),
-                // ),
+                    ? AppStyle.selectedBackgroundColor
+                    : Colors.transparent,
+                // decoration: context.select<FileSystemController, int>(
+                //             (value) => value.currentWidgetId) ==
+                //         widget.index
+                //     ? BoxDecoration(
+                //         color: AppStyle.selectedBackgroundColor, // 背景色
+                //         // border: Border.all(
+                //         //     color: Colors.blue, width: 0.5), // border
+                //         // borderRadius: BorderRadius.circular((1)), // 圆角
+                //       )
+                //     : null,
                 child: BaseFileWidget(
                   data: currentEntity,
                 ),

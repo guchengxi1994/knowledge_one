@@ -10,14 +10,9 @@ import 'base_file_widget.dart';
 // ignore: must_be_immutable
 class FolderWidget extends StatefulWidget {
   FolderWidget(
-      {Key? key,
-      required this.index,
-      this.onDoubleClick,
-      this.tooltip,
-      required this.entity})
+      {Key? key, required this.index, this.onDoubleClick, required this.entity})
       : super(key: key);
   VoidCallback? onDoubleClick;
-  String? tooltip;
   int index;
   FolderEntity entity;
 
@@ -48,14 +43,14 @@ class _FolderWidgetState extends State<FolderWidget> {
       if (isDragging) {
         decoration = BoxDecoration(
           color: AppStyle.selectedBackgroundColorWhenGragging, // 背景色
-          border: Border.all(color: Colors.blue, width: 0.5), // border
-          borderRadius: BorderRadius.circular((1)), // 圆角
+          // border: Border.all(color: Colors.blue, width: 0.5), // border
+          // borderRadius: BorderRadius.circular((1)), // 圆角
         );
       } else {
         decoration = BoxDecoration(
           color: AppStyle.selectedBackgroundColor, // 背景色
-          border: Border.all(color: Colors.blue, width: 0.5), // border
-          borderRadius: BorderRadius.circular((1)), // 圆角
+          // border: Border.all(color: Colors.blue, width: 0.5), // border
+          // borderRadius: BorderRadius.circular((1)), // 圆角
         );
       }
     } else {
@@ -145,26 +140,24 @@ class _FolderWidgetState extends State<FolderWidget> {
                   ];
                 },
                 child: MouseRegion(
-                    onEnter: (event) {
-                      context
-                          .read<FileSystemController>()
-                          .changeCurrentWidgetId(widget.index);
-                    },
-                    onExit: (event) {
-                      context
-                          .read<FileSystemController>()
-                          .changeCurrentWidgetId(-1);
-                    },
-                    child: Container(
-                      decoration: decoration,
-                      child: Tooltip(
-                        margin: const EdgeInsets.only(top: 20),
-                        message: widget.tooltip ??
-                            "${widget.entity.name}, 包含${widget.entity.children.length}个文件",
-                        child: BaseFileWidget(
-                          data: widget.entity,
-                        ),
-                      ),
-                    )))));
+                  onEnter: (event) {
+                    context
+                        .read<FileSystemController>()
+                        .changeCurrentWidgetId(widget.index);
+                  },
+                  onExit: (event) {
+                    context
+                        .read<FileSystemController>()
+                        .changeCurrentWidgetId(-1);
+                  },
+                  child: Container(
+                    decoration: decoration,
+                    child: BaseFileWidget(
+                      message:
+                          "${widget.entity.name}, 包含${widget.entity.children.length}个文件",
+                      data: widget.entity,
+                    ),
+                  ),
+                ))));
   }
 }

@@ -17,6 +17,7 @@ use flutter_rust_bridge::*;
 
 // Section: imports
 
+use crate::database::model::changelog::FileChangelog;
 use crate::database::model::changelog::NativeFileNewVersion;
 use crate::database::model::file::FileDetails;
 use crate::database::model::file::NativeFileSummary;
@@ -112,6 +113,19 @@ fn wire_create_new_version_impl(
         },
     )
 }
+fn wire_get_file_logs_impl(port_: MessagePort, file_hash: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_file_logs",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_file_hash = file_hash.wire2api();
+            move |task_callback| Ok(get_file_logs(api_file_hash))
+        },
+    )
+}
 fn wire_init_mysql_impl(port_: MessagePort, conf_path: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
@@ -203,6 +217,25 @@ impl Wire2Api<u8> for u8 {
 
 // Section: impl IntoDart
 
+impl support::IntoDart for FileChangelog {
+    fn into_dart(self) -> support::DartAbi {
+        vec![
+            self.changelog_id.into_dart(),
+            self.file_id.into_dart(),
+            self.version_id.into_dart(),
+            self.prev_version_id.into_dart(),
+            self.is_deleted.into_dart(),
+            self.create_at.into_dart(),
+            self.update_at.into_dart(),
+            self.file_length.into_dart(),
+            self.file_path.into_dart(),
+            self.diff_path.into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for FileChangelog {}
+
 impl support::IntoDart for FileDetails {
     fn into_dart(self) -> support::DartAbi {
         vec![
@@ -255,6 +288,13 @@ impl support::IntoDartExceptPrimitive for TodoStatus {}
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
+
+/// cbindgen:ignore
+#[cfg(target_family = "wasm")]
+#[path = "bridge_generated.web.rs"]
+mod web;
+#[cfg(target_family = "wasm")]
+pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

@@ -249,11 +249,9 @@ packages:
   flutter_graph:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "6435bae343e7e8f07fce8d9acd5a5ca8862f017e"
-      url: "https://github.com/guchengxi1994/flutter_graph"
-    source: git
+      path: "../flow_graph"
+      relative: true
+    source: path
     version: "0.0.0"
   flutter_inappwebview_quill:
     dependency: transitive

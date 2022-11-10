@@ -67,6 +67,7 @@ class NativePlatform extends FlutterRustBridgeBase<NativeWire> {
     wireObj.new_version_file_path = api2wire_String(apiObj.newVersionFilePath);
     wireObj.new_version_file_hash = api2wire_String(apiObj.newVersionFileHash);
     wireObj.new_version_file_name = api2wire_String(apiObj.newVersionFileName);
+    wireObj.diff_path = api2wire_opt_String(apiObj.diffPath);
   }
 
   void _api_fill_to_wire_native_file_summary(NativeFileSummary apiObj, wire_NativeFileSummary wireObj) {
@@ -183,6 +184,19 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_create_new_versionPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_NativeFileNewVersion>)>>('wire_create_new_version');
   late final _wire_create_new_version = _wire_create_new_versionPtr.asFunction<void Function(int, ffi.Pointer<wire_NativeFileNewVersion>)>();
 
+  void wire_get_file_logs(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_hash,
+  ) {
+    return _wire_get_file_logs(
+      port_,
+      file_hash,
+    );
+  }
+
+  late final _wire_get_file_logsPtr = _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_get_file_logs');
+  late final _wire_get_file_logs = _wire_get_file_logsPtr.asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
   void wire_init_mysql(
     int port_,
     ffi.Pointer<wire_uint_8_list> conf_path,
@@ -298,6 +312,8 @@ class wire_NativeFileNewVersion extends ffi.Struct {
   external ffi.Pointer<wire_uint_8_list> new_version_file_hash;
 
   external ffi.Pointer<wire_uint_8_list> new_version_file_name;
+
+  external ffi.Pointer<wire_uint_8_list> diff_path;
 }
 
 class wire_NativeFileSummary extends ffi.Struct {

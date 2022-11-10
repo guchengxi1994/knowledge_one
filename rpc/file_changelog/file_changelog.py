@@ -26,10 +26,24 @@ class Diff(FileDiffServicer):
         except:
             return GenerateDiffResponse(message=1)
 
+class Restore(FileRestoreServicer):
+
+    def Restore(self, request, context):
+        filePath:str = request.filePath
+        diffs:list = request.diffs
+        print(filePath)
+        print(diffs)
+
+        try:
+            return RestoreResponse(message="a")
+        except:
+            return RestoreResponse(message="b")
+
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))
     add_FileDiffServicer_to_server(Diff(),server=server)
+    add_FileRestoreServicer_to_server(Restore(),server=server)
     server.add_insecure_port(_HOST+':'+_PORT)
     server.start()
     try:

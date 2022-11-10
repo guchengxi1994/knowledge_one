@@ -32,6 +32,11 @@ pub fn wire_create_new_version(port_: MessagePort, model: JsValue) {
 }
 
 #[wasm_bindgen]
+pub fn wire_get_file_logs(port_: MessagePort, file_hash: String) {
+    wire_get_file_logs_impl(port_, file_hash)
+}
+
+#[wasm_bindgen]
 pub fn wire_init_mysql(port_: MessagePort, conf_path: String) {
     wire_init_mysql_impl(port_, conf_path)
 }
@@ -71,8 +76,8 @@ impl Wire2Api<NativeFileNewVersion> for JsValue {
         let self_ = self.dyn_into::<JsArray>().unwrap();
         assert_eq!(
             self_.length(),
-            6,
-            "Expected 6 elements, got {}",
+            7,
+            "Expected 7 elements, got {}",
             self_.length()
         );
         NativeFileNewVersion {
@@ -82,6 +87,7 @@ impl Wire2Api<NativeFileNewVersion> for JsValue {
             new_version_file_path: self_.get(3).wire2api(),
             new_version_file_hash: self_.get(4).wire2api(),
             new_version_file_name: self_.get(5).wire2api(),
+            diff_path: self_.get(6).wire2api(),
         }
     }
 }

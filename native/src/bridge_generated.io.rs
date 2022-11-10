@@ -32,6 +32,11 @@ pub extern "C" fn wire_create_new_version(port_: i64, model: *mut wire_NativeFil
 }
 
 #[no_mangle]
+pub extern "C" fn wire_get_file_logs(port_: i64, file_hash: *mut wire_uint_8_list) {
+    wire_get_file_logs_impl(port_, file_hash)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_init_mysql(port_: i64, conf_path: *mut wire_uint_8_list) {
     wire_init_mysql_impl(port_, conf_path)
 }
@@ -107,6 +112,7 @@ impl Wire2Api<NativeFileNewVersion> for wire_NativeFileNewVersion {
             new_version_file_path: self.new_version_file_path.wire2api(),
             new_version_file_hash: self.new_version_file_hash.wire2api(),
             new_version_file_name: self.new_version_file_name.wire2api(),
+            diff_path: self.diff_path.wire2api(),
         }
     }
 }
@@ -140,6 +146,7 @@ pub struct wire_NativeFileNewVersion {
     new_version_file_path: *mut wire_uint_8_list,
     new_version_file_hash: *mut wire_uint_8_list,
     new_version_file_name: *mut wire_uint_8_list,
+    diff_path: *mut wire_uint_8_list,
 }
 
 #[repr(C)]
@@ -179,6 +186,7 @@ impl NewWithNullPtr for wire_NativeFileNewVersion {
             new_version_file_path: core::ptr::null_mut(),
             new_version_file_hash: core::ptr::null_mut(),
             new_version_file_name: core::ptr::null_mut(),
+            diff_path: core::ptr::null_mut(),
         }
     }
 }

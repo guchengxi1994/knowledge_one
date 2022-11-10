@@ -4,8 +4,10 @@ import 'package:knowledge_one/app_style.dart';
 import '../models/models.dart';
 
 class BaseFileWidget<T extends BaseFileEntity> extends StatelessWidget {
-  const BaseFileWidget({Key? key, required this.data}) : super(key: key);
+  const BaseFileWidget({Key? key, required this.data, this.message})
+      : super(key: key);
   final T data;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class BaseFileWidget<T extends BaseFileEntity> extends StatelessWidget {
           ),
           Tooltip(
             // margin: const EdgeInsets.only(top: 20),
-            message: data.name,
+            message: message ?? data.name,
             child: Text(
               data.name,
               overflow: TextOverflow.ellipsis,

@@ -28,10 +28,17 @@ pub fn change_version_control(file_hash: String) -> i64 {
 }
 
 /// 手动更新新版本 （右键绑定新版本）
-pub fn create_new_version(model:crate::database::model::changelog::NativeFileNewVersion){
+pub fn create_new_version(model:crate::database::model::changelog::NativeFileNewVersion)->i64{
     block_on(async {
         model.create_new_version()
     })  
+}
+
+/// 根据现在的hash值获取变更记录
+pub fn get_file_logs(file_hash:String)->Option<Vec<crate::database::model::changelog::FileChangelog>>{
+    block_on(async {
+        crate::database::model::changelog::FileChangelog::get_filelogs_by_file_hash(file_hash)
+    })
 }
 
 /// 初始化数据库，创建数据库连接池
