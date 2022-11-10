@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:knowledge_one/src/native.dart';
+import 'package:knowledge_one/native.dart';
+
 import 'package:knowledge_one/src/screens/workboard/models/models.dart';
-import 'package:knowledge_one/src/native/bridge_definitions.dart'
-    show TodoDetails;
 
 class TodoItem<BaseItemDetails> {
   bool deletable;

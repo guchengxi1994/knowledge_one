@@ -7,9 +7,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/app_style.dart';
+import 'package:knowledge_one/native.dart';
 import 'package:knowledge_one/rpc_controller.dart';
-import 'package:knowledge_one/src/native.dart';
-import 'package:knowledge_one/src/native/bridge_definitions.dart';
+
 import 'package:knowledge_one/src/rpc/file_diff.pbgrpc.dart';
 import 'package:knowledge_one/src/screens/markdown_edit/markdown_edit_screen.dart';
 import 'package:knowledge_one/src/screens/pdf_viewer/pdf_viewer_screen.dart';
