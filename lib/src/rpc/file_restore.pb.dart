@@ -13,6 +13,8 @@ class RestoreRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'RestoreRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'file_changelog'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'filePath', protoName: 'filePath')
     ..pPS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'diffs')
+    ..p<$core.int>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fileSize', $pb.PbFieldType.K3, protoName: 'fileSize')
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'saveDir', protoName: 'saveDir')
     ..hasRequiredFields = false
   ;
 
@@ -20,6 +22,8 @@ class RestoreRequest extends $pb.GeneratedMessage {
   factory RestoreRequest({
     $core.String? filePath,
     $core.Iterable<$core.String>? diffs,
+    $core.Iterable<$core.int>? fileSize,
+    $core.String? saveDir,
   }) {
     final _result = create();
     if (filePath != null) {
@@ -27,6 +31,12 @@ class RestoreRequest extends $pb.GeneratedMessage {
     }
     if (diffs != null) {
       _result.diffs.addAll(diffs);
+    }
+    if (fileSize != null) {
+      _result.fileSize.addAll(fileSize);
+    }
+    if (saveDir != null) {
+      _result.saveDir = saveDir;
     }
     return _result;
   }
@@ -62,6 +72,18 @@ class RestoreRequest extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(2)
   $core.List<$core.String> get diffs => $_getList(1);
+
+  @$pb.TagNumber(3)
+  $core.List<$core.int> get fileSize => $_getList(2);
+
+  @$pb.TagNumber(4)
+  $core.String get saveDir => $_getSZ(3);
+  @$pb.TagNumber(4)
+  set saveDir($core.String v) { $_setString(3, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasSaveDir() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearSaveDir() => clearField(4);
 }
 
 class RestoreResponse extends $pb.GeneratedMessage {

@@ -1,7 +1,7 @@
 name: knowledge_one
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 0.0.1
+version: 0.0.2
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -36,6 +36,7 @@ dependencies:
   ## for dev
   flutter_graph: 
     path: ../flow_graph
+  filesize: ^2.0.1
   # flutter_graph: 
   #   git:
   #     url: https://github.com/guchengxi1994/flutter_graph

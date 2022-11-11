@@ -72,7 +72,7 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
             if (result != "") {
               context
                   .read<FileSystemController>()
-                  .addToCurrentFolder(FileEntity(fileName: result));
+                  .addToCurrentFolder(FileEntity(fileName: result, fileId: -1));
             }
           },
           icon: const Icon(
@@ -174,7 +174,7 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
           final filePath = details.files.first.path;
           final fileName = details.files.first.name;
           context.read<FileSystemController>().addToCurrentFolder(
-              FileEntity(fileName: fileName, path: filePath));
+              FileEntity(fileName: fileName, path: filePath, fileId: -1));
         },
         child: SingleChildScrollView(
           controller: controller,

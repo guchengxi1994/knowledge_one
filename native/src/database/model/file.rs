@@ -24,14 +24,33 @@ pub struct NativeFileSummary {
 #[tokio::main]
 pub async fn delete_file_by_file_hash(file_hash: String) -> i64 {
     let pool = crate::database::sqlx_connection::POOL.read().await;
-    let sql = sqlx::query(r#"UPDATE file SET is_deleted = 1 WHERE file_hash=? "#)
-        .bind(file_hash)
-        .execute(pool.get_pool())
-        .await;
-    match sql {
-        Ok(_) => {
-            // println!("{:?}",result);
-            return 0;
+    let file = sqlx::query_as::<sqlx::MySql, FileDetails>(
+        r#"SELECT * from file WHERE is_deleted=0 and file_hash=?"#,
+    )
+    .bind(&file_hash)
+    .fetch_one(pool.get_pool())
+    .await;
+    match file {
+        Ok(f) => {
+            let mut tx = pool.get_pool().begin().await.unwrap();
+            let _ = sqlx::query(r#"UPDATE file SET is_deleted = 1 WHERE file_id=? "#)
+                .bind(f.file_id)
+                .execute(&mut tx)
+                .await;
+            let _ = sqlx::query(r#"UPDATE file_changelog SET is_deleted = 1 WHERE file_id=? "#)
+                .bind(f.file_id)
+                .execute(&mut tx)
+                .await;
+            let result = tx.commit().await;
+            match result {
+                Err(_) => {
+                    // println!("{:?}",err);
+                    return 1;
+                },
+                Ok(_)=>{
+                    return 0;
+                }
+            }
         }
         Err(_) => {
             // println!("{:?}",err);

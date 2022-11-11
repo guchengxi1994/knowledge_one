@@ -32,7 +32,6 @@ class _FolderWidgetState extends State<FolderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // print(context.watch<FileSystemController>().currentWidgetId);
     bool isDragging = context.watch<FileSystemController>().isDragging;
 
     late Decoration? decoration;
@@ -43,32 +42,23 @@ class _FolderWidgetState extends State<FolderWidget> {
       if (isDragging) {
         decoration = BoxDecoration(
           color: AppStyle.selectedBackgroundColorWhenGragging, // 背景色
-          // border: Border.all(color: Colors.blue, width: 0.5), // border
+          border: Border.all(color: Colors.blue, width: 0.5), // border
           borderRadius: BorderRadius.circular((1)), // 圆角
-          border: Border.all(
-              color: context.select<FileSystemController, int>(
-                          (value) => value.currentWidgetId) ==
-                      widget.index
-                  ? Colors.blue
-                  : Colors.transparent,
-              width: 0.5),
         );
       } else {
         decoration = BoxDecoration(
           color: AppStyle.selectedBackgroundColor, // 背景色
-          // border: Border.all(color: Colors.blue, width: 0.5), // border
+          border: Border.all(color: Colors.blue, width: 0.5), // border
           borderRadius: BorderRadius.circular((1)), // 圆角
-          border: Border.all(
-              color: context.select<FileSystemController, int>(
-                          (value) => value.currentWidgetId) ==
-                      widget.index
-                  ? Colors.blue
-                  : Colors.transparent,
-              width: 0.5),
         );
       }
     } else {
-      decoration = null;
+      decoration = BoxDecoration(
+        color: Colors.transparent, // 背景色
+        // border: Border.all(color: Colors.blue, width: 0.5), // border
+        borderRadius: BorderRadius.circular((1)), // 圆角
+        border: Border.all(color: Colors.transparent, width: 0.5),
+      );
     }
 
     dx = (widget.index %

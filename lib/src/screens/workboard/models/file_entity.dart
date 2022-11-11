@@ -3,6 +3,7 @@ import 'base_file_entity.dart';
 class FileEntity extends BaseFileEntity {
   FileEntity(
       {required String fileName,
+      required this.fileId,
       this.fileHash,
       this.versionControl,
       String path = "",
@@ -11,6 +12,7 @@ class FileEntity extends BaseFileEntity {
 
   String? fileHash;
   int? versionControl;
+  int? fileId;
 
   @override
   Map<String, dynamic> toJson() {
@@ -18,7 +20,8 @@ class FileEntity extends BaseFileEntity {
       "fileName": name,
       "path": path,
       "fileHash": fileHash,
-      "versionControl": versionControl
+      "versionControl": versionControl,
+      "fileId": fileId
     };
   }
 
@@ -35,6 +38,7 @@ class FileEntity extends BaseFileEntity {
 
   static FileEntity fromJson(Map<String, dynamic> json) {
     return FileEntity(
+        fileId: json['fileId'],
         versionControl: json['versionControl'],
         fileHash: json['fileHash'],
         fileName: json['fileName'],

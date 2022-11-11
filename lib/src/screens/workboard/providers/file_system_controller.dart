@@ -154,6 +154,7 @@ class FileSystemController extends ChangeNotifier {
       }
 
       entity.fileHash = fileHash;
+      entity.fileId = i;
     }
 
     int lengthBefore = folder.children.length;

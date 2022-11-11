@@ -52,6 +52,49 @@ impl FileChangelog {
             }
         }
     }
+
+    #[tokio::main]
+    pub async fn get_filelogs_by_id_after_some_file_hash(
+        id: i64,
+        file_hash: String,
+    ) -> Option<Vec<FileChangelog>> {
+        let pool = crate::database::sqlx_connection::POOL.read().await;
+        let sql = sqlx::query_as::<sqlx::MySql, FileChangelog>(
+            r#"SELECT * FROM file_changelog WHERE file_id=? and is_deleted=0"#,
+        )
+        .bind(id)
+        .fetch_all(pool.get_pool())
+        .await;
+
+        match sql {
+            Ok(s) => {
+                let mut id = 0;
+                for i in 0..s.len() {
+                    let this_file_hash = &s[i].version_id;
+                    match this_file_hash {
+                        None => {
+                            continue;
+                        }
+                        Some(tfh) => {
+                            if tfh.eq(&file_hash) {
+                                id = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                let mut sv: Vec<FileChangelog> = Vec::new();
+                for i in id..s.len() {
+                    sv.push(s[i].clone());
+                }
+                return Some(sv);
+            }
+            Err(_) => {
+                return None;
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -93,11 +136,15 @@ impl NativeFileNewVersion {
             r#"INSERT INTO file_changelog (file_id,version_id,prev_version_id,file_length,file_path,diff_path) VALUES(?,?,?,?,?,?) "#,
         ).bind(file_id).bind(self.new_version_file_hash.clone()).bind(self.prev_file_hash.clone()).bind(file_size).bind(self.new_version_file_path.clone()).bind(self.diff_path.clone()).execute(&mut tx).await;
 
-                let _ = sqlx::query(r#"UPDATE file SET file_hash = ? WHERE file_id=? "#)
-                    .bind(self.new_version_file_hash.clone())
-                    .bind(file_id)
-                    .execute(&mut tx)
-                    .await;
+                let _ = sqlx::query(
+                    r#"UPDATE file SET file_hash = ?,file_name=?,file_path=? WHERE file_id=? "#,
+                )
+                .bind(self.new_version_file_hash.clone())
+                .bind(self.new_version_file_name.clone())
+                .bind(self.new_version_file_path.clone())
+                .bind(file_id)
+                .execute(&mut tx)
+                .await;
                 let r = tx.commit().await;
                 match r {
                     Ok(_) => 0,

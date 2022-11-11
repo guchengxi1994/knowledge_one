@@ -12,11 +12,11 @@ if "%input1%"=="run" (
     cd rpc
     :: file_changelog
     cd file_changelog
-    pyinstaller -i app_icon.ico -F file_changelog.py
+    pyinstaller -w -i  app_icon.ico  file_changelog.py -y
     if exist "dist/file_changelog.exe" (
         echo "file exists"
-        copy dist\file_changelog.exe ..\..\build\windows\runner\Debug\file_changelog.exe /y 
-        copy dist\file_changelog.exe ..\..\build\windows\runner\release\file_changelog.exe /y 
+        xcopy dist\file_changelog\ ..\..\build\windows\runner\Debug\file_changelog\ /E /Y /F
+        xcopy dist\file_changelog\ ..\..\build\windows\runner\release\file_changelog\ /E /Y /F
     ) else (
         echo "file not find"
     )

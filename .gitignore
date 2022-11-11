@@ -48,3 +48,4 @@ app.*.map.json
 # just support desktop
 ios/
 android/
+lib/src/native
