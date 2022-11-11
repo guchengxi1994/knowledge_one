@@ -3,9 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
-import 'package:knowledge_one/src/native.dart';
-import 'package:knowledge_one/src/native/bridge_definitions.dart'
-    show NativeFileSummary;
+import 'package:knowledge_one/native.dart';
 import 'package:knowledge_one/utils/utils.dart';
 
 import '../models/models.dart';

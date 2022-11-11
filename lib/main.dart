@@ -4,7 +4,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/routers.dart';
 import 'package:knowledge_one/rpc_controller.dart';
-import 'package:knowledge_one/src/native/native.dart';
+import 'native.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'app_style.dart';

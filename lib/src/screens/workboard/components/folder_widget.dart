@@ -44,13 +44,27 @@ class _FolderWidgetState extends State<FolderWidget> {
         decoration = BoxDecoration(
           color: AppStyle.selectedBackgroundColorWhenGragging, // 背景色
           // border: Border.all(color: Colors.blue, width: 0.5), // border
-          // borderRadius: BorderRadius.circular((1)), // 圆角
+          borderRadius: BorderRadius.circular((1)), // 圆角
+          border: Border.all(
+              color: context.select<FileSystemController, int>(
+                          (value) => value.currentWidgetId) ==
+                      widget.index
+                  ? Colors.blue
+                  : Colors.transparent,
+              width: 0.5),
         );
       } else {
         decoration = BoxDecoration(
           color: AppStyle.selectedBackgroundColor, // 背景色
           // border: Border.all(color: Colors.blue, width: 0.5), // border
-          // borderRadius: BorderRadius.circular((1)), // 圆角
+          borderRadius: BorderRadius.circular((1)), // 圆角
+          border: Border.all(
+              color: context.select<FileSystemController, int>(
+                          (value) => value.currentWidgetId) ==
+                      widget.index
+                  ? Colors.blue
+                  : Colors.transparent,
+              width: 0.5),
         );
       }
     } else {

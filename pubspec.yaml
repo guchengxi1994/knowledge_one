@@ -54,6 +54,7 @@ flutter:
 
   assets:
     - assets/icons/file.png
+    - assets/icons/version.png
     - assets/icons/vc_file.png
     - assets/icons/folder.png
     - assets/icons/switch.png
