@@ -65,6 +65,24 @@ fn wire_create_restore_directory_impl(port_: MessagePort, s: impl Wire2Api<Strin
         },
     )
 }
+fn wire_get_changelog_from_id_impl(
+    port_: MessagePort,
+    id: impl Wire2Api<i64> + UnwindSafe,
+    file_hash: impl Wire2Api<String> + UnwindSafe,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_changelog_from_id",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_id = id.wire2api();
+            let api_file_hash = file_hash.wire2api();
+            move |task_callback| Ok(get_changelog_from_id(api_id, api_file_hash))
+        },
+    )
+}
 fn wire_get_file_hash_impl(port_: MessagePort, file_path: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {

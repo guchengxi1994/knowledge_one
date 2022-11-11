@@ -1,3 +1,4 @@
+import multiprocessing
 import grpc
 import time
 from concurrent import futures
@@ -6,6 +7,7 @@ from file_diff.file_diff_impl import get_diff
 from file_diff.file_diff_pb2_grpc import FileDiffServicer, add_FileDiffServicer_to_server
 from file_diff.file_diff_pb2 import GenerateDiffResponse
 
+from file_restore.file_restore_impl import restore_from_file
 from file_restore.file_restore_pb2_grpc import FileRestoreServicer,add_FileRestoreServicer_to_server
 from file_restore.file_restore_pb2 import RestoreResponse
 
@@ -33,13 +35,12 @@ class Restore(FileRestoreServicer):
         diffs:list = request.diffs
         fileSize:list = request.fileSize
         saveDir:str = request.saveDir
-        print(filePath)
-        print(diffs)
 
         try:
-            return RestoreResponse(message="a")
+            s = restore_from_file(filePath,diffs,fileSize,saveDir)
+            return RestoreResponse(message=s)
         except:
-            return RestoreResponse(message="b")
+            return RestoreResponse(message="")
 
 
 def serve():
@@ -55,4 +56,5 @@ def serve():
         server.stop(0)
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     serve()

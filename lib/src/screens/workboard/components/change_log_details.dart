@@ -1,11 +1,17 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
+import 'dart:io';
+
+import 'package:grpc/grpc.dart';
+import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/src/extensions/date_time_extension.dart';
+import 'package:knowledge_one/src/rpc/file_restore.pbgrpc.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/native.dart';
 import 'package:filesize/filesize.dart';
+import 'package:provider/provider.dart';
 
 class ChangelogDetails extends StatelessWidget {
   const ChangelogDetails(
@@ -75,7 +81,51 @@ class ChangelogDetails extends StatelessWidget {
                 height: 20,
               ),
               if (!isLast)
-                ElevatedButton(onPressed: () {}, child: const Text("回退到这个版本"))
+                ElevatedButton(
+                    onPressed: () async {
+                      debugPrint(model.fileId.toString());
+                      final result = await api.getChangelogFromId(
+                        id: model.fileId,
+                        fileHash: model.versionId!,
+                      );
+                      if (result != null) {
+                        final path = File(Platform.resolvedExecutable).parent;
+                        debugPrint("logs:${result.length}");
+                        final currentFilePath = result.last.filePath!;
+                        final diffs =
+                            result.map((e) => e.diffPath ?? "").toList();
+                        final fileSize =
+                            result.map((e) => e.fileLength).toList();
+                        final saveDir = "${path.path}/_restore";
+
+                        final channel = ClientChannel(
+                          'localhost',
+                          port: 15556,
+                          options: const ChannelOptions(
+                              credentials: ChannelCredentials.insecure()),
+                        );
+
+                        final stub = FileRestoreClient(channel);
+                        RestoreRequest request = RestoreRequest(
+                            filePath: currentFilePath,
+                            diffs: diffs,
+                            fileSize: fileSize,
+                            saveDir: saveDir);
+
+                        await context
+                            .read<RPCController>()
+                            .startFileChangelogTracingRPC();
+
+                        try {
+                          var response = await stub.restore(request);
+                          debugPrint('服务端返回信息: ${response.message}');
+                        } catch (e) {
+                          debugPrint('Caught error: $e');
+                        }
+                        await channel.shutdown();
+                      }
+                    },
+                    child: const Text("回退到这个版本"))
             ],
           )),
         ),

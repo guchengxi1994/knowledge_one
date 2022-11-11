@@ -9,7 +9,7 @@ message RestoreRequest {
   // 中间经历的diff文件路径
   repeated string diffs = 2;
   // 经历每个diff文件大小
-  repeated int64 fileSize = 3;
+  repeated int32 fileSize = 3;
   // 保存的路径
   string saveDir = 4;
 }

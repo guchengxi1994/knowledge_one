@@ -12,11 +12,13 @@ class RPCController extends ChangeNotifier {
   }
 
   startFileChangelogTracingRPC() async {
-    final path = File(Platform.resolvedExecutable).parent;
-    late String tracingExe = "${path.path}/file_changelog.exe";
-
-    final process = await Process.start(tracingExe, []);
-    addRPC(RPCTypes.fileChangeLog, process.pid);
+    if (validRPCs[RPCTypes.fileChangeLog] == null) {
+      final path = File(Platform.resolvedExecutable).parent;
+      late String tracingExe = "${path.path}/file_changelog/file_changelog.exe";
+      final process = await Process.start(tracingExe, []);
+      addRPC(RPCTypes.fileChangeLog, process.pid);
+      debugPrint("pid:${process.pid}");
+    }
   }
 
   addRPC(RPCTypes t, int rpcProcessId) {
@@ -38,6 +40,21 @@ class RPCController extends ChangeNotifier {
           removeRPC(t);
         }
       } catch (_) {}
+    }
+  }
+
+  endAll() {
+    try {
+      for (final i in validRPCs.entries) {
+        if (i.value != null) {
+          final r = Process.killPid(i.value!);
+          if (r) {
+            removeRPC(i.key);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 }

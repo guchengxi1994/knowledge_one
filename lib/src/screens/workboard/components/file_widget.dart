@@ -213,37 +213,38 @@ class _FileWidgetState extends State<FileWidget> {
                       Navigator.of(ctx).pop();
                     },
                   ),
-                ListTile(
-                  leading: Icon(
-                    Icons.verified,
-                    color: AppStyle.appBlue,
-                  ),
-                  title: const Text('启用版本追踪'),
-                  onTap: () async {
-                    if (currentEntity.fileHash == null) {
-                      SmartDialogUtils.error("文件Hash值为空");
-                    }
-
-                    if (currentEntity.versionControl != 1) {
-                      final r = await api.changeVersionControl(
-                          fileHash: currentEntity.fileHash!);
-                      if (r == 1) {
-                        SmartDialogUtils.error("失败");
-                      } else {
-                        setState(() {
-                          currentEntity.versionControl = 1;
-                          currentEntity.iconPath = "assets/icons/vc_file.png";
-                        });
-                        context
-                            .read<FileSystemController>()
-                            .changeVersionControlStatus(currentEntity);
+                if (currentEntity.versionControl != 1)
+                  ListTile(
+                    leading: Icon(
+                      Icons.verified,
+                      color: AppStyle.appBlue,
+                    ),
+                    title: const Text('启用版本追踪'),
+                    onTap: () async {
+                      if (currentEntity.fileHash == null) {
+                        SmartDialogUtils.error("文件Hash值为空");
                       }
-                    } else {
-                      SmartDialogUtils.message("已开启版本控制");
-                    }
-                    Navigator.of(ctx).pop();
-                  },
-                ),
+
+                      if (currentEntity.versionControl != 1) {
+                        final r = await api.changeVersionControl(
+                            fileHash: currentEntity.fileHash!);
+                        if (r == 1) {
+                          SmartDialogUtils.error("失败");
+                        } else {
+                          setState(() {
+                            currentEntity.versionControl = 1;
+                            currentEntity.iconPath = "assets/icons/vc_file.png";
+                          });
+                          context
+                              .read<FileSystemController>()
+                              .changeVersionControlStatus(currentEntity);
+                        }
+                      } else {
+                        SmartDialogUtils.message("已开启版本控制");
+                      }
+                      Navigator.of(ctx).pop();
+                    },
+                  ),
                 if (currentEntity.versionControl == 1)
                   ListTile(
                     leading: Icon(

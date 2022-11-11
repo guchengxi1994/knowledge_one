@@ -23,6 +23,12 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kCreateRestoreDirectoryConstMeta;
 
+  /// 根据file_id 和hash值获取修改的changelog
+  Future<List<FileChangelog>?> getChangelogFromId(
+      {required int id, required String fileHash, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetChangelogFromIdConstMeta;
+
   /// 获取文件hash值
   Future<String> getFileHash({required String filePath, dynamic hint});
 
@@ -249,6 +255,23 @@ class NativeImpl implements Native {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "create_restore_directory",
         argNames: ["s"],
+      );
+
+  Future<List<FileChangelog>?> getChangelogFromId(
+          {required int id, required String fileHash, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_get_changelog_from_id(port_,
+            _platform.api2wire_i64(id), _platform.api2wire_String(fileHash)),
+        parseSuccessData: _wire2api_opt_list_file_changelog,
+        constMeta: kGetChangelogFromIdConstMeta,
+        argValues: [id, fileHash],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kGetChangelogFromIdConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_changelog_from_id",
+        argNames: ["id", "fileHash"],
       );
 
   Future<String> getFileHash({required String filePath, dynamic hint}) =>
@@ -694,6 +717,25 @@ class NativeWire implements FlutterRustBridgeWireBase {
               ffi.Pointer<wire_uint_8_list>)>>('wire_create_restore_directory');
   late final _wire_create_restore_directory = _wire_create_restore_directoryPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_changelog_from_id(
+    int port_,
+    int id,
+    ffi.Pointer<wire_uint_8_list> file_hash,
+  ) {
+    return _wire_get_changelog_from_id(
+      port_,
+      id,
+      file_hash,
+    );
+  }
+
+  late final _wire_get_changelog_from_idPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64, ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_get_changelog_from_id');
+  late final _wire_get_changelog_from_id = _wire_get_changelog_from_idPtr
+      .asFunction<void Function(int, int, ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_get_file_hash(
     int port_,

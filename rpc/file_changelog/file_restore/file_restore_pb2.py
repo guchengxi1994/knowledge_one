@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x66ile_restore.proto\x12\x0e\x66ile_changelog\"T\n\x0eRestoreRequest\x12\x10\n\x08\x66ilePath\x18\x01 \x01(\t\x12\r\n\x05\x64iffs\x18\x02 \x03(\t\x12\x10\n\x08\x66ileSize\x18\x03 \x03(\x03\x12\x0f\n\x07saveDir\x18\x04 \x01(\t\"\"\n\x0fRestoreResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2[\n\x0b\x46ileRestore\x12L\n\x07Restore\x12\x1e.file_changelog.RestoreRequest\x1a\x1f.file_changelog.RestoreResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12\x66ile_restore.proto\x12\x0e\x66ile_changelog\"T\n\x0eRestoreRequest\x12\x10\n\x08\x66ilePath\x18\x01 \x01(\t\x12\r\n\x05\x64iffs\x18\x02 \x03(\t\x12\x10\n\x08\x66ileSize\x18\x03 \x03(\x05\x12\x0f\n\x07saveDir\x18\x04 \x01(\t\"\"\n\x0fRestoreResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2[\n\x0b\x46ileRestore\x12L\n\x07Restore\x12\x1e.file_changelog.RestoreRequest\x1a\x1f.file_changelog.RestoreResponse\"\x00\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'file_restore_pb2', globals())

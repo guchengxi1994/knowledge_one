@@ -17,6 +17,15 @@ pub extern "C" fn wire_create_restore_directory(port_: i64, s: *mut wire_uint_8_
 }
 
 #[no_mangle]
+pub extern "C" fn wire_get_changelog_from_id(
+    port_: i64,
+    id: i64,
+    file_hash: *mut wire_uint_8_list,
+) {
+    wire_get_changelog_from_id_impl(port_, id, file_hash)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_get_file_hash(port_: i64, file_path: *mut wire_uint_8_list) {
     wire_get_file_hash_impl(port_, file_path)
 }

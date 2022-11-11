@@ -17,6 +17,11 @@ pub fn wire_create_restore_directory(port_: MessagePort, s: String) {
 }
 
 #[wasm_bindgen]
+pub fn wire_get_changelog_from_id(port_: MessagePort, id: i64, file_hash: String) {
+    wire_get_changelog_from_id_impl(port_, id, file_hash)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_file_hash(port_: MessagePort, file_path: String) {
     wire_get_file_hash_impl(port_, file_path)
 }

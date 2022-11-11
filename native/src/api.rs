@@ -16,6 +16,13 @@ pub fn create_restore_directory(s: String) -> i32 {
     storage::create_folder::create_restore_dir(s)
 }
 
+/// 根据file_id 和hash值获取修改的changelog
+pub fn get_changelog_from_id(id:i64,file_hash:String)->Option<Vec<crate::database::model::changelog::FileChangelog>>{
+    block_on(async {
+        crate::database::model::changelog::FileChangelog::get_filelogs_by_id_after_some_file_hash(id, file_hash)
+    })
+}
+
 /// 获取文件hash值
 pub fn get_file_hash(file_path: String) -> String {
     crate::storage::file_hash::get_file_hash(file_path)

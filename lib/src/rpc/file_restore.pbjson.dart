@@ -14,13 +14,13 @@ const RestoreRequest$json = const {
   '2': const [
     const {'1': 'filePath', '3': 1, '4': 1, '5': 9, '10': 'filePath'},
     const {'1': 'diffs', '3': 2, '4': 3, '5': 9, '10': 'diffs'},
-    const {'1': 'fileSize', '3': 3, '4': 3, '5': 3, '10': 'fileSize'},
+    const {'1': 'fileSize', '3': 3, '4': 3, '5': 5, '10': 'fileSize'},
     const {'1': 'saveDir', '3': 4, '4': 1, '5': 9, '10': 'saveDir'},
   ],
 };
 
 /// Descriptor for `RestoreRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List restoreRequestDescriptor = $convert.base64Decode('Cg5SZXN0b3JlUmVxdWVzdBIaCghmaWxlUGF0aBgBIAEoCVIIZmlsZVBhdGgSFAoFZGlmZnMYAiADKAlSBWRpZmZzEhoKCGZpbGVTaXplGAMgAygDUghmaWxlU2l6ZRIYCgdzYXZlRGlyGAQgASgJUgdzYXZlRGly');
+final $typed_data.Uint8List restoreRequestDescriptor = $convert.base64Decode('Cg5SZXN0b3JlUmVxdWVzdBIaCghmaWxlUGF0aBgBIAEoCVIIZmlsZVBhdGgSFAoFZGlmZnMYAiADKAlSBWRpZmZzEhoKCGZpbGVTaXplGAMgAygFUghmaWxlU2l6ZRIYCgdzYXZlRGlyGAQgASgJUgdzYXZlRGly');
 @$core.Deprecated('Use restoreResponseDescriptor instead')
 const RestoreResponse$json = const {
   '1': 'RestoreResponse',
