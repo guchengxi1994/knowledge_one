@@ -52,6 +52,19 @@ fn wire_create_diff_directory_impl(port_: MessagePort, s: impl Wire2Api<String> 
         },
     )
 }
+fn wire_create_restore_directory_impl(port_: MessagePort, s: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "create_restore_directory",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_s = s.wire2api();
+            move |task_callback| Ok(create_restore_directory(api_s))
+        },
+    )
+}
 fn wire_get_file_hash_impl(port_: MessagePort, file_path: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {

@@ -31,6 +31,8 @@ class Restore(FileRestoreServicer):
     def Restore(self, request, context):
         filePath:str = request.filePath
         diffs:list = request.diffs
+        fileSize:list = request.fileSize
+        saveDir:str = request.saveDir
         print(filePath)
         print(diffs)
 

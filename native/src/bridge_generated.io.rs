@@ -12,6 +12,11 @@ pub extern "C" fn wire_create_diff_directory(port_: i64, s: *mut wire_uint_8_lis
 }
 
 #[no_mangle]
+pub extern "C" fn wire_create_restore_directory(port_: i64, s: *mut wire_uint_8_list) {
+    wire_create_restore_directory_impl(port_, s)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_get_file_hash(port_: i64, file_path: *mut wire_uint_8_list) {
     wire_get_file_hash_impl(port_, file_path)
 }

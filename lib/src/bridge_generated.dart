@@ -19,6 +19,10 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kCreateDiffDirectoryConstMeta;
 
+  Future<int> createRestoreDirectory({required String s, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCreateRestoreDirectoryConstMeta;
+
   /// 获取文件hash值
   Future<String> getFileHash({required String filePath, dynamic hint});
 
@@ -228,6 +232,22 @@ class NativeImpl implements Native {
   FlutterRustBridgeTaskConstMeta get kCreateDiffDirectoryConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "create_diff_directory",
+        argNames: ["s"],
+      );
+
+  Future<int> createRestoreDirectory({required String s, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner
+            .wire_create_restore_directory(port_, _platform.api2wire_String(s)),
+        parseSuccessData: _wire2api_i32,
+        constMeta: kCreateRestoreDirectoryConstMeta,
+        argValues: [s],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kCreateRestoreDirectoryConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "create_restore_directory",
         argNames: ["s"],
       );
 
@@ -656,6 +676,23 @@ class NativeWire implements FlutterRustBridgeWireBase {
           ffi.Void Function(ffi.Int64,
               ffi.Pointer<wire_uint_8_list>)>>('wire_create_diff_directory');
   late final _wire_create_diff_directory = _wire_create_diff_directoryPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_create_restore_directory(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> s,
+  ) {
+    return _wire_create_restore_directory(
+      port_,
+      s,
+    );
+  }
+
+  late final _wire_create_restore_directoryPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_create_restore_directory');
+  late final _wire_create_restore_directory = _wire_create_restore_directoryPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_get_file_hash(

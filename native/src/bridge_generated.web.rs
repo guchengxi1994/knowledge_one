@@ -12,6 +12,11 @@ pub fn wire_create_diff_directory(port_: MessagePort, s: String) {
 }
 
 #[wasm_bindgen]
+pub fn wire_create_restore_directory(port_: MessagePort, s: String) {
+    wire_create_restore_directory_impl(port_, s)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_file_hash(port_: MessagePort, file_path: String) {
     wire_get_file_hash_impl(port_, file_path)
 }

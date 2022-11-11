@@ -93,11 +93,15 @@ impl NativeFileNewVersion {
             r#"INSERT INTO file_changelog (file_id,version_id,prev_version_id,file_length,file_path,diff_path) VALUES(?,?,?,?,?,?) "#,
         ).bind(file_id).bind(self.new_version_file_hash.clone()).bind(self.prev_file_hash.clone()).bind(file_size).bind(self.new_version_file_path.clone()).bind(self.diff_path.clone()).execute(&mut tx).await;
 
-                let _ = sqlx::query(r#"UPDATE file SET file_hash = ? WHERE file_id=? "#)
-                    .bind(self.new_version_file_hash.clone())
-                    .bind(file_id)
-                    .execute(&mut tx)
-                    .await;
+                let _ = sqlx::query(
+                    r#"UPDATE file SET file_hash = ?,file_name=?,file_path=? WHERE file_id=? "#,
+                )
+                .bind(self.new_version_file_hash.clone())
+                .bind(self.new_version_file_name.clone())
+                .bind(self.new_version_file_path.clone())
+                .bind(file_id)
+                .execute(&mut tx)
+                .await;
                 let r = tx.commit().await;
                 match r {
                     Ok(_) => 0,

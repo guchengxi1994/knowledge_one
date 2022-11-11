@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
@@ -12,13 +13,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initApp();
+  runApp(const MyApp());
+}
+
+Future<void> initApp() async {
   Directory executableDir = File(Platform.resolvedExecutable).parent;
   await api.createStorageDirectory(s: executableDir.path);
+  await api.createDiffDirectory(s: executableDir.path);
+  await api.createRestoreDirectory(s: executableDir.path);
 
   await api.initMysql(confPath: "${executableDir.path}/db_config.toml");
-
-  // final results = await api.testSqlx();
-  // debugPrint(results.length.toString());
 
   await windowManager.ensureInitialized();
   windowManager.setTitle("KnowledgeOne");
@@ -27,8 +32,15 @@ void main() async {
   windowManager
       .setMinimumSize(const Size(AppStyle.appMinWidth, AppStyle.appMinHeight));
   windowManager.setResizable(false);
+}
 
-  runApp(const MyApp());
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
 
 class MyApp extends StatelessWidget {
@@ -50,6 +62,7 @@ class MyApp extends StatelessWidget {
             Locale('zh', 'HK'),
             Locale('en', 'US'),
           ],
+          scrollBehavior: CustomScrollBehavior(),
           theme: ThemeData(fontFamily: "思源"),
           locale: const Locale('zh'),
           debugShowCheckedModeBanner: false,

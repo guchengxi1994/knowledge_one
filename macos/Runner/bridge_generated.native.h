@@ -40,6 +40,8 @@ void wire_create_storage_directory(int64_t port_, struct wire_uint_8_list *s);
 
 void wire_create_diff_directory(int64_t port_, struct wire_uint_8_list *s);
 
+void wire_create_restore_directory(int64_t port_, struct wire_uint_8_list *s);
+
 void wire_get_file_hash(int64_t port_, struct wire_uint_8_list *file_path);
 
 void wire_delete_file_by_file_hash(int64_t port_, struct wire_uint_8_list *file_hash);
@@ -72,6 +74,7 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     int64_t dummy_var = 0;
     dummy_var ^= ((int64_t) (void*) wire_create_storage_directory);
     dummy_var ^= ((int64_t) (void*) wire_create_diff_directory);
+    dummy_var ^= ((int64_t) (void*) wire_create_restore_directory);
     dummy_var ^= ((int64_t) (void*) wire_get_file_hash);
     dummy_var ^= ((int64_t) (void*) wire_delete_file_by_file_hash);
     dummy_var ^= ((int64_t) (void*) wire_change_version_control);

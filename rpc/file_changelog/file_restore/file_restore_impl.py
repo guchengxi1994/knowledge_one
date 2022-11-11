@@ -1,6 +1,16 @@
 import pickle
 import numpy as np
-from file_diff_impl import _load_file_by_numpy, MATRIX_WIDTH
+
+MATRIX_WIDTH = 6
+
+def restore_from_file(filePath: str, diffs: list) -> str:
+    # 逆序排列，从最近的开始
+    diffs.reverse()
+
+
+def _load_file_by_numpy(p: str) -> list:
+    array = np.fromfile(p, dtype=np.uint8)
+    return array.tolist()
 
 
 def load_pickle(f: str):
@@ -9,7 +19,7 @@ def load_pickle(f: str):
     return r
 
 
-def restore_from_mtx(mtx: str,
+def _restore_from_mtx(mtx: str,
                      filePath: str,
                      fileLen: int,
                      savePath: str = "result.png"):

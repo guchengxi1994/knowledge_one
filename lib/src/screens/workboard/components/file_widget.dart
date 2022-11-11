@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/models.dart';
 import 'base_file_widget.dart';
+import 'flow_graph_dialog.dart';
 import 'preview_dialog.dart';
 
 // ignore: must_be_immutable
@@ -256,6 +257,16 @@ class _FileWidgetState extends State<FileWidget> {
                           fileHash: currentEntity.fileHash!);
                       if (result != null) {
                         debugPrint("length:${result.length}");
+                        await showGeneralDialog(
+                            context: context,
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return Center(
+                                child: FileChangelogGraph(
+                                  changelogs: result,
+                                ),
+                              );
+                            });
                       }
                     },
                   ),
@@ -289,10 +300,12 @@ class _FileWidgetState extends State<FileWidget> {
                         );
                         final stub = FileDiffClient(channel);
                         try {
+                          final currentTime =
+                              DateTime.now().millisecondsSinceEpoch;
                           await stub.generateDiff(GenerateDiffRequest()
                             ..after = filePath
                             ..before = currentEntity.path!
-                            ..savePath = "${path.path}/test.mtx");
+                            ..savePath = "${path.path}/_diff/$currentTime.mtx");
 
                           final newFileHash =
                               await api.getFileHash(filePath: filePath);
@@ -305,7 +318,8 @@ class _FileWidgetState extends State<FileWidget> {
                                   newVersionFilePath: filePath,
                                   newVersionFileHash: newFileHash,
                                   newVersionFileName: fileName,
-                                  diffPath: "${path.path}/test.mtx");
+                                  diffPath:
+                                      "${path.path}/_diff/$currentTime.mtx");
                           final r = await api.createNewVersion(
                               model: nativeFileNewVersion);
                           debugPrint(r.toString());
@@ -315,7 +329,12 @@ class _FileWidgetState extends State<FileWidget> {
                             SmartDialogUtils.ok("成功");
                             setState(() {
                               currentEntity.fileHash = newFileHash;
+                              currentEntity.name = fileName;
+                              currentEntity.path = filePath;
                             });
+                            context
+                                .read<FileSystemController>()
+                                .changeVersionControlStatus(currentEntity);
                           }
                         } catch (e) {
                           // print('Caught error: $e');
@@ -369,7 +388,12 @@ class _FileWidgetState extends State<FileWidget> {
                 //     ? AppStyle.selectedBackgroundColor
                 //     : Colors.transparent,
                 decoration: BoxDecoration(
-                  color: AppStyle.selectedBackgroundColor, // 背景色
+                  // color: AppStyle.selectedBackgroundColor, // 背景色
+                  color: context.select<FileSystemController, int>(
+                              (value) => value.currentWidgetId) ==
+                          widget.index
+                      ? AppStyle.selectedBackgroundColor
+                      : Colors.transparent,
                   border: Border.all(
                       color: context.select<FileSystemController, int>(
                                   (value) => value.currentWidgetId) ==

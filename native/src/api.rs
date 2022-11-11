@@ -12,6 +12,10 @@ pub fn create_diff_directory(s: String) -> i32 {
     storage::create_folder::create_diff_dir(s)
 }
 
+pub fn create_restore_directory(s: String) -> i32 {
+    storage::create_folder::create_restore_dir(s)
+}
+
 /// 获取文件hash值
 pub fn get_file_hash(file_path: String) -> String {
     crate::storage::file_hash::get_file_hash(file_path)
