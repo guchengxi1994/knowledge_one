@@ -133,246 +133,7 @@ class _FileWidgetState extends State<FileWidget> {
           ),
           child: ContextMenuArea(
             width: 300,
-            builder: (ctx) {
-              return [
-                ListTile(
-                  leading: Icon(
-                    Icons.file_open,
-                    color: AppStyle.appGreen,
-                  ),
-                  title: const Text('以系统默认程序打开'),
-                  onTap: () async {
-                    final Uri uri = Uri.file(currentEntity.path!);
-                    try {
-                      if (!File(uri.toFilePath()).existsSync()) {
-                        // throw '$uri does not exist!';
-                        SmartDialogUtils.error("文件已不存在,请删除");
-                        return;
-                      }
-                      if (!await launchUrl(uri)) {
-                        // throw 'Could not launch $uri';
-                        SmartDialogUtils.error("无法打开文件");
-                        return;
-                      }
-                    } catch (_) {
-                      SmartDialogUtils.error("仅支持英文路径😅");
-                    }
-
-                    Navigator.of(ctx).pop();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.file_open,
-                    color: AppStyle.appGreen,
-                  ),
-                  title: const Text('以内置Markdown打开'),
-                  onTap: () async {
-                    await Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (c) {
-                      return MarkdownEditScreen(
-                        filePath: currentEntity.path!,
-                        fileName: currentEntity.name,
-                      );
-                    }));
-                    Navigator.of(ctx).pop();
-                  },
-                ),
-                ListTile(
-                  leading: Icon(
-                    Icons.file_open,
-                    color: AppStyle.appGreen,
-                  ),
-                  title: const Text('以内置富文本打开'),
-                  onTap: () async {
-                    await Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (c) {
-                      return QuillEditScreen(
-                        filePath: currentEntity.path!,
-                        fileName: currentEntity.name,
-                      );
-                    }));
-                    Navigator.of(ctx).pop();
-                  },
-                ),
-                if (!DevUtils.isLinux)
-                  ListTile(
-                    leading: Icon(
-                      Icons.file_open,
-                      color: AppStyle.appGreen,
-                    ),
-                    title: const Text('以内置PDF Previewer打开'),
-                    onTap: () async {
-                      await Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (c) {
-                        return PdfViewerScreen(
-                          filePath: currentEntity.path!,
-                          fileName: currentEntity.name,
-                        );
-                      }));
-                      Navigator.of(ctx).pop();
-                    },
-                  ),
-                if (currentEntity.versionControl != 1)
-                  ListTile(
-                    leading: Icon(
-                      Icons.verified,
-                      color: AppStyle.appBlue,
-                    ),
-                    title: const Text('启用版本追踪'),
-                    onTap: () async {
-                      if (currentEntity.fileHash == null) {
-                        SmartDialogUtils.error("文件Hash值为空");
-                      }
-
-                      if (currentEntity.versionControl != 1) {
-                        final r = await api.changeVersionControl(
-                            fileHash: currentEntity.fileHash!);
-                        if (r == 1) {
-                          SmartDialogUtils.error("失败");
-                        } else {
-                          setState(() {
-                            currentEntity.versionControl = 1;
-                            currentEntity.iconPath = "assets/icons/vc_file.png";
-                          });
-                          context
-                              .read<FileSystemController>()
-                              .changeVersionControlStatus(currentEntity);
-                        }
-                      } else {
-                        SmartDialogUtils.message("已开启版本控制");
-                      }
-                      Navigator.of(ctx).pop();
-                    },
-                  ),
-                if (currentEntity.versionControl == 1)
-                  ListTile(
-                    leading: Icon(
-                      Icons.search,
-                      color: AppStyle.appBlue,
-                    ),
-                    title: const Text('查看修改链路'),
-                    onTap: () async {
-                      Navigator.of(ctx).pop();
-                      final result = await api.getFileLogs(
-                          fileHash: currentEntity.fileHash!);
-                      if (result != null) {
-                        debugPrint("length:${result.length}");
-                        await showGeneralDialog(
-                            context: context,
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) {
-                              return Center(
-                                child: FileChangelogGraph(
-                                  changelogs: result,
-                                ),
-                              );
-                            });
-                      }
-                    },
-                  ),
-                if (currentEntity.versionControl == 1)
-                  ListTile(
-                    leading: Icon(
-                      Icons.verified_user,
-                      color: AppStyle.appBlue,
-                    ),
-                    title: const Text('上传新版本文件'),
-                    onTap: () async {
-                      Navigator.of(ctx).pop();
-                      FilePickerResult? result =
-                          await FilePicker.platform.pickFiles();
-
-                      if (result != null) {
-                        // File file = File(result.files.single.path);
-                        String filePath = result.files.single.path!;
-                        String fileName = result.files.single.name;
-                        debugPrint(filePath);
-
-                        /// 这里启动 rpc
-                        await context
-                            .read<RPCController>()
-                            .startFileChangelogTracingRPC();
-                        final channel = ClientChannel(
-                          'localhost',
-                          port: 15556,
-                          options: const ChannelOptions(
-                              credentials: ChannelCredentials.insecure()),
-                        );
-                        final stub = FileDiffClient(channel);
-                        try {
-                          final currentTime =
-                              DateTime.now().millisecondsSinceEpoch;
-                          await stub.generateDiff(GenerateDiffRequest()
-                            ..after = filePath
-                            ..before = currentEntity.path!
-                            ..savePath = "${path.path}/_diff/$currentTime.mtx");
-
-                          final newFileHash =
-                              await api.getFileHash(filePath: filePath);
-
-                          NativeFileNewVersion nativeFileNewVersion =
-                              NativeFileNewVersion(
-                                  prevFilePath: currentEntity.path!,
-                                  prevFileHash: currentEntity.fileHash!,
-                                  prevFileName: currentEntity.name,
-                                  newVersionFilePath: filePath,
-                                  newVersionFileHash: newFileHash,
-                                  newVersionFileName: fileName,
-                                  diffPath:
-                                      "${path.path}/_diff/$currentTime.mtx");
-                          final r = await api.createNewVersion(
-                              model: nativeFileNewVersion);
-                          debugPrint(r.toString());
-                          if (r != 0) {
-                            SmartDialogUtils.error("失败");
-                          } else {
-                            SmartDialogUtils.ok("成功");
-                            setState(() {
-                              currentEntity.fileHash = newFileHash;
-                              currentEntity.name = fileName;
-                              currentEntity.path = filePath;
-                            });
-                            context
-                                .read<FileSystemController>()
-                                .changeVersionControlStatus(currentEntity);
-                          }
-                        } catch (e) {
-                          // print('Caught error: $e');
-                          SmartDialogUtils.message("失败");
-                        }
-                        await channel.shutdown();
-                      }
-                    },
-                  ),
-                ListTile(
-                  leading: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  ),
-                  title: const Text('删除'),
-                  onTap: () async {
-                    // debugPrint(currentEntity.fileHash);
-                    if (currentEntity.fileHash == null) {
-                      SmartDialogUtils.error("文件Hash不存在");
-                      Navigator.of(ctx).pop();
-                      return;
-                    }
-                    final r = await api.deleteFileByFileHash(
-                        fileHash: currentEntity.fileHash!);
-                    if (r == 1) {
-                      SmartDialogUtils.error("删除失败");
-                      Navigator.of(ctx).pop();
-                      return;
-                    }
-                    context
-                        .read<FileSystemController>()
-                        .removeFromCurrentFolder(widget.entity);
-                    Navigator.of(ctx).pop();
-                  },
-                ),
-              ];
-            },
+            builder: (ctx) => _actions(ctx),
             child: MouseRegion(
               onEnter: (event) {
                 context
@@ -411,5 +172,238 @@ class _FileWidgetState extends State<FileWidget> {
             ),
           )),
     );
+  }
+
+  List<Widget> _actions(BuildContext ctx) {
+    return [
+      ListTile(
+        leading: Icon(
+          Icons.file_open,
+          color: AppStyle.appGreen,
+        ),
+        title: const Text('以系统默认程序打开'),
+        onTap: () async {
+          final Uri uri = Uri.file(currentEntity.path!);
+          try {
+            if (!File(uri.toFilePath()).existsSync()) {
+              // throw '$uri does not exist!';
+              SmartDialogUtils.error("文件已不存在,请删除");
+              return;
+            }
+            if (!await launchUrl(uri)) {
+              // throw 'Could not launch $uri';
+              SmartDialogUtils.error("无法打开文件");
+              return;
+            }
+          } catch (_) {
+            SmartDialogUtils.error("仅支持英文路径😅");
+          }
+
+          Navigator.of(ctx).pop();
+        },
+      ),
+      ListTile(
+        leading: Icon(
+          Icons.file_open,
+          color: AppStyle.appGreen,
+        ),
+        title: const Text('以内置Markdown打开'),
+        onTap: () async {
+          await Navigator.of(context).push(MaterialPageRoute(builder: (c) {
+            return MarkdownEditScreen(
+              filePath: currentEntity.path!,
+              fileName: currentEntity.name,
+            );
+          }));
+          Navigator.of(ctx).pop();
+        },
+      ),
+      ListTile(
+        leading: Icon(
+          Icons.file_open,
+          color: AppStyle.appGreen,
+        ),
+        title: const Text('以内置富文本打开'),
+        onTap: () async {
+          await Navigator.of(context).push(MaterialPageRoute(builder: (c) {
+            return QuillEditScreen(
+              filePath: currentEntity.path!,
+              fileName: currentEntity.name,
+            );
+          }));
+          Navigator.of(ctx).pop();
+        },
+      ),
+      if (!DevUtils.isLinux)
+        ListTile(
+          leading: Icon(
+            Icons.file_open,
+            color: AppStyle.appGreen,
+          ),
+          title: const Text('以内置PDF Previewer打开'),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(builder: (c) {
+              return PdfViewerScreen(
+                filePath: currentEntity.path!,
+                fileName: currentEntity.name,
+              );
+            }));
+            Navigator.of(ctx).pop();
+          },
+        ),
+      if (currentEntity.versionControl != 1)
+        ListTile(
+          leading: Icon(
+            Icons.verified,
+            color: AppStyle.appBlue,
+          ),
+          title: const Text('启用版本追踪'),
+          onTap: () async {
+            if (currentEntity.fileHash == null) {
+              SmartDialogUtils.error("文件Hash值为空");
+            }
+
+            if (currentEntity.versionControl != 1) {
+              final r = await api.changeVersionControl(
+                  fileHash: currentEntity.fileHash!);
+              if (r == 1) {
+                SmartDialogUtils.error("失败");
+              } else {
+                setState(() {
+                  currentEntity.versionControl = 1;
+                  currentEntity.iconPath = "assets/icons/vc_file.png";
+                });
+                context
+                    .read<FileSystemController>()
+                    .changeVersionControlStatus(currentEntity);
+              }
+            } else {
+              SmartDialogUtils.message("已开启版本控制");
+            }
+            Navigator.of(ctx).pop();
+          },
+        ),
+      if (currentEntity.versionControl == 1)
+        ListTile(
+          leading: Icon(
+            Icons.search,
+            color: AppStyle.appBlue,
+          ),
+          title: const Text('查看修改链路'),
+          onTap: () async {
+            Navigator.of(ctx).pop();
+            final result =
+                await api.getFileLogs(fileHash: currentEntity.fileHash!);
+            if (result != null) {
+              debugPrint("length:${result.length}");
+              await showGeneralDialog(
+                  context: context,
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return Center(
+                      child: FileChangelogGraph(
+                        changelogs: result,
+                      ),
+                    );
+                  });
+            }
+          },
+        ),
+      if (currentEntity.versionControl == 1)
+        ListTile(
+          leading: Icon(
+            Icons.verified_user,
+            color: AppStyle.appBlue,
+          ),
+          title: const Text('上传新版本文件'),
+          onTap: () async {
+            Navigator.of(ctx).pop();
+            FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+            if (result != null) {
+              // File file = File(result.files.single.path);
+              String filePath = result.files.single.path!;
+              String fileName = result.files.single.name;
+              debugPrint(filePath);
+
+              /// 这里启动 rpc
+              await context
+                  .read<RPCController>()
+                  .startFileChangelogTracingRPC();
+              final channel = ClientChannel(
+                'localhost',
+                port: 15556,
+                options: const ChannelOptions(
+                    credentials: ChannelCredentials.insecure()),
+              );
+              final stub = FileDiffClient(channel);
+              try {
+                final currentTime = DateTime.now().millisecondsSinceEpoch;
+                await stub.generateDiff(GenerateDiffRequest()
+                  ..after = filePath
+                  ..before = currentEntity.path!
+                  ..savePath = "${path.path}/_diff/$currentTime.mtx");
+
+                final newFileHash = await api.getFileHash(filePath: filePath);
+
+                NativeFileNewVersion nativeFileNewVersion =
+                    NativeFileNewVersion(
+                        prevFilePath: currentEntity.path!,
+                        prevFileHash: currentEntity.fileHash!,
+                        prevFileName: currentEntity.name,
+                        newVersionFilePath: filePath,
+                        newVersionFileHash: newFileHash,
+                        newVersionFileName: fileName,
+                        diffPath: "${path.path}/_diff/$currentTime.mtx");
+                final r =
+                    await api.createNewVersion(model: nativeFileNewVersion);
+                debugPrint(r.toString());
+                if (r != 0) {
+                  SmartDialogUtils.error("失败");
+                } else {
+                  SmartDialogUtils.ok("成功");
+                  setState(() {
+                    currentEntity.fileHash = newFileHash;
+                    currentEntity.name = fileName;
+                    currentEntity.path = filePath;
+                  });
+                  context
+                      .read<FileSystemController>()
+                      .changeVersionControlStatus(currentEntity);
+                }
+              } catch (e) {
+                // print('Caught error: $e');
+                SmartDialogUtils.message("失败");
+              }
+              await channel.shutdown();
+            }
+          },
+        ),
+      ListTile(
+        leading: const Icon(
+          Icons.delete,
+          color: Colors.red,
+        ),
+        title: const Text('删除'),
+        onTap: () async {
+          // debugPrint(currentEntity.fileHash);
+          if (currentEntity.fileHash == null) {
+            SmartDialogUtils.error("文件Hash不存在");
+            Navigator.of(ctx).pop();
+            return;
+          }
+          final r =
+              await api.deleteFileByFileHash(fileHash: currentEntity.fileHash!);
+          if (r == 1) {
+            SmartDialogUtils.error("删除失败");
+            Navigator.of(ctx).pop();
+            return;
+          }
+          context
+              .read<FileSystemController>()
+              .removeFromCurrentFolder(widget.entity);
+          Navigator.of(ctx).pop();
+        },
+      ),
+    ];
   }
 }

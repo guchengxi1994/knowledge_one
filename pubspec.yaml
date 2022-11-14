@@ -33,10 +33,10 @@ dependencies:
   protobuf: ^2.1.0
   grpc: ^3.0.2
   url_launcher: ^6.1.4
+  filesize: ^2.0.1
   ## for dev
   flutter_graph: 
     path: ../flow_graph
-  filesize: ^2.0.1
   # flutter_graph: 
   #   git:
   #     url: https://github.com/guchengxi1994/flutter_graph

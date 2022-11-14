@@ -25,6 +25,13 @@ class FileSystemController extends ChangeNotifier {
 
   int currentWidgetId = -1;
 
+  List<String> getCurrentFileNames() {
+    return folder.children
+        .where((element) => (element is FileEntity))
+        .map((e) => e.name)
+        .toList();
+  }
+
   changeCurrentWidgetId(int i) {
     currentWidgetId = i;
     notifyListeners();
@@ -191,6 +198,62 @@ class FileSystemController extends ChangeNotifier {
   removeFromCurrentFolder(BaseFileEntity entity) {
     folder.children.remove(entity);
     file.writeAsStringSync(json.encode(folderList.first.toJson()));
+    notifyListeners();
+  }
+
+  /// 排序
+  FileSortStrategy sortStrategy = FileSortStrategy.none;
+  FileSortByTimeStrategy sortByTimeStrategy = FileSortByTimeStrategy.asc;
+
+  sortByType() {
+    if (folder.children.isEmpty) {
+      return;
+    }
+
+    if (sortStrategy == FileSortStrategy.none ||
+        sortStrategy == FileSortStrategy.fileFirst) {
+      sortStrategy = FileSortStrategy.folderFirst;
+    } else {
+      sortStrategy = FileSortStrategy.fileFirst;
+    }
+
+    List<FileEntity> entityFile = [];
+    List<FolderEntity> entityFolder = [];
+
+    for (final i in folder.children) {
+      if (i is FileEntity) {
+        entityFile.add(i);
+      } else {
+        entityFolder.add(i as FolderEntity);
+      }
+    }
+
+    folder.children.clear();
+
+    if (sortStrategy == FileSortStrategy.fileFirst) {
+      folder.children.addAll(entityFile);
+      folder.children.addAll(entityFolder);
+    } else {
+      folder.children.addAll(entityFolder);
+      folder.children.addAll(entityFile);
+    }
+
+    notifyListeners();
+  }
+
+  sortByTime() {
+    if (folder.children.isEmpty) {
+      return;
+    }
+
+    final children = folder.children.reversed.toList();
+    folder.children.clear();
+    folder.children.addAll(children);
+    if (sortByTimeStrategy == FileSortByTimeStrategy.asc) {
+      sortByTimeStrategy = FileSortByTimeStrategy.desc;
+    } else {
+      sortByTimeStrategy = FileSortByTimeStrategy.asc;
+    }
     notifyListeners();
   }
 }
