@@ -229,8 +229,12 @@ class _FileWidgetState extends State<FileWidget> {
             return QuillEditScreen(
               filePath: currentEntity.path!,
               fileName: currentEntity.name,
+              fileId: currentEntity.fileId ?? -1,
             );
           }));
+          await context
+              .read<FileSystemController>()
+              .changeFileHash(currentEntity);
           Navigator.of(ctx).pop();
         },
       ),

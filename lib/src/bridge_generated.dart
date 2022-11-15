@@ -50,11 +50,22 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kCreateNewVersionConstMeta;
 
+  /// 创建一个物理文件
+  Future<int> createNewDiskFile({required String filePath, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCreateNewDiskFileConstMeta;
+
   /// 根据现在的hash值获取变更记录
   Future<List<FileChangelog>?> getFileLogs(
       {required String fileHash, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kGetFileLogsConstMeta;
+
+  /// 根据文件id修改文件hash
+  Future<int> changeFileHashById(
+      {required String filePath, required int fileId, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kChangeFileHashByIdConstMeta;
 
   /// 初始化数据库，创建数据库连接池
   Future<void> initMysql({required String confPath, dynamic hint});
@@ -339,6 +350,22 @@ class NativeImpl implements Native {
         argNames: ["model"],
       );
 
+  Future<int> createNewDiskFile({required String filePath, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_create_new_disk_file(
+            port_, _platform.api2wire_String(filePath)),
+        parseSuccessData: _wire2api_i64,
+        constMeta: kCreateNewDiskFileConstMeta,
+        argValues: [filePath],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kCreateNewDiskFileConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "create_new_disk_file",
+        argNames: ["filePath"],
+      );
+
   Future<List<FileChangelog>?> getFileLogs(
           {required String fileHash, dynamic hint}) =>
       _platform.executeNormal(FlutterRustBridgeTask(
@@ -354,6 +381,25 @@ class NativeImpl implements Native {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "get_file_logs",
         argNames: ["fileHash"],
+      );
+
+  Future<int> changeFileHashById(
+          {required String filePath, required int fileId, dynamic hint}) =>
+      _platform.executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => _platform.inner.wire_change_file_hash_by_id(
+            port_,
+            _platform.api2wire_String(filePath),
+            _platform.api2wire_i64(fileId)),
+        parseSuccessData: _wire2api_i64,
+        constMeta: kChangeFileHashByIdConstMeta,
+        argValues: [filePath, fileId],
+        hint: hint,
+      ));
+
+  FlutterRustBridgeTaskConstMeta get kChangeFileHashByIdConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "change_file_hash_by_id",
+        argNames: ["filePath", "fileId"],
       );
 
   Future<void> initMysql({required String confPath, dynamic hint}) =>
@@ -806,6 +852,23 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _wire_create_new_version = _wire_create_new_versionPtr
       .asFunction<void Function(int, ffi.Pointer<wire_NativeFileNewVersion>)>();
 
+  void wire_create_new_disk_file(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_path,
+  ) {
+    return _wire_create_new_disk_file(
+      port_,
+      file_path,
+    );
+  }
+
+  late final _wire_create_new_disk_filePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_create_new_disk_file');
+  late final _wire_create_new_disk_file = _wire_create_new_disk_filePtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
   void wire_get_file_logs(
     int port_,
     ffi.Pointer<wire_uint_8_list> file_hash,
@@ -822,6 +885,25 @@ class NativeWire implements FlutterRustBridgeWireBase {
               ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_get_file_logs');
   late final _wire_get_file_logs = _wire_get_file_logsPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_change_file_hash_by_id(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_path,
+    int file_id,
+  ) {
+    return _wire_change_file_hash_by_id(
+      port_,
+      file_path,
+      file_id,
+    );
+  }
+
+  late final _wire_change_file_hash_by_idPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>,
+              ffi.Int64)>>('wire_change_file_hash_by_id');
+  late final _wire_change_file_hash_by_id = _wire_change_file_hash_by_idPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>, int)>();
 
   void wire_init_mysql(
     int port_,

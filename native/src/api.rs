@@ -45,10 +45,22 @@ pub fn create_new_version(model:crate::database::model::changelog::NativeFileNew
     })  
 }
 
+/// 创建一个物理文件
+pub fn create_new_disk_file(file_path:String)->i64{
+    crate::storage::create_file::create_file(file_path)
+}
+
 /// 根据现在的hash值获取变更记录
 pub fn get_file_logs(file_hash:String)->Option<Vec<crate::database::model::changelog::FileChangelog>>{
     block_on(async {
         crate::database::model::changelog::FileChangelog::get_filelogs_by_file_hash(file_hash)
+    })
+}
+
+/// 根据文件id修改文件hash
+pub fn change_file_hash_by_id(file_path:String,file_id:i64)->i64{
+    block_on(async {
+        crate::database::model::file::change_file_hash_by_id(file_path, file_id)
     })
 }
 

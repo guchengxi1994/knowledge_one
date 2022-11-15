@@ -140,11 +140,40 @@ class FileSystemController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future changeFileHash(FileEntity entity) async {
+    final r = await api.changeFileHashById(
+        filePath: entity.path!, fileId: entity.fileId!);
+    debugPrint(r.toString());
+    final id = folder.children.indexOf(entity);
+    folder.children.removeAt(id);
+    folder.children.insert(id, entity);
+    file.writeAsStringSync(json.encode(folderList.first.toJson()));
+    notifyListeners();
+  }
+
   List<BaseFileEntity> get currentFolderElements => folder.children;
 
   addToCurrentFolder(BaseFileEntity entity) async {
     if (entity is FileEntity) {
-      final fileHash = await api.getFileHash(filePath: entity.path!);
+      final String fileHash;
+      if (entity.path == "" || entity.path == null) {
+        final path = File(Platform.resolvedExecutable).parent;
+        final filePath = "${path.path}/_private/${entity.name}";
+        debugPrint(filePath);
+        final r = await api.createNewDiskFile(filePath: filePath);
+        if (r == 500) {
+          SmartDialogUtils.warning("文件已存在");
+          return;
+        } else if (r == -1) {
+          SmartDialogUtils.error("归档失败");
+          return;
+        }
+        fileHash = await api.getFileHash(filePath: filePath);
+        entity.path = filePath;
+        entity.fileId = r;
+      } else {
+        fileHash = await api.getFileHash(filePath: entity.path!);
+      }
 
       int i = await api.newFile(
           f: NativeFileSummary(
@@ -157,6 +186,9 @@ class FileSystemController extends ChangeNotifier {
         return;
       } else if (i == -1) {
         SmartDialogUtils.warning("文件已存在");
+        return;
+      } else if (i == -500) {
+        SmartDialogUtils.warning("已存在不同版本文件");
         return;
       }
 

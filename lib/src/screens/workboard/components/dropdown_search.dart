@@ -75,53 +75,52 @@ class DropDownSearchState extends State<DropDownSearch> {
             }
           },
           onIconTap: () {
-            toggleOverlay(context);
+            if (!show) {
+              toggleOverlay(context);
+            } else {
+              hideOverlay();
+            }
           },
         ));
   }
 
   void toggleOverlay(BuildContext context) {
-    // debugPrint("_toggleOverlay");
-    if (!show) {
-      // _showOverlay(context);
-      _overlayEntry = OverlayEntry(builder: (c) {
-        return UnconstrainedBox(
-          child: CompositedTransformFollower(
-            link: layerLink,
+    _overlayEntry = OverlayEntry(builder: (c) {
+      return UnconstrainedBox(
+        child: CompositedTransformFollower(
+          link: layerLink,
 
-            ///主体的位置
-            followerAnchor: Alignment.bottomCenter,
+          ///主体的位置
+          followerAnchor: Alignment.bottomCenter,
 
-            ///这个是浮窗的位置
-            targetAnchor: Alignment.topCenter,
-            offset: Offset(0, widget.searchBoxHeight + widget.textFieldHeight),
-            child: Material(
-              // color: Colors.amber,
-              child: SearchBox(
-                key: boxkey,
-                datas: widget.datas,
-                width: widget.searchBoxWidth,
-                height: widget.searchBoxHeight,
-                onItemTap: (index) {
-                  controller.text = d[index];
-                  if (widget.onBoxItemTap != null) {
-                    widget.onBoxItemTap!(controller.text);
-                  }
-                  hideOverlay();
-                  show = !show;
-                  setState(() {});
-                },
-              ),
+          ///这个是浮窗的位置
+          targetAnchor: Alignment.topCenter,
+          offset: Offset(0, widget.searchBoxHeight + widget.textFieldHeight),
+          child: Material(
+            // color: Colors.amber,
+            child: SearchBox(
+              key: boxkey,
+              datas: widget.datas,
+              width: widget.searchBoxWidth,
+              height: widget.searchBoxHeight,
+              onItemTap: (index) {
+                controller.text = d[index];
+                if (widget.onBoxItemTap != null) {
+                  widget.onBoxItemTap!(controller.text);
+                }
+                hideOverlay();
+                // show = !show;
+                // setState(() {});
+              },
             ),
           ),
-        );
-      });
-      OverlayState? overlayState = Navigator.of(context).overlay;
-      // debugPrint("overlayState $overlayState");
-      overlayState?.insert(_overlayEntry!);
-    } else {
-      hideOverlay();
-    }
+        ),
+      );
+    });
+    OverlayState? overlayState = Navigator.of(context).overlay;
+    // debugPrint("overlayState $overlayState");
+    overlayState?.insert(_overlayEntry!);
+
     show = !show;
     setState(() {});
   }
@@ -129,6 +128,10 @@ class DropDownSearchState extends State<DropDownSearch> {
   void hideOverlay() {
     try {
       _overlayEntry?.remove();
+      if (show) {
+        show = !show;
+        setState(() {});
+      }
     } catch (_) {}
   }
 }

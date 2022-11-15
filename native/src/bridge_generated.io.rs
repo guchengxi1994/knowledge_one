@@ -46,8 +46,22 @@ pub extern "C" fn wire_create_new_version(port_: i64, model: *mut wire_NativeFil
 }
 
 #[no_mangle]
+pub extern "C" fn wire_create_new_disk_file(port_: i64, file_path: *mut wire_uint_8_list) {
+    wire_create_new_disk_file_impl(port_, file_path)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_get_file_logs(port_: i64, file_hash: *mut wire_uint_8_list) {
     wire_get_file_logs_impl(port_, file_hash)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_change_file_hash_by_id(
+    port_: i64,
+    file_path: *mut wire_uint_8_list,
+    file_id: i64,
+) {
+    wire_change_file_hash_by_id_impl(port_, file_path, file_id)
 }
 
 #[no_mangle]

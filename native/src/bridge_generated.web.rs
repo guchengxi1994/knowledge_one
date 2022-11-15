@@ -42,8 +42,18 @@ pub fn wire_create_new_version(port_: MessagePort, model: JsValue) {
 }
 
 #[wasm_bindgen]
+pub fn wire_create_new_disk_file(port_: MessagePort, file_path: String) {
+    wire_create_new_disk_file_impl(port_, file_path)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_file_logs(port_: MessagePort, file_hash: String) {
     wire_get_file_logs_impl(port_, file_hash)
+}
+
+#[wasm_bindgen]
+pub fn wire_change_file_hash_by_id(port_: MessagePort, file_path: String, file_id: i64) {
+    wire_change_file_hash_by_id_impl(port_, file_path, file_id)
 }
 
 #[wasm_bindgen]

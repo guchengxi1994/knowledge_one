@@ -87,6 +87,13 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
               FileEntity(fileName: fileName, path: filePath, fileId: -1));
         },
         child: GestureDetector(
+          onTapUp: (details) {
+            context
+                .read<PageChangeController>()
+                .dropdownKey
+                .currentState!
+                .hideOverlay();
+          },
           behavior: HitTestBehavior.opaque,
           onSecondaryTapDown: (details) {
             if (context.read<FileSystemController>().currentWidgetId == -1) {

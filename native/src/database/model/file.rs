@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
 use sqlx::types::chrono;
 
+use crate::storage::file_hash::get_file_hash;
+
+use super::changelog::FileChangelog;
+
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct FileDetails {
     pub file_id: i64,
@@ -19,6 +23,26 @@ pub struct NativeFileSummary {
     pub file_path: Option<String>,
     pub file_hash: Option<String>,
     pub version_control: i64,
+}
+
+#[tokio::main]
+pub async fn change_file_hash_by_id(file_path: String, file_id: i64)->i64 {
+    let file_hash = get_file_hash(file_path);
+    let pool = crate::database::sqlx_connection::POOL.read().await;
+    let r = sqlx::query(r#"UPDATE file SET file_hash = ? WHERE file_id=? "#)
+        .bind(file_hash)
+        .bind(file_id)
+        .execute(pool.get_pool())
+        .await;
+    
+        match r {
+            Ok(_)=>{
+                0
+            },
+            Err(_)=>{
+                1
+            }
+        }
 }
 
 #[tokio::main]
@@ -46,8 +70,8 @@ pub async fn delete_file_by_file_hash(file_hash: String) -> i64 {
                 Err(_) => {
                     // println!("{:?}",err);
                     return 1;
-                },
-                Ok(_)=>{
+                }
+                Ok(_) => {
                     return 0;
                 }
             }
@@ -127,6 +151,18 @@ impl NativeFileSummary {
                 }
 
                 if file_hash != "" {
+                    let logs = sqlx::query_as::<sqlx::MySql, FileChangelog>(
+                        r#"SELECT * from file_changelog WHERE is_deleted=0 and version_id=?"#,
+                    )
+                    .bind(&file_hash)
+                    .fetch_all(pool.get_pool())
+                    .await
+                    .unwrap();
+
+                    if logs.len() > 0 {
+                        return -500;
+                    }
+
                     let results = sqlx::query_as::<sqlx::MySql, FileDetails>(
                         r#"SELECT * from file WHERE is_deleted=0 and file_hash=?"#,
                     )
