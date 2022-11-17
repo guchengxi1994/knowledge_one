@@ -2,18 +2,8 @@ use super::*;
 // Section: wire functions
 
 #[wasm_bindgen]
-pub fn wire_create_storage_directory(port_: MessagePort, s: String) {
-    wire_create_storage_directory_impl(port_, s)
-}
-
-#[wasm_bindgen]
-pub fn wire_create_diff_directory(port_: MessagePort, s: String) {
-    wire_create_diff_directory_impl(port_, s)
-}
-
-#[wasm_bindgen]
-pub fn wire_create_restore_directory(port_: MessagePort, s: String) {
-    wire_create_restore_directory_impl(port_, s)
+pub fn wire_create_all_directory(port_: MessagePort, s: String) {
+    wire_create_all_directory_impl(port_, s)
 }
 
 #[wasm_bindgen]
@@ -42,8 +32,24 @@ pub fn wire_create_new_version(port_: MessagePort, model: JsValue) {
 }
 
 #[wasm_bindgen]
+pub fn wire_create_new_disk_file(port_: MessagePort, file_path: String) {
+    wire_create_new_disk_file_impl(port_, file_path)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_file_logs(port_: MessagePort, file_hash: String) {
     wire_get_file_logs_impl(port_, file_hash)
+}
+
+#[wasm_bindgen]
+pub fn wire_change_file_hash_by_id(
+    port_: MessagePort,
+    ori_file_path: String,
+    file_path: String,
+    file_id: i64,
+    diff_path: Option<String>,
+) {
+    wire_change_file_hash_by_id_impl(port_, ori_file_path, file_path, file_id, diff_path)
 }
 
 #[wasm_bindgen]

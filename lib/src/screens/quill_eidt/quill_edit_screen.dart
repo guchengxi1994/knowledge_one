@@ -25,10 +25,14 @@ enum _SelectionType {
 
 class QuillEditScreen extends StatefulWidget {
   const QuillEditScreen(
-      {Key? key, required this.filePath, required this.fileName})
+      {Key? key,
+      required this.filePath,
+      required this.fileName,
+      required this.fileId})
       : super(key: key);
   final String filePath;
   final String fileName;
+  final int fileId;
 
   @override
   State<QuillEditScreen> createState() => _QuillEditScreenState();
@@ -39,10 +43,17 @@ class _QuillEditScreenState extends State<QuillEditScreen> {
   final FocusNode _focusNode = FocusNode();
   Timer? _selectAllTimer;
   _SelectionType _selectionType = _SelectionType.none;
+  bool canRead = true;
 
   @override
   void dispose() {
     _selectAllTimer?.cancel();
+    if (_controller != null && canRead) {
+      var json = jsonEncode(_controller!.document.toDelta().toJson());
+      File f = File(widget.filePath);
+      f.writeAsStringSync(json);
+    }
+
     super.dispose();
   }
 
@@ -55,7 +66,20 @@ class _QuillEditScreenState extends State<QuillEditScreen> {
   Future<void> _loadFromFilePath() async {
     try {
       File f = File(widget.filePath);
+      debugPrint("file path: ${widget.filePath}");
+      debugPrint("file id: ${widget.fileId}");
       final result = await f.readAsString();
+      // debugPrint("file details: $result");
+      if (result == "") {
+        final doc = Document()..insert(0, '空白文件');
+        setState(() {
+          _controller = QuillController(
+              document: doc,
+              selection: const TextSelection.collapsed(offset: 0));
+        });
+        return;
+      }
+
       final doc = Document.fromJson(jsonDecode(result));
       setState(() {
         _controller = QuillController(
@@ -63,7 +87,9 @@ class _QuillEditScreenState extends State<QuillEditScreen> {
       });
     } catch (error) {
       final doc = Document()..insert(0, '导入失败,文件不存在或者格式错误');
+
       setState(() {
+        canRead = false;
         _controller = QuillController(
             document: doc, selection: const TextSelection.collapsed(offset: 0));
       });

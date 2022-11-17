@@ -1,5 +1,11 @@
+use std::fs;
+
 use serde::{Deserialize, Serialize};
-use sqlx::types::chrono;
+use sqlx::{types::chrono, MySql};
+
+use crate::storage::file_hash::get_file_hash;
+
+use super::changelog::FileChangelog;
 
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct FileDetails {
@@ -19,6 +25,76 @@ pub struct NativeFileSummary {
     pub file_path: Option<String>,
     pub file_hash: Option<String>,
     pub version_control: i64,
+}
+
+#[tokio::main]
+pub async fn change_file_hash_by_id(
+    ori_file_path: String,
+    file_path: String,
+    file_id: i64,
+    diff_path: Option<String>,
+) -> String {
+    println!("rust {:?}", ori_file_path);
+    println!("rust {:?}", file_path);
+    println!("rust {:?}", file_id);
+    println!("rust {:?}", diff_path);
+
+    let file_hash = get_file_hash(file_path.clone());
+    let pool = crate::database::sqlx_connection::POOL.read().await;
+
+    let f = sqlx::query_as::<MySql, FileDetails>(r#"SELECT * FROM file  WHERE file_id=? "#)
+        .bind(file_id)
+        .fetch_one(pool.get_pool())
+        .await;
+
+    match f {
+        Err(e) => {
+            println!("{:?}", e);
+            return String::from("");
+        }
+        Ok(fi) => {
+            let c = fs::copy(file_path.clone(), ori_file_path);
+
+            match c {
+                Ok(_) => {
+                    let mut tx = pool.get_pool().begin().await.unwrap();
+                    if fi.version_control == 1 {
+                        // 添加一条新版本
+                        let d_p: String;
+                        match diff_path {
+                            None => {
+                                d_p = String::from("");
+                            }
+                            Some(p) => {
+                                d_p = p;
+                            }
+                        }
+
+                        let file_size = crate::storage::file_size::get_file_size(file_path.clone());
+
+                        let _ = sqlx::query(
+                        r#"INSERT INTO file_changelog (file_id,version_id,prev_version_id,file_length,file_path,diff_path) VALUES(?,?,?,?,?,?) "#,
+                    ).bind(file_id).bind(file_hash.clone()).bind(fi.file_hash.clone()).bind(file_size).bind(fi.file_path.unwrap().clone()).bind(d_p.clone()).execute(&mut tx).await;
+                    }
+                    let _ = sqlx::query(r#"UPDATE file SET file_hash = ? WHERE file_id=? "#)
+                        .bind(file_hash.clone())
+                        .bind(file_id)
+                        .execute(&mut tx)
+                        .await;
+                    let r = tx.commit().await;
+
+                    match r {
+                        Ok(_) => String::from(file_hash),
+                        Err(_) => String::from(""),
+                    }
+                }
+                Err(e) => {
+                    println!("rust error {:?}", e);
+                    return String::from("");
+                }
+            }
+        }
+    }
 }
 
 #[tokio::main]
@@ -46,8 +122,8 @@ pub async fn delete_file_by_file_hash(file_hash: String) -> i64 {
                 Err(_) => {
                     // println!("{:?}",err);
                     return 1;
-                },
-                Ok(_)=>{
+                }
+                Ok(_) => {
                     return 0;
                 }
             }
@@ -127,6 +203,18 @@ impl NativeFileSummary {
                 }
 
                 if file_hash != "" {
+                    let logs = sqlx::query_as::<sqlx::MySql, FileChangelog>(
+                        r#"SELECT * from file_changelog WHERE is_deleted=0 and version_id=?"#,
+                    )
+                    .bind(&file_hash)
+                    .fetch_all(pool.get_pool())
+                    .await
+                    .unwrap();
+
+                    if logs.len() > 0 {
+                        return -500;
+                    }
+
                     let results = sqlx::query_as::<sqlx::MySql, FileDetails>(
                         r#"SELECT * from file WHERE is_deleted=0 and file_hash=?"#,
                     )

@@ -1,5 +1,8 @@
+// ignore_for_file: avoid_init_to_null
+
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
@@ -24,6 +27,13 @@ class FileSystemController extends ChangeNotifier {
   List<FolderEntity> folderList = [];
 
   int currentWidgetId = -1;
+
+  List<String> getCurrentFileNames() {
+    return folder.children
+        .where((element) => (element is FileEntity))
+        .map((e) => e.name)
+        .toList();
+  }
 
   changeCurrentWidgetId(int i) {
     currentWidgetId = i;
@@ -93,9 +103,8 @@ class FileSystemController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Directory executableDir = File(Platform.resolvedExecutable).parent;
-
-  late final file = File("${executableDir.path}/_private/structure.json");
+  late final file =
+      File("${DevUtils.executableDir.path}/_private/structure.json");
 
   init() async {
     // var file = File("${executableDir.path}/_private/structure.json");
@@ -133,11 +142,55 @@ class FileSystemController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future changeFileHash2(String cacheFilePath, FileEntity entity,
+      {String? diffPath}) async {
+    final r =
+        await _changeFileHashImpl(cacheFilePath, entity, diffPath: diffPath);
+    if (r == "") {
+      SmartDialogUtils.error("失败");
+    } else {
+      entity.fileHash = r;
+      final id = folder.children.indexOf(entity);
+      folder.children.removeAt(id);
+      folder.children.insert(id, entity);
+      file.writeAsStringSync(json.encode(folderList.first.toJson()));
+      notifyListeners();
+    }
+  }
+
+  Future<String> _changeFileHashImpl(String cacheFilePath, FileEntity entity,
+      {String? diffPath}) async {
+    final r = await api.changeFileHashById(
+        oriFilePath: entity.path!,
+        filePath: cacheFilePath,
+        fileId: entity.fileId!,
+        diffPath: diffPath);
+    return r;
+  }
+
   List<BaseFileEntity> get currentFolderElements => folder.children;
 
   addToCurrentFolder(BaseFileEntity entity) async {
     if (entity is FileEntity) {
-      final fileHash = await api.getFileHash(filePath: entity.path!);
+      final String fileHash;
+      if (entity.path == "" || entity.path == null) {
+        final filePath =
+            "${DevUtils.executableDir.path}/_private/${entity.name}";
+        debugPrint(filePath);
+        final r = await api.createNewDiskFile(filePath: filePath);
+        if (r == 500) {
+          SmartDialogUtils.warning("文件已存在");
+          return;
+        } else if (r == -1) {
+          SmartDialogUtils.error("归档失败");
+          return;
+        }
+        fileHash = await api.getFileHash(filePath: filePath);
+        entity.path = filePath;
+        entity.fileId = r;
+      } else {
+        fileHash = await api.getFileHash(filePath: entity.path!);
+      }
 
       int i = await api.newFile(
           f: NativeFileSummary(
@@ -150,6 +203,9 @@ class FileSystemController extends ChangeNotifier {
         return;
       } else if (i == -1) {
         SmartDialogUtils.warning("文件已存在");
+        return;
+      } else if (i == -500) {
+        SmartDialogUtils.warning("已存在不同版本文件");
         return;
       }
 
@@ -191,6 +247,62 @@ class FileSystemController extends ChangeNotifier {
   removeFromCurrentFolder(BaseFileEntity entity) {
     folder.children.remove(entity);
     file.writeAsStringSync(json.encode(folderList.first.toJson()));
+    notifyListeners();
+  }
+
+  /// 排序
+  FileSortStrategy sortStrategy = FileSortStrategy.none;
+  FileSortByTimeStrategy sortByTimeStrategy = FileSortByTimeStrategy.asc;
+
+  sortByType() {
+    if (folder.children.isEmpty) {
+      return;
+    }
+
+    if (sortStrategy == FileSortStrategy.none ||
+        sortStrategy == FileSortStrategy.fileFirst) {
+      sortStrategy = FileSortStrategy.folderFirst;
+    } else {
+      sortStrategy = FileSortStrategy.fileFirst;
+    }
+
+    List<FileEntity> entityFile = [];
+    List<FolderEntity> entityFolder = [];
+
+    for (final i in folder.children) {
+      if (i is FileEntity) {
+        entityFile.add(i);
+      } else {
+        entityFolder.add(i as FolderEntity);
+      }
+    }
+
+    folder.children.clear();
+
+    if (sortStrategy == FileSortStrategy.fileFirst) {
+      folder.children.addAll(entityFile);
+      folder.children.addAll(entityFolder);
+    } else {
+      folder.children.addAll(entityFolder);
+      folder.children.addAll(entityFile);
+    }
+
+    notifyListeners();
+  }
+
+  sortByTime() {
+    if (folder.children.isEmpty) {
+      return;
+    }
+
+    final children = folder.children.reversed.toList();
+    folder.children.clear();
+    folder.children.addAll(children);
+    if (sortByTimeStrategy == FileSortByTimeStrategy.asc) {
+      sortByTimeStrategy = FileSortByTimeStrategy.desc;
+    } else {
+      sortByTimeStrategy = FileSortByTimeStrategy.asc;
+    }
     notifyListeners();
   }
 }

@@ -2,18 +2,8 @@ use super::*;
 // Section: wire functions
 
 #[no_mangle]
-pub extern "C" fn wire_create_storage_directory(port_: i64, s: *mut wire_uint_8_list) {
-    wire_create_storage_directory_impl(port_, s)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_create_diff_directory(port_: i64, s: *mut wire_uint_8_list) {
-    wire_create_diff_directory_impl(port_, s)
-}
-
-#[no_mangle]
-pub extern "C" fn wire_create_restore_directory(port_: i64, s: *mut wire_uint_8_list) {
-    wire_create_restore_directory_impl(port_, s)
+pub extern "C" fn wire_create_all_directory(port_: i64, s: *mut wire_uint_8_list) {
+    wire_create_all_directory_impl(port_, s)
 }
 
 #[no_mangle]
@@ -46,8 +36,24 @@ pub extern "C" fn wire_create_new_version(port_: i64, model: *mut wire_NativeFil
 }
 
 #[no_mangle]
+pub extern "C" fn wire_create_new_disk_file(port_: i64, file_path: *mut wire_uint_8_list) {
+    wire_create_new_disk_file_impl(port_, file_path)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_get_file_logs(port_: i64, file_hash: *mut wire_uint_8_list) {
     wire_get_file_logs_impl(port_, file_hash)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_change_file_hash_by_id(
+    port_: i64,
+    ori_file_path: *mut wire_uint_8_list,
+    file_path: *mut wire_uint_8_list,
+    file_id: i64,
+    diff_path: *mut wire_uint_8_list,
+) {
+    wire_change_file_hash_by_id_impl(port_, ori_file_path, file_path, file_id, diff_path)
 }
 
 #[no_mangle]

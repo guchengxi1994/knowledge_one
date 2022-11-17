@@ -16,4 +16,7 @@ class DevUtils {
   static bool get isLinux => _PlatformUtils._isLinux();
   static bool get isMobile =>
       _PlatformUtils._isAndroid() || _PlatformUtils._isIOS();
+
+  static Directory get executableDir =>
+      File(Platform.resolvedExecutable).parent;
 }

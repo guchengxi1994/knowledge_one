@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:knowledge_one/utils/utils.dart';
 
 enum RPCTypes { fileChangeLog }
 
@@ -13,8 +14,8 @@ class RPCController extends ChangeNotifier {
 
   startFileChangelogTracingRPC() async {
     if (validRPCs[RPCTypes.fileChangeLog] == null) {
-      final path = File(Platform.resolvedExecutable).parent;
-      late String tracingExe = "${path.path}/file_changelog/file_changelog.exe";
+      late String tracingExe =
+          "${DevUtils.executableDir.path}/file_changelog/file_changelog.exe";
       final process = await Process.start(tracingExe, []);
       addRPC(RPCTypes.fileChangeLog, process.pid);
       debugPrint("pid:${process.pid}");

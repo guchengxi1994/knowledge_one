@@ -4,16 +4,11 @@ use crate::{
 };
 use futures::executor::block_on;
 
-pub fn create_storage_directory(s: String) -> i32 {
-    storage::create_folder::create_storage_dir(s)
-}
-
-pub fn create_diff_directory(s: String) -> i32 {
-    storage::create_folder::create_diff_dir(s)
-}
-
-pub fn create_restore_directory(s: String) -> i32 {
-    storage::create_folder::create_restore_dir(s)
+pub fn create_all_directory(s:String){
+    storage::create_folder::create_cache_dir(s.clone());
+    storage::create_folder::create_diff_dir(s.clone());
+    storage::create_folder::create_restore_dir(s.clone());
+    storage::create_folder::create_storage_dir(s.clone());
 }
 
 /// 根据file_id 和hash值获取修改的changelog
@@ -45,10 +40,22 @@ pub fn create_new_version(model:crate::database::model::changelog::NativeFileNew
     })  
 }
 
+/// 创建一个物理文件
+pub fn create_new_disk_file(file_path:String)->i64{
+    crate::storage::create_file::create_file(file_path)
+}
+
 /// 根据现在的hash值获取变更记录
 pub fn get_file_logs(file_hash:String)->Option<Vec<crate::database::model::changelog::FileChangelog>>{
     block_on(async {
         crate::database::model::changelog::FileChangelog::get_filelogs_by_file_hash(file_hash)
+    })
+}
+
+/// 根据文件id修改文件hash
+pub fn change_file_hash_by_id(ori_file_path: String, file_path:String,file_id:i64,diff_path:Option<String>)->String{
+    block_on(async {
+        crate::database::model::file::change_file_hash_by_id(ori_file_path,file_path, file_id,diff_path)
     })
 }
 

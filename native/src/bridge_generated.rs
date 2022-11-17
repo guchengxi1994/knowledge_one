@@ -26,42 +26,16 @@ use crate::database::model::todo_status::TodoStatus;
 
 // Section: wire functions
 
-fn wire_create_storage_directory_impl(port_: MessagePort, s: impl Wire2Api<String> + UnwindSafe) {
+fn wire_create_all_directory_impl(port_: MessagePort, s: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
-            debug_name: "create_storage_directory",
+            debug_name: "create_all_directory",
             port: Some(port_),
             mode: FfiCallMode::Normal,
         },
         move || {
             let api_s = s.wire2api();
-            move |task_callback| Ok(create_storage_directory(api_s))
-        },
-    )
-}
-fn wire_create_diff_directory_impl(port_: MessagePort, s: impl Wire2Api<String> + UnwindSafe) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
-        WrapInfo {
-            debug_name: "create_diff_directory",
-            port: Some(port_),
-            mode: FfiCallMode::Normal,
-        },
-        move || {
-            let api_s = s.wire2api();
-            move |task_callback| Ok(create_diff_directory(api_s))
-        },
-    )
-}
-fn wire_create_restore_directory_impl(port_: MessagePort, s: impl Wire2Api<String> + UnwindSafe) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
-        WrapInfo {
-            debug_name: "create_restore_directory",
-            port: Some(port_),
-            mode: FfiCallMode::Normal,
-        },
-        move || {
-            let api_s = s.wire2api();
-            move |task_callback| Ok(create_restore_directory(api_s))
+            move |task_callback| Ok(create_all_directory(api_s))
         },
     )
 }
@@ -144,6 +118,22 @@ fn wire_create_new_version_impl(
         },
     )
 }
+fn wire_create_new_disk_file_impl(
+    port_: MessagePort,
+    file_path: impl Wire2Api<String> + UnwindSafe,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "create_new_disk_file",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_file_path = file_path.wire2api();
+            move |task_callback| Ok(create_new_disk_file(api_file_path))
+        },
+    )
+}
 fn wire_get_file_logs_impl(port_: MessagePort, file_hash: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
@@ -154,6 +144,35 @@ fn wire_get_file_logs_impl(port_: MessagePort, file_hash: impl Wire2Api<String> 
         move || {
             let api_file_hash = file_hash.wire2api();
             move |task_callback| Ok(get_file_logs(api_file_hash))
+        },
+    )
+}
+fn wire_change_file_hash_by_id_impl(
+    port_: MessagePort,
+    ori_file_path: impl Wire2Api<String> + UnwindSafe,
+    file_path: impl Wire2Api<String> + UnwindSafe,
+    file_id: impl Wire2Api<i64> + UnwindSafe,
+    diff_path: impl Wire2Api<Option<String>> + UnwindSafe,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "change_file_hash_by_id",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_ori_file_path = ori_file_path.wire2api();
+            let api_file_path = file_path.wire2api();
+            let api_file_id = file_id.wire2api();
+            let api_diff_path = diff_path.wire2api();
+            move |task_callback| {
+                Ok(change_file_hash_by_id(
+                    api_ori_file_path,
+                    api_file_path,
+                    api_file_id,
+                    api_diff_path,
+                ))
+            }
         },
     )
 }
@@ -319,6 +338,13 @@ impl support::IntoDartExceptPrimitive for TodoStatus {}
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
+
+/// cbindgen:ignore
+#[cfg(target_family = "wasm")]
+#[path = "bridge_generated.web.rs"]
+mod web;
+#[cfg(target_family = "wasm")]
+pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

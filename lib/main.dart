@@ -5,6 +5,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/routers.dart';
 import 'package:knowledge_one/rpc_controller.dart';
+import 'package:knowledge_one/utils/utils.dart';
 import 'native.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
@@ -18,11 +19,8 @@ void main() async {
 }
 
 Future<void> initApp() async {
-  Directory executableDir = File(Platform.resolvedExecutable).parent;
-  await api.createStorageDirectory(s: executableDir.path);
-  await api.createDiffDirectory(s: executableDir.path);
-  await api.createRestoreDirectory(s: executableDir.path);
-
+  Directory executableDir = DevUtils.executableDir;
+  await api.createAllDirectory(s: executableDir.path);
   await api.initMysql(confPath: "${executableDir.path}/db_config.toml");
 
   await windowManager.ensureInitialized();
