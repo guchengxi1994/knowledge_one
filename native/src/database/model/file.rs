@@ -1,5 +1,7 @@
+use std::fs;
+
 use serde::{Deserialize, Serialize};
-use sqlx::types::chrono;
+use sqlx::{types::chrono, MySql};
 
 use crate::storage::file_hash::get_file_hash;
 
@@ -26,23 +28,73 @@ pub struct NativeFileSummary {
 }
 
 #[tokio::main]
-pub async fn change_file_hash_by_id(file_path: String, file_id: i64)->i64 {
-    let file_hash = get_file_hash(file_path);
+pub async fn change_file_hash_by_id(
+    ori_file_path: String,
+    file_path: String,
+    file_id: i64,
+    diff_path: Option<String>,
+) -> String {
+    println!("rust {:?}", ori_file_path);
+    println!("rust {:?}", file_path);
+    println!("rust {:?}", file_id);
+    println!("rust {:?}", diff_path);
+
+    let file_hash = get_file_hash(file_path.clone());
     let pool = crate::database::sqlx_connection::POOL.read().await;
-    let r = sqlx::query(r#"UPDATE file SET file_hash = ? WHERE file_id=? "#)
-        .bind(file_hash)
+
+    let f = sqlx::query_as::<MySql, FileDetails>(r#"SELECT * FROM file  WHERE file_id=? "#)
         .bind(file_id)
-        .execute(pool.get_pool())
+        .fetch_one(pool.get_pool())
         .await;
-    
-        match r {
-            Ok(_)=>{
-                0
-            },
-            Err(_)=>{
-                1
+
+    match f {
+        Err(e) => {
+            println!("{:?}", e);
+            return String::from("");
+        }
+        Ok(fi) => {
+            let c = fs::copy(file_path.clone(), ori_file_path);
+
+            match c {
+                Ok(_) => {
+                    let mut tx = pool.get_pool().begin().await.unwrap();
+                    if fi.version_control == 1 {
+                        // 添加一条新版本
+                        let d_p: String;
+                        match diff_path {
+                            None => {
+                                d_p = String::from("");
+                            }
+                            Some(p) => {
+                                d_p = p;
+                            }
+                        }
+
+                        let file_size = crate::storage::file_size::get_file_size(file_path.clone());
+
+                        let _ = sqlx::query(
+                        r#"INSERT INTO file_changelog (file_id,version_id,prev_version_id,file_length,file_path,diff_path) VALUES(?,?,?,?,?,?) "#,
+                    ).bind(file_id).bind(file_hash.clone()).bind(fi.file_hash.clone()).bind(file_size).bind(fi.file_path.unwrap().clone()).bind(d_p.clone()).execute(&mut tx).await;
+                    }
+                    let _ = sqlx::query(r#"UPDATE file SET file_hash = ? WHERE file_id=? "#)
+                        .bind(file_hash.clone())
+                        .bind(file_id)
+                        .execute(&mut tx)
+                        .await;
+                    let r = tx.commit().await;
+
+                    match r {
+                        Ok(_) => String::from(file_hash),
+                        Err(_) => String::from(""),
+                    }
+                }
+                Err(e) => {
+                    println!("rust error {:?}", e);
+                    return String::from("");
+                }
             }
         }
+    }
 }
 
 #[tokio::main]

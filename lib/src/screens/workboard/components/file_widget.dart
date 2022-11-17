@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, unused_import
 
 import 'dart:io';
 
@@ -22,6 +22,7 @@ import '../models/models.dart';
 import 'base_file_widget.dart';
 import 'flow_graph_dialog.dart';
 import 'preview_dialog.dart';
+import 'package:path/path.dart' as P;
 
 // ignore: must_be_immutable
 class FileWidget extends StatefulWidget {
@@ -41,7 +42,6 @@ class _FileWidgetState extends State<FileWidget> {
   late double dy = 0;
   final iconSize = AppStyle.fileWidgetSize;
   late FileEntity currentEntity;
-  late final path = File(Platform.resolvedExecutable).parent;
 
   @override
   void initState() {
@@ -209,13 +209,38 @@ class _FileWidgetState extends State<FileWidget> {
         ),
         title: const Text('以内置Markdown打开'),
         onTap: () async {
+          Navigator.of(ctx).pop();
           await Navigator.of(context).push(MaterialPageRoute(builder: (c) {
             return MarkdownEditScreen(
               filePath: currentEntity.path!,
               fileName: currentEntity.name,
             );
           }));
-          Navigator.of(ctx).pop();
+          final p = P.basename(currentEntity.path!);
+          final cachePath = "${DevUtils.executableDir.path}/_cache/$p";
+          await context.read<RPCController>().startFileChangelogTracingRPC();
+          final channel = ClientChannel(
+            'localhost',
+            port: 15556,
+            options: const ChannelOptions(
+                credentials: ChannelCredentials.insecure()),
+          );
+          final stub = FileDiffClient(channel);
+          try {
+            final currentTime = DateTime.now().millisecondsSinceEpoch;
+            await stub.generateDiff(GenerateDiffRequest()
+              ..after = cachePath
+              ..before = currentEntity.path!
+              ..savePath =
+                  "${DevUtils.executableDir.path}/_diff/$currentTime.mtx");
+
+            await context.read<FileSystemController>().changeFileHash2(
+                cachePath, currentEntity,
+                diffPath:
+                    "${DevUtils.executableDir.path}/_diff/$currentTime.mtx");
+          } catch (e) {
+            debugPrint(e.toString());
+          }
         },
       ),
       ListTile(
@@ -225,6 +250,7 @@ class _FileWidgetState extends State<FileWidget> {
         ),
         title: const Text('以内置富文本打开'),
         onTap: () async {
+          Navigator.of(ctx).pop();
           await Navigator.of(context).push(MaterialPageRoute(builder: (c) {
             return QuillEditScreen(
               filePath: currentEntity.path!,
@@ -232,10 +258,31 @@ class _FileWidgetState extends State<FileWidget> {
               fileId: currentEntity.fileId ?? -1,
             );
           }));
-          await context
-              .read<FileSystemController>()
-              .changeFileHash(currentEntity);
-          Navigator.of(ctx).pop();
+          final p = P.basename(currentEntity.path!);
+          final cachePath = "${DevUtils.executableDir.path}/_cache/$p";
+          await context.read<RPCController>().startFileChangelogTracingRPC();
+          final channel = ClientChannel(
+            'localhost',
+            port: 15556,
+            options: const ChannelOptions(
+                credentials: ChannelCredentials.insecure()),
+          );
+          final stub = FileDiffClient(channel);
+          try {
+            final currentTime = DateTime.now().millisecondsSinceEpoch;
+            await stub.generateDiff(GenerateDiffRequest()
+              ..after = cachePath
+              ..before = currentEntity.path!
+              ..savePath =
+                  "${DevUtils.executableDir.path}/_diff/$currentTime.mtx");
+
+            await context.read<FileSystemController>().changeFileHash2(
+                cachePath, currentEntity,
+                diffPath:
+                    "${DevUtils.executableDir.path}/_diff/$currentTime.mtx");
+          } catch (e) {
+            debugPrint(e.toString());
+          }
         },
       ),
       if (!DevUtils.isLinux)
@@ -345,19 +392,20 @@ class _FileWidgetState extends State<FileWidget> {
                 await stub.generateDiff(GenerateDiffRequest()
                   ..after = filePath
                   ..before = currentEntity.path!
-                  ..savePath = "${path.path}/_diff/$currentTime.mtx");
+                  ..savePath =
+                      "${DevUtils.executableDir.path}/_diff/$currentTime.mtx");
 
                 final newFileHash = await api.getFileHash(filePath: filePath);
 
-                NativeFileNewVersion nativeFileNewVersion =
-                    NativeFileNewVersion(
-                        prevFilePath: currentEntity.path!,
-                        prevFileHash: currentEntity.fileHash!,
-                        prevFileName: currentEntity.name,
-                        newVersionFilePath: filePath,
-                        newVersionFileHash: newFileHash,
-                        newVersionFileName: fileName,
-                        diffPath: "${path.path}/_diff/$currentTime.mtx");
+                NativeFileNewVersion nativeFileNewVersion = NativeFileNewVersion(
+                    prevFilePath: currentEntity.path!,
+                    prevFileHash: currentEntity.fileHash!,
+                    prevFileName: currentEntity.name,
+                    newVersionFilePath: filePath,
+                    newVersionFileHash: newFileHash,
+                    newVersionFileName: fileName,
+                    diffPath:
+                        "${DevUtils.executableDir.path}/_diff/$currentTime.mtx");
                 final r =
                     await api.createNewVersion(model: nativeFileNewVersion);
                 debugPrint(r.toString());
@@ -375,7 +423,7 @@ class _FileWidgetState extends State<FileWidget> {
                       .changeVersionControlStatus(currentEntity);
                 }
               } catch (e) {
-                // print('Caught error: $e');
+                debugPrint('Caught error: $e');
                 SmartDialogUtils.message("失败");
               }
               await channel.shutdown();

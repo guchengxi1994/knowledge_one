@@ -43,11 +43,12 @@ class _QuillEditScreenState extends State<QuillEditScreen> {
   final FocusNode _focusNode = FocusNode();
   Timer? _selectAllTimer;
   _SelectionType _selectionType = _SelectionType.none;
+  bool canRead = true;
 
   @override
   void dispose() {
     _selectAllTimer?.cancel();
-    if (_controller != null) {
+    if (_controller != null && canRead) {
       var json = jsonEncode(_controller!.document.toDelta().toJson());
       File f = File(widget.filePath);
       f.writeAsStringSync(json);
@@ -86,7 +87,9 @@ class _QuillEditScreenState extends State<QuillEditScreen> {
       });
     } catch (error) {
       final doc = Document()..insert(0, '导入失败,文件不存在或者格式错误');
+
       setState(() {
+        canRead = false;
         _controller = QuillController(
             document: doc, selection: const TextSelection.collapsed(offset: 0));
       });

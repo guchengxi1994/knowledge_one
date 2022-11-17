@@ -1,5 +1,8 @@
+// ignore_for_file: avoid_init_to_null
+
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
@@ -100,9 +103,8 @@ class FileSystemController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Directory executableDir = File(Platform.resolvedExecutable).parent;
-
-  late final file = File("${executableDir.path}/_private/structure.json");
+  late final file =
+      File("${DevUtils.executableDir.path}/_private/structure.json");
 
   init() async {
     // var file = File("${executableDir.path}/_private/structure.json");
@@ -140,15 +142,30 @@ class FileSystemController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future changeFileHash(FileEntity entity) async {
+  Future changeFileHash2(String cacheFilePath, FileEntity entity,
+      {String? diffPath}) async {
+    final r =
+        await _changeFileHashImpl(cacheFilePath, entity, diffPath: diffPath);
+    if (r == "") {
+      SmartDialogUtils.error("失败");
+    } else {
+      entity.fileHash = r;
+      final id = folder.children.indexOf(entity);
+      folder.children.removeAt(id);
+      folder.children.insert(id, entity);
+      file.writeAsStringSync(json.encode(folderList.first.toJson()));
+      notifyListeners();
+    }
+  }
+
+  Future<String> _changeFileHashImpl(String cacheFilePath, FileEntity entity,
+      {String? diffPath}) async {
     final r = await api.changeFileHashById(
-        filePath: entity.path!, fileId: entity.fileId!);
-    debugPrint(r.toString());
-    final id = folder.children.indexOf(entity);
-    folder.children.removeAt(id);
-    folder.children.insert(id, entity);
-    file.writeAsStringSync(json.encode(folderList.first.toJson()));
-    notifyListeners();
+        oriFilePath: entity.path!,
+        filePath: cacheFilePath,
+        fileId: entity.fileId!,
+        diffPath: diffPath);
+    return r;
   }
 
   List<BaseFileEntity> get currentFolderElements => folder.children;
@@ -157,8 +174,8 @@ class FileSystemController extends ChangeNotifier {
     if (entity is FileEntity) {
       final String fileHash;
       if (entity.path == "" || entity.path == null) {
-        final path = File(Platform.resolvedExecutable).parent;
-        final filePath = "${path.path}/_private/${entity.name}";
+        final filePath =
+            "${DevUtils.executableDir.path}/_private/${entity.name}";
         debugPrint(filePath);
         final r = await api.createNewDiskFile(filePath: filePath);
         if (r == 500) {

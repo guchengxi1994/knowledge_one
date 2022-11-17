@@ -1,11 +1,14 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
+// ignore_for_file: prefer_typing_uninitialized_variables, depend_on_referenced_packages
 
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:knowledge_one/src/screens/workboard/components/tools_overlay.dart';
+import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'markdown_edit_controller.dart';
+import 'package:path/path.dart' as path;
 
 class MarkdownEditScreen extends StatelessWidget {
   const MarkdownEditScreen(
@@ -39,7 +42,7 @@ class MarkdownScreen extends StatefulWidget {
 }
 
 class _MarkdownScreenState extends State<MarkdownScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, OverlayStateMixin {
   late String mdData = "";
   var loadFuture;
   late final reg = RegExp(r"!\[(.*?)\]\([a-z|A-Z]{1}:(.*?)\)");
@@ -47,9 +50,17 @@ class _MarkdownScreenState extends State<MarkdownScreen>
   final ScrollController scrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
   double fontSize = 14;
+  bool canRead = true;
 
   @override
   void dispose() {
+    if (canRead) {
+      final p = path.basename(widget.filePath);
+      final cachePath = "${DevUtils.executableDir.path}/_cache/$p";
+      File f = File(cachePath);
+      f.writeAsStringSync(textEditingController.text);
+    }
+
     textEditingController.dispose();
     scrollController.dispose();
     super.dispose();
@@ -62,7 +73,9 @@ class _MarkdownScreenState extends State<MarkdownScreen>
       result = result.replaceAll(reg, "***本地资源无法渲染***");
       mdData = result;
       textEditingController.text = result;
-    } catch (_) {}
+    } catch (_) {
+      canRead = false;
+    }
   }
 
   @override
@@ -117,6 +130,22 @@ class _MarkdownScreenState extends State<MarkdownScreen>
         icon: Image.asset("assets/icons/switch.png"),
         iconSize: 30,
       ),
+      IconButton(
+          onPressed: () {
+            toggleOverlay(Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                margin: const EdgeInsets.only(top: 80),
+                width: 200,
+                height: 200,
+                color: Colors.red,
+              ),
+            ));
+          },
+          icon: const Icon(
+            Icons.work,
+            color: Colors.black,
+          )),
       const SizedBox(
         width: 20,
       )

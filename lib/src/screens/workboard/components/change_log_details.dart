@@ -6,6 +6,7 @@ import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/src/extensions/date_time_extension.dart';
 import 'package:knowledge_one/src/rpc/file_restore.pbgrpc.dart';
+import 'package:knowledge_one/utils/utils.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
@@ -89,14 +90,14 @@ class ChangelogDetails extends StatelessWidget {
                         fileHash: model.versionId!,
                       );
                       if (result != null) {
-                        final path = File(Platform.resolvedExecutable).parent;
                         debugPrint("logs:${result.length}");
                         final currentFilePath = result.last.filePath!;
                         final diffs =
                             result.map((e) => e.diffPath ?? "").toList();
                         final fileSize =
                             result.map((e) => e.fileLength).toList();
-                        final saveDir = "${path.path}/_restore";
+                        final saveDir =
+                            "${DevUtils.executableDir.path}/_restore";
 
                         final channel = ClientChannel(
                           'localhost',

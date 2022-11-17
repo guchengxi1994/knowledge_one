@@ -11,17 +11,9 @@ import 'package:meta/meta.dart';
 import 'dart:ffi' as ffi;
 
 abstract class Native {
-  Future<int> createStorageDirectory({required String s, dynamic hint});
+  Future<void> createAllDirectory({required String s, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta;
-
-  Future<int> createDiffDirectory({required String s, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kCreateDiffDirectoryConstMeta;
-
-  Future<int> createRestoreDirectory({required String s, dynamic hint});
-
-  FlutterRustBridgeTaskConstMeta get kCreateRestoreDirectoryConstMeta;
+  FlutterRustBridgeTaskConstMeta get kCreateAllDirectoryConstMeta;
 
   /// 根据file_id 和hash值获取修改的changelog
   Future<List<FileChangelog>?> getChangelogFromId(
@@ -62,8 +54,12 @@ abstract class Native {
   FlutterRustBridgeTaskConstMeta get kGetFileLogsConstMeta;
 
   /// 根据文件id修改文件hash
-  Future<int> changeFileHashById(
-      {required String filePath, required int fileId, dynamic hint});
+  Future<String> changeFileHashById(
+      {required String oriFilePath,
+      required String filePath,
+      required int fileId,
+      String? diffPath,
+      dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kChangeFileHashByIdConstMeta;
 
@@ -220,51 +216,19 @@ class NativeImpl implements Native {
   factory NativeImpl.wasm(FutureOr<WasmModule> module) =>
       NativeImpl(module as ExternalLibrary);
   NativeImpl.raw(this._platform);
-  Future<int> createStorageDirectory({required String s, dynamic hint}) =>
+  Future<void> createAllDirectory({required String s, dynamic hint}) =>
       _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner
-            .wire_create_storage_directory(port_, _platform.api2wire_String(s)),
-        parseSuccessData: _wire2api_i32,
-        constMeta: kCreateStorageDirectoryConstMeta,
+            .wire_create_all_directory(port_, _platform.api2wire_String(s)),
+        parseSuccessData: _wire2api_unit,
+        constMeta: kCreateAllDirectoryConstMeta,
         argValues: [s],
         hint: hint,
       ));
 
-  FlutterRustBridgeTaskConstMeta get kCreateStorageDirectoryConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kCreateAllDirectoryConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "create_storage_directory",
-        argNames: ["s"],
-      );
-
-  Future<int> createDiffDirectory({required String s, dynamic hint}) =>
-      _platform.executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => _platform.inner
-            .wire_create_diff_directory(port_, _platform.api2wire_String(s)),
-        parseSuccessData: _wire2api_i32,
-        constMeta: kCreateDiffDirectoryConstMeta,
-        argValues: [s],
-        hint: hint,
-      ));
-
-  FlutterRustBridgeTaskConstMeta get kCreateDiffDirectoryConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "create_diff_directory",
-        argNames: ["s"],
-      );
-
-  Future<int> createRestoreDirectory({required String s, dynamic hint}) =>
-      _platform.executeNormal(FlutterRustBridgeTask(
-        callFfi: (port_) => _platform.inner
-            .wire_create_restore_directory(port_, _platform.api2wire_String(s)),
-        parseSuccessData: _wire2api_i32,
-        constMeta: kCreateRestoreDirectoryConstMeta,
-        argValues: [s],
-        hint: hint,
-      ));
-
-  FlutterRustBridgeTaskConstMeta get kCreateRestoreDirectoryConstMeta =>
-      const FlutterRustBridgeTaskConstMeta(
-        debugName: "create_restore_directory",
+        debugName: "create_all_directory",
         argNames: ["s"],
       );
 
@@ -383,23 +347,29 @@ class NativeImpl implements Native {
         argNames: ["fileHash"],
       );
 
-  Future<int> changeFileHashById(
-          {required String filePath, required int fileId, dynamic hint}) =>
+  Future<String> changeFileHashById(
+          {required String oriFilePath,
+          required String filePath,
+          required int fileId,
+          String? diffPath,
+          dynamic hint}) =>
       _platform.executeNormal(FlutterRustBridgeTask(
         callFfi: (port_) => _platform.inner.wire_change_file_hash_by_id(
             port_,
+            _platform.api2wire_String(oriFilePath),
             _platform.api2wire_String(filePath),
-            _platform.api2wire_i64(fileId)),
-        parseSuccessData: _wire2api_i64,
+            _platform.api2wire_i64(fileId),
+            _platform.api2wire_opt_String(diffPath)),
+        parseSuccessData: _wire2api_String,
         constMeta: kChangeFileHashByIdConstMeta,
-        argValues: [filePath, fileId],
+        argValues: [oriFilePath, filePath, fileId, diffPath],
         hint: hint,
       ));
 
   FlutterRustBridgeTaskConstMeta get kChangeFileHashByIdConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "change_file_hash_by_id",
-        argNames: ["filePath", "fileId"],
+        argNames: ["oriFilePath", "filePath", "fileId", "diffPath"],
       );
 
   Future<void> initMysql({required String confPath, dynamic hint}) =>
@@ -521,10 +491,6 @@ class NativeImpl implements Native {
       fileHash: _wire2api_opt_String(arr[6]),
       versionControl: _wire2api_i64(arr[7]),
     );
-  }
-
-  int _wire2api_i32(dynamic raw) {
-    return raw as int;
   }
 
   int _wire2api_i64(dynamic raw) {
@@ -713,55 +679,21 @@ class NativeWire implements FlutterRustBridgeWireBase {
   late final _store_dart_post_cobject = _store_dart_post_cobjectPtr
       .asFunction<void Function(DartPostCObjectFnType)>();
 
-  void wire_create_storage_directory(
+  void wire_create_all_directory(
     int port_,
     ffi.Pointer<wire_uint_8_list> s,
   ) {
-    return _wire_create_storage_directory(
+    return _wire_create_all_directory(
       port_,
       s,
     );
   }
 
-  late final _wire_create_storage_directoryPtr = _lookup<
+  late final _wire_create_all_directoryPtr = _lookup<
       ffi.NativeFunction<
           ffi.Void Function(ffi.Int64,
-              ffi.Pointer<wire_uint_8_list>)>>('wire_create_storage_directory');
-  late final _wire_create_storage_directory = _wire_create_storage_directoryPtr
-      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
-
-  void wire_create_diff_directory(
-    int port_,
-    ffi.Pointer<wire_uint_8_list> s,
-  ) {
-    return _wire_create_diff_directory(
-      port_,
-      s,
-    );
-  }
-
-  late final _wire_create_diff_directoryPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(ffi.Int64,
-              ffi.Pointer<wire_uint_8_list>)>>('wire_create_diff_directory');
-  late final _wire_create_diff_directory = _wire_create_diff_directoryPtr
-      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
-
-  void wire_create_restore_directory(
-    int port_,
-    ffi.Pointer<wire_uint_8_list> s,
-  ) {
-    return _wire_create_restore_directory(
-      port_,
-      s,
-    );
-  }
-
-  late final _wire_create_restore_directoryPtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Void Function(ffi.Int64,
-              ffi.Pointer<wire_uint_8_list>)>>('wire_create_restore_directory');
-  late final _wire_create_restore_directory = _wire_create_restore_directoryPtr
+              ffi.Pointer<wire_uint_8_list>)>>('wire_create_all_directory');
+  late final _wire_create_all_directory = _wire_create_all_directoryPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_get_changelog_from_id(
@@ -888,22 +820,36 @@ class NativeWire implements FlutterRustBridgeWireBase {
 
   void wire_change_file_hash_by_id(
     int port_,
+    ffi.Pointer<wire_uint_8_list> ori_file_path,
     ffi.Pointer<wire_uint_8_list> file_path,
     int file_id,
+    ffi.Pointer<wire_uint_8_list> diff_path,
   ) {
     return _wire_change_file_hash_by_id(
       port_,
+      ori_file_path,
       file_path,
       file_id,
+      diff_path,
     );
   }
 
   late final _wire_change_file_hash_by_idPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>,
-              ffi.Int64)>>('wire_change_file_hash_by_id');
-  late final _wire_change_file_hash_by_id = _wire_change_file_hash_by_idPtr
-      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>, int)>();
+          ffi.Void Function(
+              ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>,
+              ffi.Pointer<wire_uint_8_list>,
+              ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_change_file_hash_by_id');
+  late final _wire_change_file_hash_by_id =
+      _wire_change_file_hash_by_idPtr.asFunction<
+          void Function(
+              int,
+              ffi.Pointer<wire_uint_8_list>,
+              ffi.Pointer<wire_uint_8_list>,
+              int,
+              ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_init_mysql(
     int port_,
