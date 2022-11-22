@@ -241,6 +241,7 @@ class _FileWidgetState extends State<FileWidget> {
           } catch (e) {
             debugPrint(e.toString());
           }
+          await channel.shutdown();
         },
       ),
       ListTile(
@@ -283,6 +284,7 @@ class _FileWidgetState extends State<FileWidget> {
           } catch (e) {
             debugPrint(e.toString());
           }
+          await channel.shutdown();
         },
       ),
       if (!DevUtils.isLinux)
