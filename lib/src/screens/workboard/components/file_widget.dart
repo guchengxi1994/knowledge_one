@@ -22,6 +22,7 @@ import '../models/models.dart';
 import 'base_file_widget.dart';
 import 'flow_graph_dialog.dart';
 import 'preview_dialog.dart';
+// ignore: library_prefixes, depend_on_referenced_packages
 import 'package:path/path.dart' as P;
 
 // ignore: must_be_immutable
@@ -241,6 +242,7 @@ class _FileWidgetState extends State<FileWidget> {
           } catch (e) {
             debugPrint(e.toString());
           }
+          await channel.shutdown();
         },
       ),
       ListTile(
@@ -283,6 +285,7 @@ class _FileWidgetState extends State<FileWidget> {
           } catch (e) {
             debugPrint(e.toString());
           }
+          await channel.shutdown();
         },
       ),
       if (!DevUtils.isLinux)
