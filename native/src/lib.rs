@@ -4,8 +4,6 @@ mod api;
 mod bridge_generated;
 mod database;
 mod storage;
-#[deprecated = "performance and unfixed bugs"]
-mod file_changelog;
 
 #[macro_use]
 extern crate lazy_static;
@@ -22,13 +20,18 @@ mod tests {
     use crate::database::load_config::load_config;
 
     #[tokio::test]
-   async fn init_db() {
+    async fn init_db() {
         let info = load_config("web_config.toml");
 
-        let url = format!(
-            "mysql://{}:{}@{}:{}/{}",
-            info.username, info.password, info.address, info.port, info.database
-        );
-        crate::database::sqlx_connection::init(String::from(url));
+        match info {
+            Some(s) => {
+                let url = format!(
+                    "mysql://{}:{}@{}:{}/{}",
+                    s.username, s.password, s.address, s.port, s.database
+                );
+                crate::database::sqlx_connection::init(String::from(url));
+            }
+            None => todo!(),
+        }
     }
 }

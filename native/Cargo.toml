@@ -20,8 +20,7 @@ futures = "0.3"
 sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls" , "mysql","chrono" ] }
 structopt = "0.3"
 tokio = { version = "1", features = ["full"] }
-nalgebra = "0.31.3"
-nalgebra-sparse = { version = "0.8.0", features = ["io"] }
+svgcleaner = "0.9.5"  # svg清理
 
 [build-dependencies]
 flutter_rust_bridge_codegen = "1"

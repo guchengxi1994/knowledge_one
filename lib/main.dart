@@ -8,8 +8,6 @@ import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'native.dart';
 import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
-import 'app_style.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
@@ -20,16 +18,9 @@ void main() async {
 
 Future<void> initApp() async {
   Directory executableDir = DevUtils.executableDir;
+  print("${executableDir.path}/db_config.toml");
   await api.createAllDirectory(s: executableDir.path);
   await api.initMysql(confPath: "${executableDir.path}/db_config.toml");
-
-  await windowManager.ensureInitialized();
-  windowManager.setTitle("KnowledgeOne");
-  windowManager
-      .setSize(const Size(AppStyle.appMinWidth, AppStyle.appMinHeight));
-  windowManager
-      .setMinimumSize(const Size(AppStyle.appMinWidth, AppStyle.appMinHeight));
-  windowManager.setResizable(false);
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {

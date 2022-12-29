@@ -13,8 +13,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   ffi: ^2.0.1
-  flutter_rust_bridge: ^1.49.0
-  window_manager: ^0.2.7
+  flutter_rust_bridge: ^1.58.0
   provider: ^6.0.3
   shared_preferences: ^2.0.15
   loading_indicator: ^3.1.0
@@ -41,6 +40,10 @@ dependencies:
   #   git:
   #     url: https://github.com/guchengxi1994/flutter_graph
   #     channel: master
+  flutter_useful_widgets: 
+    path: ../flutter_useful_widgets
+  file_type:
+    path: ../file_type
 
 dev_dependencies:
   flutter_test:

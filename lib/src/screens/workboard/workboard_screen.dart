@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/src/screens/workboard/providers/todo_controller.dart';
 import 'package:knowledge_one/src/screens/workboard/sub_screens/todo_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'providers/file_system_controller.dart';
 import 'providers/page_controller.dart';
@@ -17,52 +15,10 @@ class WorkboardScreen extends StatefulWidget {
   State<WorkboardScreen> createState() => _WorkboardScreenState();
 }
 
-class _WorkboardScreenState extends State<WorkboardScreen> with WindowListener {
+class _WorkboardScreenState extends State<WorkboardScreen> {
   @override
   void initState() {
-    windowManager.addListener(this);
-    _init();
     super.initState();
-  }
-
-  @override
-  void onWindowClose() async {
-    bool isPreventClose = await windowManager.isPreventClose();
-    if (isPreventClose && mounted) {
-      showDialog(
-        context: context,
-        builder: (_) {
-          return AlertDialog(
-            title: const Text('Are you sure you want to close this window?'),
-            actions: [
-              TextButton(
-                child: const Text('No'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text('Yes'),
-                onPressed: () async {
-                  context.read<RPCController>().endAll();
-                  // ignore: use_build_context_synchronously
-                  Navigator.of(context).pop();
-                  await windowManager.destroy();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      await windowManager.destroy();
-    }
-  }
-
-  void _init() async {
-    // Add this line to override the default close handler
-    await windowManager.setPreventClose(true);
-    setState(() {});
   }
 
   final PageController pageController = PageController();

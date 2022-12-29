@@ -79,6 +79,8 @@ pub fn wire_new_file(port_: MessagePort, f: JsValue) {
 
 // Section: allocate functions
 
+// Section: related functions
+
 // Section: impl Wire2Api
 
 impl Wire2Api<String> for String {

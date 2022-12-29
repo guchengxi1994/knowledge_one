@@ -91,8 +91,8 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
             context
                 .read<PageChangeController>()
                 .dropdownKey
-                .currentState!
-                .hideOverlay();
+                .currentState
+                ?.hideOverlay();
           },
           behavior: HitTestBehavior.opaque,
           onSecondaryTapDown: (details) {
