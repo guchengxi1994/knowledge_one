@@ -44,6 +44,9 @@ dependencies:
     path: ../flutter_useful_widgets
   file_type:
     path: ../file_type
+  json_dart_generator: ^1.1.0+1
+  json_tree_viewer: ^0.0.2
+
 
 dev_dependencies:
   flutter_test:
