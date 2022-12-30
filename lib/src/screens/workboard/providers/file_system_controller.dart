@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
@@ -23,6 +22,11 @@ class FileSystemController extends ChangeNotifier {
   Offset clickPoint = const Offset(0, 0);
   List<WidgetStatus> widgetStatus = [];
   bool isDragging = false;
+  double scrolledHeight = 0;
+
+  changeScrolledHeight(double d) {
+    scrolledHeight = d;
+  }
 
   List<FolderEntity> folderList = [];
 
@@ -58,6 +62,9 @@ class FileSystemController extends ChangeNotifier {
               off.dx - AppStyle.sideMenuWidth &&
           widgetStatus[i].dy + AppStyle.fileWidgetSize > off.dy) {
         // print(i);
+        // print(widgetStatus[i].dx);
+        // print(widgetStatus[i].dx + 71);
+        // print(widgetStatus[i].dy);
         return currentFolderElements[i];
       }
     }
