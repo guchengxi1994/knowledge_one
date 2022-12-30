@@ -7,6 +7,7 @@ import 'providers/file_system_controller.dart';
 import 'providers/page_controller.dart';
 import 'sub_screens/file_management_screen.dart';
 import 'components/sidemenu.dart';
+import 'sub_screens/svg_cleaner_screen.dart';
 
 class WorkboardScreen extends StatefulWidget {
   const WorkboardScreen({Key? key}) : super(key: key);
@@ -44,9 +45,10 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
                   child: PageView(
                     controller: pageController,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: const [
-                      FileManagementScreen(),
-                      TodoScreen(),
+                    children: [
+                      const FileManagementScreen(),
+                      const TodoScreen(),
+                      SvgCleanerScreen()
                     ],
                   ),
                 )
