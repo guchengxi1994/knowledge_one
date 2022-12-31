@@ -81,6 +81,16 @@ pub extern "C" fn wire_new_file(port_: i64, f: *mut wire_NativeFileSummary) {
     wire_new_file_impl(port_, f)
 }
 
+#[no_mangle]
+pub extern "C" fn wire_clean_svg_file(port_: i64, file_path: *mut wire_uint_8_list) {
+    wire_clean_svg_file_impl(port_, file_path)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_clean_svg_string(port_: i64, content: *mut wire_uint_8_list) {
+    wire_clean_svg_string_impl(port_, content)
+}
+
 // Section: allocate functions
 
 #[no_mangle]

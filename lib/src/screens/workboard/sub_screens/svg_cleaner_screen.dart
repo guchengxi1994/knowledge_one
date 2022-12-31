@@ -4,6 +4,7 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:knowledge_one/app_style.dart';
 
 import 'base_sub_screens.dart';
 
@@ -88,8 +89,11 @@ class _SvgCleanerScreenState<T> extends BaseSubScreenState<SvgCleanerScreen> {
                     });
                   },
                   child: Container(
+                    margin: const EdgeInsets.only(top: 10, bottom: 10),
                     height: 200,
-                    width: 200,
+                    width: 0.4 *
+                        (MediaQuery.of(context).size.width -
+                            AppStyle.sideMenuWidth),
                     color: _dragging
                         ? Colors.blue.withOpacity(0.4)
                         : Colors.black26,
@@ -99,14 +103,6 @@ class _SvgCleanerScreenState<T> extends BaseSubScreenState<SvgCleanerScreen> {
                           const Center(child: Text("Drop here"))
                         else
                           Text(_list.map((e) => e.path).join("\n")),
-                        if (offset != null)
-                          Align(
-                            alignment: Alignment.topRight,
-                            child: Text(
-                              '$offset',
-                              style: Theme.of(context).textTheme.caption,
-                            ),
-                          )
                       ],
                     ),
                   ),
@@ -116,6 +112,16 @@ class _SvgCleanerScreenState<T> extends BaseSubScreenState<SvgCleanerScreen> {
                 ),
                 Expanded(child: TextFormField())
               ],
+            )),
+        const VerticalDivider(
+          thickness: 3,
+        ),
+        IconButton(
+            tooltip: "convert",
+            onPressed: () async {},
+            icon: Icon(
+              Icons.arrow_forward,
+              color: Colors.blueAccent,
             )),
         const VerticalDivider(
           thickness: 3,

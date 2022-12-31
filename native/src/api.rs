@@ -1,6 +1,7 @@
 use crate::{
     database::{load_config::load_config, model},
     storage,
+    svg::{CleanerResult,file_cleaner,string_cleaner}
 };
 use futures::executor::block_on;
 
@@ -118,4 +119,14 @@ pub fn new_file(mut f: model::file::NativeFileSummary) -> i64 {
 async fn get_todustatus() -> Vec<model::todo_status::TodoStatus> {
     let result = model::todo_status::TodoStatus::get_all_status_types().await;
     return result;
+}
+
+/// svg_cleaner for file
+pub fn clean_svg_file(file_path:String) -> Option<CleanerResult>{
+    file_cleaner(file_path)
+}
+
+/// svg_cleaner for string
+pub fn clean_svg_string(content:String) -> Option<CleanerResult>{
+    string_cleaner(content)
 }

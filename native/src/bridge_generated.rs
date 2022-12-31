@@ -25,6 +25,7 @@ use crate::database::model::file::FileDetails;
 use crate::database::model::file::NativeFileSummary;
 use crate::database::model::todo::TodoDetails;
 use crate::database::model::todo_status::TodoStatus;
+use crate::svg::CleanerResult;
 
 // Section: wire functions
 
@@ -234,6 +235,32 @@ fn wire_new_file_impl(port_: MessagePort, f: impl Wire2Api<NativeFileSummary> + 
         },
     )
 }
+fn wire_clean_svg_file_impl(port_: MessagePort, file_path: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "clean_svg_file",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_file_path = file_path.wire2api();
+            move |task_callback| Ok(clean_svg_file(api_file_path))
+        },
+    )
+}
+fn wire_clean_svg_string_impl(port_: MessagePort, content: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "clean_svg_string",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_content = content.wire2api();
+            move |task_callback| Ok(clean_svg_string(api_content))
+        },
+    )
+}
 // Section: wrapper structs
 
 // Section: static checks
@@ -270,6 +297,18 @@ impl Wire2Api<u8> for u8 {
 }
 
 // Section: impl IntoDart
+
+impl support::IntoDart for CleanerResult {
+    fn into_dart(self) -> support::DartAbi {
+        vec![
+            self.duration.into_dart(),
+            self.radio.into_dart(),
+            self.result.into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for CleanerResult {}
 
 impl support::IntoDart for FileChangelog {
     fn into_dart(self) -> support::DartAbi {
@@ -342,13 +381,6 @@ impl support::IntoDartExceptPrimitive for TodoStatus {}
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
-
-/// cbindgen:ignore
-#[cfg(target_family = "wasm")]
-#[path = "bridge_generated.web.rs"]
-mod web;
-#[cfg(target_family = "wasm")]
-pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

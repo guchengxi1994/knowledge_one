@@ -77,6 +77,16 @@ pub fn wire_new_file(port_: MessagePort, f: JsValue) {
     wire_new_file_impl(port_, f)
 }
 
+#[wasm_bindgen]
+pub fn wire_clean_svg_file(port_: MessagePort, file_path: String) {
+    wire_clean_svg_file_impl(port_, file_path)
+}
+
+#[wasm_bindgen]
+pub fn wire_clean_svg_string(port_: MessagePort, content: String) {
+    wire_clean_svg_string_impl(port_, content)
+}
+
 // Section: allocate functions
 
 // Section: related functions

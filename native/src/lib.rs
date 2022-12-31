@@ -4,6 +4,7 @@ mod api;
 mod bridge_generated;
 mod database;
 mod storage;
+pub mod svg;
 
 #[macro_use]
 extern crate lazy_static;

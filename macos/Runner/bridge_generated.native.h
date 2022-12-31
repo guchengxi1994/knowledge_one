@@ -75,6 +75,10 @@ void wire_get_files(int64_t port_);
 
 void wire_new_file(int64_t port_, struct wire_NativeFileSummary *f);
 
+void wire_clean_svg_file(int64_t port_, struct wire_uint_8_list *file_path);
+
+void wire_clean_svg_string(int64_t port_, struct wire_uint_8_list *content);
+
 struct wire_NativeFileNewVersion *new_box_autoadd_native_file_new_version_0(void);
 
 struct wire_NativeFileSummary *new_box_autoadd_native_file_summary_0(void);
@@ -99,6 +103,8 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_get_todos);
     dummy_var ^= ((int64_t) (void*) wire_get_files);
     dummy_var ^= ((int64_t) (void*) wire_new_file);
+    dummy_var ^= ((int64_t) (void*) wire_clean_svg_file);
+    dummy_var ^= ((int64_t) (void*) wire_clean_svg_string);
     dummy_var ^= ((int64_t) (void*) new_box_autoadd_native_file_new_version_0);
     dummy_var ^= ((int64_t) (void*) new_box_autoadd_native_file_summary_0);
     dummy_var ^= ((int64_t) (void*) new_uint_8_list_0);

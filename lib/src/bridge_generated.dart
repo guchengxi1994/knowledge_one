@@ -87,6 +87,29 @@ abstract class Native {
   Future<int> newFile({required NativeFileSummary f, dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kNewFileConstMeta;
+
+  /// svg_cleaner for file
+  Future<CleanerResult?> cleanSvgFile({required String filePath, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCleanSvgFileConstMeta;
+
+  /// svg_cleaner for string
+  Future<CleanerResult?> cleanSvgString(
+      {required String content, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kCleanSvgStringConstMeta;
+}
+
+class CleanerResult {
+  final int duration;
+  final double radio;
+  final String result;
+
+  CleanerResult({
+    required this.duration,
+    required this.radio,
+    required this.result,
+  });
 }
 
 class FileChangelog {
@@ -469,6 +492,42 @@ class NativeImpl implements Native {
         argNames: ["f"],
       );
 
+  Future<CleanerResult?> cleanSvgFile(
+      {required String filePath, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(filePath);
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_clean_svg_file(port_, arg0),
+      parseSuccessData: _wire2api_opt_box_autoadd_cleaner_result,
+      constMeta: kCleanSvgFileConstMeta,
+      argValues: [filePath],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kCleanSvgFileConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "clean_svg_file",
+        argNames: ["filePath"],
+      );
+
+  Future<CleanerResult?> cleanSvgString(
+      {required String content, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(content);
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_clean_svg_string(port_, arg0),
+      parseSuccessData: _wire2api_opt_box_autoadd_cleaner_result,
+      constMeta: kCleanSvgStringConstMeta,
+      argValues: [content],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kCleanSvgStringConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "clean_svg_string",
+        argNames: ["content"],
+      );
+
   void dispose() {
     _platform.dispose();
   }
@@ -480,6 +539,25 @@ class NativeImpl implements Native {
 
   String _wire2api_String(dynamic raw) {
     return raw as String;
+  }
+
+  CleanerResult _wire2api_box_autoadd_cleaner_result(dynamic raw) {
+    return _wire2api_cleaner_result(raw);
+  }
+
+  CleanerResult _wire2api_cleaner_result(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return CleanerResult(
+      duration: _wire2api_u32(arr[0]),
+      radio: _wire2api_f64(arr[1]),
+      result: _wire2api_String(arr[2]),
+    );
+  }
+
+  double _wire2api_f64(dynamic raw) {
+    return raw as double;
   }
 
   FileChangelog _wire2api_file_changelog(dynamic raw) {
@@ -540,6 +618,10 @@ class NativeImpl implements Native {
     return raw == null ? null : _wire2api_String(raw);
   }
 
+  CleanerResult? _wire2api_opt_box_autoadd_cleaner_result(dynamic raw) {
+    return raw == null ? null : _wire2api_box_autoadd_cleaner_result(raw);
+  }
+
   List<FileChangelog>? _wire2api_opt_list_file_changelog(dynamic raw) {
     return raw == null ? null : _wire2api_list_file_changelog(raw);
   }
@@ -570,6 +652,10 @@ class NativeImpl implements Native {
       todoStatusName: _wire2api_opt_String(arr[1]),
       todoStatusColor: _wire2api_opt_String(arr[2]),
     );
+  }
+
+  int _wire2api_u32(dynamic raw) {
+    return raw as int;
   }
 
   int _wire2api_u8(dynamic raw) {
@@ -1013,6 +1099,40 @@ class NativeWire implements FlutterRustBridgeWireBase {
               ffi.Pointer<wire_NativeFileSummary>)>>('wire_new_file');
   late final _wire_new_file = _wire_new_filePtr
       .asFunction<void Function(int, ffi.Pointer<wire_NativeFileSummary>)>();
+
+  void wire_clean_svg_file(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> file_path,
+  ) {
+    return _wire_clean_svg_file(
+      port_,
+      file_path,
+    );
+  }
+
+  late final _wire_clean_svg_filePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_clean_svg_file');
+  late final _wire_clean_svg_file = _wire_clean_svg_filePtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_clean_svg_string(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> content,
+  ) {
+    return _wire_clean_svg_string(
+      port_,
+      content,
+    );
+  }
+
+  late final _wire_clean_svg_stringPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_clean_svg_string');
+  late final _wire_clean_svg_string = _wire_clean_svg_stringPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
   ffi.Pointer<wire_NativeFileNewVersion>
       new_box_autoadd_native_file_new_version_0() {
