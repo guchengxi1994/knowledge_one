@@ -25,6 +25,16 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
   final TextEditingController textEditingController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    controller.addListener(() {
+      context
+          .read<FileSystemController>()
+          .changeScrolledHeight(controller.offset);
+    });
+  }
+
+  @override
   void dispose() {
     controller.dispose();
     textEditingController.dispose();
@@ -49,7 +59,7 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(50),
+        preferredSize: const Size.fromHeight(AppStyle.appbarHeight),
         child: AppBar(
           actions: [
             _buildSearchBar(),
@@ -91,8 +101,8 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
             context
                 .read<PageChangeController>()
                 .dropdownKey
-                .currentState!
-                .hideOverlay();
+                .currentState
+                ?.hideOverlay();
           },
           behavior: HitTestBehavior.opaque,
           onSecondaryTapDown: (details) {
@@ -101,16 +111,15 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
                   (ctx) => _actions(ctx), 8.0, 320.0);
             }
           },
-          child: SingleChildScrollView(
-            controller: controller,
-            child: Container(
-              decoration: BoxDecoration(
-                  border: Border(
-                      top: BorderSide(color: Colors.grey[200]!, width: 2))),
-              width: MediaQuery.of(context).size.width - AppStyle.sideMenuWidth,
-              padding: const EdgeInsets.only(
-                  bottom: 10, top: 10, left: 10, right: 10),
-              height: MediaQuery.of(context).size.height - 50,
+          child: Container(
+            decoration: BoxDecoration(
+                border: Border(
+                    top: BorderSide(color: Colors.grey[200]!, width: 2))),
+            width: MediaQuery.of(context).size.width - AppStyle.sideMenuWidth,
+            padding: const EdgeInsets.only(bottom: 10, top: 10),
+            height: MediaQuery.of(context).size.height - AppStyle.appbarHeight,
+            child: SingleChildScrollView(
+              controller: controller,
               child: Wrap(
                   spacing: 10,
                   runSpacing: 10,

@@ -1,10 +1,11 @@
 use crate::{
     database::{load_config::load_config, model},
     storage,
+    svg::{CleanerResult,file_cleaner,string_cleaner}
 };
 use futures::executor::block_on;
 
-pub fn create_all_directory(s:String){
+pub fn create_all_directory(s: String) {
     storage::create_folder::create_cache_dir(s.clone());
     storage::create_folder::create_diff_dir(s.clone());
     storage::create_folder::create_restore_dir(s.clone());
@@ -12,9 +13,14 @@ pub fn create_all_directory(s:String){
 }
 
 /// 根据file_id 和hash值获取修改的changelog
-pub fn get_changelog_from_id(id:i64,file_hash:String)->Option<Vec<crate::database::model::changelog::FileChangelog>>{
+pub fn get_changelog_from_id(
+    id: i64,
+    file_hash: String,
+) -> Option<Vec<crate::database::model::changelog::FileChangelog>> {
     block_on(async {
-        crate::database::model::changelog::FileChangelog::get_filelogs_by_id_after_some_file_hash(id, file_hash)
+        crate::database::model::changelog::FileChangelog::get_filelogs_by_id_after_some_file_hash(
+            id, file_hash,
+        )
     })
 }
 
@@ -34,28 +40,38 @@ pub fn change_version_control(file_hash: String) -> i64 {
 }
 
 /// 手动更新新版本 （右键绑定新版本）
-pub fn create_new_version(model:crate::database::model::changelog::NativeFileNewVersion)->i64{
-    block_on(async {
-        model.create_new_version()
-    })  
+pub fn create_new_version(model: crate::database::model::changelog::NativeFileNewVersion) -> i64 {
+    block_on(async { model.create_new_version() })
 }
 
 /// 创建一个物理文件
-pub fn create_new_disk_file(file_path:String)->i64{
+pub fn create_new_disk_file(file_path: String) -> i64 {
     crate::storage::create_file::create_file(file_path)
 }
 
 /// 根据现在的hash值获取变更记录
-pub fn get_file_logs(file_hash:String)->Option<Vec<crate::database::model::changelog::FileChangelog>>{
+pub fn get_file_logs(
+    file_hash: String,
+) -> Option<Vec<crate::database::model::changelog::FileChangelog>> {
     block_on(async {
         crate::database::model::changelog::FileChangelog::get_filelogs_by_file_hash(file_hash)
     })
 }
 
 /// 根据文件id修改文件hash
-pub fn change_file_hash_by_id(ori_file_path: String, file_path:String,file_id:i64,diff_path:Option<String>)->String{
+pub fn change_file_hash_by_id(
+    ori_file_path: String,
+    file_path: String,
+    file_id: i64,
+    diff_path: Option<String>,
+) -> String {
     block_on(async {
-        crate::database::model::file::change_file_hash_by_id(ori_file_path,file_path, file_id,diff_path)
+        crate::database::model::file::change_file_hash_by_id(
+            ori_file_path,
+            file_path,
+            file_id,
+            diff_path,
+        )
     })
 }
 
@@ -63,11 +79,16 @@ pub fn change_file_hash_by_id(ori_file_path: String, file_path:String,file_id:i6
 pub fn init_mysql(conf_path: String) {
     let info = load_config(&conf_path);
 
-    let url = format!(
-        "mysql://{}:{}@{}:{}/{}",
-        info.username, info.password, info.address, info.port, info.database
-    );
-    crate::database::sqlx_connection::init(url);
+    match info {
+        Some(s) => {
+            let url = format!(
+                "mysql://{}:{}@{}:{}/{}",
+                s.username, s.password, s.address, s.port, s.database
+            );
+            crate::database::sqlx_connection::init(url);
+        }
+        None => {}
+    }
 }
 
 /// 获取所有状态
@@ -98,4 +119,14 @@ pub fn new_file(mut f: model::file::NativeFileSummary) -> i64 {
 async fn get_todustatus() -> Vec<model::todo_status::TodoStatus> {
     let result = model::todo_status::TodoStatus::get_all_status_types().await;
     return result;
+}
+
+/// svg_cleaner for file
+pub fn clean_svg_file(file_path:String) -> Option<CleanerResult>{
+    file_cleaner(file_path)
+}
+
+/// svg_cleaner for string
+pub fn clean_svg_string(content:String) -> Option<CleanerResult>{
+    string_cleaner(content)
 }

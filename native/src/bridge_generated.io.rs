@@ -81,6 +81,16 @@ pub extern "C" fn wire_new_file(port_: i64, f: *mut wire_NativeFileSummary) {
     wire_new_file_impl(port_, f)
 }
 
+#[no_mangle]
+pub extern "C" fn wire_clean_svg_file(port_: i64, file_path: *mut wire_uint_8_list) {
+    wire_clean_svg_file_impl(port_, file_path)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_clean_svg_string(port_: i64, content: *mut wire_uint_8_list) {
+    wire_clean_svg_string_impl(port_, content)
+}
+
 // Section: allocate functions
 
 #[no_mangle]
@@ -101,6 +111,8 @@ pub extern "C" fn new_uint_8_list_0(len: i32) -> *mut wire_uint_8_list {
     };
     support::new_leak_box_ptr(ans)
 }
+
+// Section: related functions
 
 // Section: impl Wire2Api
 
@@ -225,8 +237,8 @@ impl NewWithNullPtr for wire_NativeFileSummary {
 // Section: sync execution mode utility
 
 #[no_mangle]
-pub extern "C" fn free_WireSyncReturnStruct(val: support::WireSyncReturnStruct) {
+pub extern "C" fn free_WireSyncReturn(ptr: support::WireSyncReturn) {
     unsafe {
-        let _ = support::vec_from_leak_ptr(val.ptr, val.len);
-    }
+        let _ = support::box_from_leak_ptr(ptr);
+    };
 }

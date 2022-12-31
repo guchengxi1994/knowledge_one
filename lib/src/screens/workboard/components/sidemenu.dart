@@ -49,6 +49,12 @@ class SideMenu extends StatelessWidget {
             title: "Todos",
             isSvg: false,
           ),
+          CustomSidemenuButton(
+            iconUrl: null,
+            buttonId: 2,
+            title: "Svg cleaner",
+            isSvg: false,
+          ),
         ],
       ),
     );

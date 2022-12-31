@@ -63,12 +63,12 @@ class _FolderWidgetState extends State<FolderWidget> {
 
     dx = (widget.index %
             ((MediaQuery.of(context).size.width - AppStyle.sideMenuWidth) ~/
-                (iconSize + 10))) *
-        (iconSize + 10);
+                (iconSize + /*spacing+border*/ 12))) *
+        (iconSize + /*spacing+border*/ 12);
     dy = (widget.index ~/
             ((MediaQuery.of(context).size.width - AppStyle.sideMenuWidth) ~/
-                (iconSize + 10))) *
-        (iconSize);
+                (iconSize + /*spacing+border*/ 12))) *
+        (iconSize + /*spacing+border*/ 12) + /*padding*/ 10 - /*scroll offset*/ context.select<FileSystemController, double>((value) => value.scrolledHeight);
 
     context
         .read<FileSystemController>()
@@ -86,10 +86,11 @@ class _FolderWidgetState extends State<FolderWidget> {
         },
         child: Draggable(
             onDragEnd: (details) async {
-              // print(details.offset);
-              BaseFileEntity? entity = context
-                  .read<FileSystemController>()
-                  .findObjectByOffset(details.offset);
+              // print(MediaQuery.of(context).size.width);
+              BaseFileEntity? entity =
+                  context.read<FileSystemController>().findObjectByOffset(
+                        details.offset,
+                      );
               // print(entity);
               if (entity != null &&
                   entity != widget.entity &&

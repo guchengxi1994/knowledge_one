@@ -4,6 +4,7 @@ class AppStyle {
   AppStyle._();
 
   static const double iconSize = 40;
+  static const double appbarHeight = 50;
 
   static Color selectedBackgroundColor = Colors.blueAccent.withOpacity(0.5);
   static Color selectedBackgroundColorWhenGragging =
