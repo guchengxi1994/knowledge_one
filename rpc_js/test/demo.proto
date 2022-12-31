@@ -1,0 +1,19 @@
+// https://juejin.cn/post/6844903464909144077
+// https://www.jianshu.com/p/004d02804183
+
+syntax = "proto3";
+
+package hello;
+
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+}
+
+message HelloRequest {
+  string message = 1;
+}
+
+message HelloReply {
+  string message = 1;
+}
+
