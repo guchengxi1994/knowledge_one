@@ -8,14 +8,16 @@ pub struct CleanerResult {
     pub duration: u32,
     pub radio: f64,
     pub result: String,
+    pub origin: String,
 }
 
 impl CleanerResult {
-    pub fn new(duration: u32, radio: f64, result: String) -> Self {
+    pub fn new(duration: u32, radio: f64, result: String, origin: String) -> Self {
         return CleanerResult {
             duration,
             radio,
             result,
+            origin,
         };
     }
 }
@@ -38,7 +40,7 @@ pub fn file_cleaner(p: String) -> Option<CleanerResult> {
     match file {
         Ok(raw) => {
             let input_size = raw.len();
-            let mut buf = raw.into_bytes();
+            let mut buf = raw.clone().into_bytes();
             let mut prev_size = 0;
             let t1 = SystemTime::now();
             loop {
@@ -82,6 +84,7 @@ pub fn file_cleaner(p: String) -> Option<CleanerResult> {
                 duration.try_into().unwrap(),
                 ratio,
                 String::from_utf8(buf).unwrap(),
+                raw,
             ));
         }
         Err(_) => {
@@ -93,7 +96,7 @@ pub fn file_cleaner(p: String) -> Option<CleanerResult> {
 /// svg cleaner for a svg string
 pub fn string_cleaner(p: String) -> Option<CleanerResult> {
     let input_size = p.len();
-    let mut buf = p.into_bytes();
+    let mut buf = p.clone().into_bytes();
     let mut prev_size = 0;
     let t1 = SystemTime::now();
     loop {
@@ -136,6 +139,7 @@ pub fn string_cleaner(p: String) -> Option<CleanerResult> {
         duration.try_into().unwrap(),
         ratio,
         String::from_utf8(buf).unwrap(),
+        p.clone(),
     ));
 }
 

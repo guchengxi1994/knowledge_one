@@ -1,10 +1,14 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, avoid_init_to_null
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/material.dart';
 import 'package:cross_file/cross_file.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:knowledge_one/app_style.dart';
+import 'package:knowledge_one/native.dart';
+import 'package:knowledge_one/utils/smart_dialog_utils.dart';
+import 'package:pretty_diff_text/pretty_diff_text.dart';
 
 import 'base_sub_screens.dart';
 
@@ -48,6 +52,15 @@ class _SvgCleanerScreenState<T> extends BaseSubScreenState<SvgCleanerScreen> {
   bool _dragging = false;
 
   Offset? offset;
+
+  late CleanerResult? result = null;
+
+  final TextEditingController controller = TextEditingController();
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget baseBuild(BuildContext context) {
@@ -110,23 +123,113 @@ class _SvgCleanerScreenState<T> extends BaseSubScreenState<SvgCleanerScreen> {
                 const Divider(
                   thickness: 3,
                 ),
-                Expanded(child: TextFormField())
+                Expanded(
+                    child: TextFormField(
+                  controller: controller,
+                  maxLines: null,
+                  maxLength: null,
+                  decoration: const InputDecoration(
+                      hintText: "在这里粘贴svg样式字符串", border: InputBorder.none),
+                ))
               ],
             )),
         const VerticalDivider(
           thickness: 3,
         ),
-        IconButton(
-            tooltip: "convert",
-            onPressed: () async {},
-            icon: Icon(
-              Icons.arrow_forward,
-              color: Colors.blueAccent,
-            )),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+                tooltip: "convert",
+                onPressed: () async {
+                  if (_list.isEmpty && controller.text == "") {
+                    return;
+                  }
+
+                  if (_list.isNotEmpty) {
+                    result = await api.cleanSvgFile(filePath: _list.first.path);
+                    if (result != null) {
+                      debugPrint(result!.result);
+                    } else {
+                      SmartDialogUtils.error("转换失败");
+                    }
+                    _list.removeAt(0);
+                    setState(() {});
+                    return;
+                  }
+
+                  if (controller.text != "") {
+                    result = await api.cleanSvgString(content: controller.text);
+                    if (result != null) {
+                      debugPrint(result!.result);
+                    } else {
+                      SmartDialogUtils.error("转换失败");
+                    }
+                    setState(() {});
+                    return;
+                  }
+                },
+                icon: const Icon(
+                  Icons.arrow_forward,
+                  color: Colors.blueAccent,
+                )),
+            IconButton(
+                tooltip: "refresh",
+                onPressed: () async {
+                  result = null;
+                  controller.text = "";
+                  _list.clear();
+                  setState(() {});
+                },
+                icon: const Icon(
+                  Icons.refresh,
+                  color: Colors.blueAccent,
+                )),
+            if (result != null)
+              IconButton(
+                  tooltip: "save",
+                  onPressed: () async {},
+                  icon: const Icon(
+                    Icons.save,
+                    color: Colors.blueAccent,
+                  )),
+          ],
+        ),
         const VerticalDivider(
           thickness: 3,
         ),
-        const Expanded(flex: 1, child: SizedBox()),
+        Expanded(
+            flex: 1,
+            child: Column(
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: result?.result == null
+                        ? const SizedBox()
+                        : SvgPicture.string(result!.result)),
+                const Divider(
+                  thickness: 3,
+                ),
+                Expanded(
+                    flex: 2,
+                    child: result == null
+                        ? SizedBox()
+                        : PrettyDiffText(
+                            oldText: result!.origin, newText: result!.result)),
+                const Divider(
+                  thickness: 1,
+                ),
+                result == null
+                    ? SizedBox()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text("运行时间： ${result!.duration}ms"),
+                          Text("变化比例： ${result!.radio.roundToDouble()}%")
+                        ],
+                      )
+              ],
+            )),
       ],
     );
   }

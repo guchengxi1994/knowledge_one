@@ -779,6 +779,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.5.1"
+  pretty_diff_text:
+    dependency: "direct main"
+    description:
+      name: pretty_diff_text
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.0"
   process:
     dependency: transitive
     description:

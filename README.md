@@ -10,6 +10,7 @@ flutter 版本是3.3.10
 
 ## changelogs
 
+* 0.0.3 [details](./changelogs/0_0_3.md)
 * 0.0.2 [details](./changelogs/0_0_2.md)
 * 0.0.1 [details](./changelogs/0_0_1.md)
 
