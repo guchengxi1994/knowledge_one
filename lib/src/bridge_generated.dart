@@ -104,11 +104,13 @@ class CleanerResult {
   final int duration;
   final double radio;
   final String result;
+  final String origin;
 
   CleanerResult({
     required this.duration,
     required this.radio,
     required this.result,
+    required this.origin,
   });
 }
 
@@ -547,12 +549,13 @@ class NativeImpl implements Native {
 
   CleanerResult _wire2api_cleaner_result(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return CleanerResult(
       duration: _wire2api_u32(arr[0]),
       radio: _wire2api_f64(arr[1]),
       result: _wire2api_String(arr[2]),
+      origin: _wire2api_String(arr[3]),
     );
   }
 

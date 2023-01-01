@@ -304,6 +304,7 @@ impl support::IntoDart for CleanerResult {
             self.duration.into_dart(),
             self.radio.into_dart(),
             self.result.into_dart(),
+            self.origin.into_dart(),
         ]
         .into_dart()
     }

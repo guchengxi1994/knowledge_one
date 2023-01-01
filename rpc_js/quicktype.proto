@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package quicktype;
+
+message QuicktypeRequest {
+  string langType = 1;
+  string structName = 2;
+  string content = 3;
+}
+
+message QuicktypeResponse { string result = 1; }
+
+service Generate {
+  rpc GenerateCode(QuicktypeRequest) returns (QuicktypeResponse) {}
+}
