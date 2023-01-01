@@ -1,0 +1,1 @@
+pkg -t node14-win-x64 .\server.js

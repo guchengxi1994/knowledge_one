@@ -9,7 +9,7 @@ if "%input1%"=="run" (
     flutter  run   -d windows
 ) else (
     conda activate minum
-    cd rpc
+    cd rpc_python
     :: file_changelog
     cd file_changelog
     pyinstaller -w -i  app_icon.ico  file_changelog.py -y
