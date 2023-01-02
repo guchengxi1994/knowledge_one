@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:knowledge_one/native.dart';
 import 'package:knowledge_one/src/screens/workboard/providers/todo_controller.dart';
 import 'package:knowledge_one/src/screens/workboard/sub_screens/todo_screen.dart';
+import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/file_system_controller.dart';
@@ -20,6 +24,16 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await initApp();
+    });
+  }
+
+  Future<void> initApp() async {
+    Directory executableDir = DevUtils.executableDir;
+    print("${executableDir.path}/db_config.toml");
+    await api.createAllDirectory(s: executableDir.path);
+    await api.initMysql(confPath: "${executableDir.path}/db_config.toml");
   }
 
   final PageController pageController = PageController();
