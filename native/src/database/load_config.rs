@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::Read;
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseInfo {
     pub name: String,
@@ -14,18 +13,19 @@ pub struct DatabaseInfo {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Config{
-    title :String,
-    database:DatabaseInfo,
+pub struct Config {
+   pub title: String,
+   pub db_type: String,
+   pub  database: DatabaseInfo,
 }
 
-pub fn load_config(conf_path:&str) ->  Option<DatabaseInfo>  {
+pub fn load_config(conf_path: &str) -> Option<Config> {
     let file_path = conf_path;
     let mut file: File = match File::open(file_path) {
         Ok(f) => f,
         Err(_) => {
             println!("can not load db_config file by native");
-            return  None;
+            return None;
         }
     };
 
@@ -38,6 +38,6 @@ pub fn load_config(conf_path:&str) ->  Option<DatabaseInfo>  {
         }
     };
 
-    let p:Config = toml::from_str(&str_val).unwrap();
-    Some(p.database)
+    let p: Config = toml::from_str(&str_val).unwrap();
+    Some(p)
 }

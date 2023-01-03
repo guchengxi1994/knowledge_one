@@ -17,7 +17,7 @@ ring = "0.16.20"
 data-encoding = "2.3.2"
 anyhow = "1.0"
 futures = "0.3"
-sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls" , "mysql","chrono" ] }
+sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls" ,"sqlite" ,"mysql","chrono" ] }
 structopt = "0.3"
 tokio = { version = "1", features = ["full"] }
 svgcleaner = "0.9.5"  # svg清理

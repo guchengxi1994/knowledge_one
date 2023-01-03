@@ -53,8 +53,8 @@ pub fn wire_change_file_hash_by_id(
 }
 
 #[wasm_bindgen]
-pub fn wire_init_mysql(port_: MessagePort, conf_path: String) {
-    wire_init_mysql_impl(port_, conf_path)
+pub fn wire_init_database(port_: MessagePort, conf_path: String, is_first_time: bool) {
+    wire_init_database_impl(port_, conf_path, is_first_time)
 }
 
 #[wasm_bindgen]
@@ -152,6 +152,11 @@ impl Wire2Api<Vec<u8>> for Box<[u8]> {
 impl Wire2Api<String> for JsValue {
     fn wire2api(self) -> String {
         self.as_string().expect("non-UTF-8 string, or not a string")
+    }
+}
+impl Wire2Api<bool> for JsValue {
+    fn wire2api(self) -> bool {
+        self.is_truthy()
     }
 }
 impl Wire2Api<i64> for JsValue {

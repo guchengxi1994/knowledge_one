@@ -57,8 +57,12 @@ pub extern "C" fn wire_change_file_hash_by_id(
 }
 
 #[no_mangle]
-pub extern "C" fn wire_init_mysql(port_: i64, conf_path: *mut wire_uint_8_list) {
-    wire_init_mysql_impl(port_, conf_path)
+pub extern "C" fn wire_init_database(
+    port_: i64,
+    conf_path: *mut wire_uint_8_list,
+    is_first_time: bool,
+) {
+    wire_init_database_impl(port_, conf_path, is_first_time)
 }
 
 #[no_mangle]
@@ -122,6 +126,7 @@ impl Wire2Api<String> for *mut wire_uint_8_list {
         String::from_utf8_lossy(&vec).into_owned()
     }
 }
+
 impl Wire2Api<NativeFileNewVersion> for *mut wire_NativeFileNewVersion {
     fn wire2api(self) -> NativeFileNewVersion {
         let wrap = unsafe { support::box_from_leak_ptr(self) };

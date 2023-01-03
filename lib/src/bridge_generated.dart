@@ -64,9 +64,10 @@ abstract class Native {
   FlutterRustBridgeTaskConstMeta get kChangeFileHashByIdConstMeta;
 
   /// 初始化数据库，创建数据库连接池
-  Future<void> initMysql({required String confPath, dynamic hint});
+  Future<int> initDatabase(
+      {required String confPath, required bool isFirstTime, dynamic hint});
 
-  FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta;
+  FlutterRustBridgeTaskConstMeta get kInitDatabaseConstMeta;
 
   /// 获取所有状态
   Future<List<TodoStatus>> getStatusTypes({dynamic hint});
@@ -412,21 +413,23 @@ class NativeImpl implements Native {
         argNames: ["oriFilePath", "filePath", "fileId", "diffPath"],
       );
 
-  Future<void> initMysql({required String confPath, dynamic hint}) {
+  Future<int> initDatabase(
+      {required String confPath, required bool isFirstTime, dynamic hint}) {
     var arg0 = _platform.api2wire_String(confPath);
+    var arg1 = isFirstTime;
     return _platform.executeNormal(FlutterRustBridgeTask(
-      callFfi: (port_) => _platform.inner.wire_init_mysql(port_, arg0),
-      parseSuccessData: _wire2api_unit,
-      constMeta: kInitMysqlConstMeta,
-      argValues: [confPath],
+      callFfi: (port_) => _platform.inner.wire_init_database(port_, arg0, arg1),
+      parseSuccessData: _wire2api_i64,
+      constMeta: kInitDatabaseConstMeta,
+      argValues: [confPath, isFirstTime],
       hint: hint,
     ));
   }
 
-  FlutterRustBridgeTaskConstMeta get kInitMysqlConstMeta =>
+  FlutterRustBridgeTaskConstMeta get kInitDatabaseConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
-        debugName: "init_mysql",
-        argNames: ["confPath"],
+        debugName: "init_database",
+        argNames: ["confPath", "isFirstTime"],
       );
 
   Future<List<TodoStatus>> getStatusTypes({dynamic hint}) {
@@ -675,6 +678,11 @@ class NativeImpl implements Native {
 }
 
 // Section: api2wire
+
+@protected
+bool api2wire_bool(bool raw) {
+  return raw;
+}
 
 @protected
 int api2wire_u8(int raw) {
@@ -1027,22 +1035,24 @@ class NativeWire implements FlutterRustBridgeWireBase {
               int,
               ffi.Pointer<wire_uint_8_list>)>();
 
-  void wire_init_mysql(
+  void wire_init_database(
     int port_,
     ffi.Pointer<wire_uint_8_list> conf_path,
+    bool is_first_time,
   ) {
-    return _wire_init_mysql(
+    return _wire_init_database(
       port_,
       conf_path,
+      is_first_time,
     );
   }
 
-  late final _wire_init_mysqlPtr = _lookup<
+  late final _wire_init_databasePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Int64, ffi.Pointer<wire_uint_8_list>)>>('wire_init_mysql');
-  late final _wire_init_mysql = _wire_init_mysqlPtr
-      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+          ffi.Void Function(ffi.Int64, ffi.Pointer<wire_uint_8_list>,
+              ffi.Bool)>>('wire_init_database');
+  late final _wire_init_database = _wire_init_databasePtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>, bool)>();
 
   void wire_get_status_types(
     int port_,
@@ -1231,3 +1241,19 @@ typedef DartPostCObjectFnType = ffi.Pointer<
     ffi.NativeFunction<ffi.Bool Function(DartPort, ffi.Pointer<ffi.Void>)>>;
 typedef DartPort = ffi.Int64;
 typedef uintptr_t = ffi.UnsignedLongLong;
+
+const int DATABASE_INIT_OK = 10000;
+
+const int DATABASE_INIT_FILE_NOT_FOUND = 10001;
+
+const int DATABASE_INIT_CREATE_FAILED = 10002;
+
+const int DATABASE_INIT_OTHER_ERROR = 10004;
+
+const int DATABASE_TABLE_CREATION_SUCCESS = 11000;
+
+const int DATABASE_TABLE_CREATION_FAIL = 11001;
+
+const int FILE_ALREADY_EXISTS_WHEN_CREATION = -500;
+
+const int FILE_DETAILS_ALREADY_EXISTS_WHEN_CREATION = -501;

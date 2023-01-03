@@ -31,9 +31,13 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
 
   Future<void> initApp() async {
     Directory executableDir = DevUtils.executableDir;
+    LocalStorage storage = LocalStorage();
     print("${executableDir.path}/db_config.toml");
     await api.createAllDirectory(s: executableDir.path);
-    await api.initMysql(confPath: "${executableDir.path}/db_config.toml");
+    await api.initDatabase(
+        confPath: "${executableDir.path}/db_config.toml",
+        isFirstTime: await storage.getFirst());
+    await storage.setFirst();
   }
 
   final PageController pageController = PageController();

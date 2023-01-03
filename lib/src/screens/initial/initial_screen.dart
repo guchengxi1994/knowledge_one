@@ -107,7 +107,7 @@ class _InitialScreenState extends State<InitialScreen> {
                             await dbFile.writeAsString(context
                                 .read<InitialController>()
                                 .generateMysql());
-                            await storage.setFirst();
+
                             Navigator.of(context).pushNamed(Routers.mainScreen);
                           },
                           child: const SizedBox(

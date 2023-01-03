@@ -179,16 +179,21 @@ fn wire_change_file_hash_by_id_impl(
         },
     )
 }
-fn wire_init_mysql_impl(port_: MessagePort, conf_path: impl Wire2Api<String> + UnwindSafe) {
+fn wire_init_database_impl(
+    port_: MessagePort,
+    conf_path: impl Wire2Api<String> + UnwindSafe,
+    is_first_time: impl Wire2Api<bool> + UnwindSafe,
+) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
-            debug_name: "init_mysql",
+            debug_name: "init_database",
             port: Some(port_),
             mode: FfiCallMode::Normal,
         },
         move || {
             let api_conf_path = conf_path.wire2api();
-            move |task_callback| Ok(init_mysql(api_conf_path))
+            let api_is_first_time = is_first_time.wire2api();
+            move |task_callback| Ok(init_database(api_conf_path, api_is_first_time))
         },
     )
 }
@@ -281,6 +286,12 @@ where
 {
     fn wire2api(self) -> Option<T> {
         (!self.is_null()).then(|| self.wire2api())
+    }
+}
+
+impl Wire2Api<bool> for bool {
+    fn wire2api(self) -> bool {
+        self
     }
 }
 
@@ -382,6 +393,13 @@ impl support::IntoDartExceptPrimitive for TodoStatus {}
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
+
+/// cbindgen:ignore
+#[cfg(target_family = "wasm")]
+#[path = "bridge_generated.web.rs"]
+mod web;
+#[cfg(target_family = "wasm")]
+pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

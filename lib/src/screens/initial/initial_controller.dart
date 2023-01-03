@@ -19,6 +19,8 @@ class InitialController extends ChangeNotifier {
   ```toml
   title = "mysql config"
 
+  db_type = "mysql"
+
   [database]
   name = "${linkNameController.text}"
   address = "${hostNameController.text}"
@@ -33,6 +35,8 @@ class InitialController extends ChangeNotifier {
   String generateMysqlConfig() {
     return """
 title = "mysql config"
+
+db_type = "mysql"
 
 [database]
 name = "${linkNameController.text}"

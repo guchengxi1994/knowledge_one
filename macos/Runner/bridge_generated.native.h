@@ -3,6 +3,22 @@
 #include <stdlib.h>
 typedef struct _Dart_Handle* Dart_Handle;
 
+#define DATABASE_INIT_OK 10000
+
+#define DATABASE_INIT_FILE_NOT_FOUND 10001
+
+#define DATABASE_INIT_CREATE_FAILED 10002
+
+#define DATABASE_INIT_OTHER_ERROR 10004
+
+#define DATABASE_TABLE_CREATION_SUCCESS 11000
+
+#define DATABASE_TABLE_CREATION_FAIL 11001
+
+#define FILE_ALREADY_EXISTS_WHEN_CREATION -500
+
+#define FILE_DETAILS_ALREADY_EXISTS_WHEN_CREATION -501
+
 typedef struct DartCObject DartCObject;
 
 typedef int64_t DartPort;
@@ -65,7 +81,7 @@ void wire_change_file_hash_by_id(int64_t port_,
                                  int64_t file_id,
                                  struct wire_uint_8_list *diff_path);
 
-void wire_init_mysql(int64_t port_, struct wire_uint_8_list *conf_path);
+void wire_init_database(int64_t port_, struct wire_uint_8_list *conf_path, bool is_first_time);
 
 void wire_get_status_types(int64_t port_);
 
@@ -98,7 +114,7 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_create_new_disk_file);
     dummy_var ^= ((int64_t) (void*) wire_get_file_logs);
     dummy_var ^= ((int64_t) (void*) wire_change_file_hash_by_id);
-    dummy_var ^= ((int64_t) (void*) wire_init_mysql);
+    dummy_var ^= ((int64_t) (void*) wire_init_database);
     dummy_var ^= ((int64_t) (void*) wire_get_status_types);
     dummy_var ^= ((int64_t) (void*) wire_get_todos);
     dummy_var ^= ((int64_t) (void*) wire_get_files);
