@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 typedef FutureFunc = Future<List<String>> Function();
 
+@Deprecated("not good")
 class DropDownSearch extends StatefulWidget {
   DropDownSearch(
       {Key? key,

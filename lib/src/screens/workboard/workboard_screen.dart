@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import 'providers/file_system_controller.dart';
 import 'providers/page_controller.dart';
+import 'sub_screens/faker_screen.dart';
 import 'sub_screens/file_management_screen.dart';
 import 'components/sidemenu.dart';
 import 'sub_screens/svg_cleaner_screen.dart';
@@ -65,7 +66,8 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
                     children: [
                       const FileManagementScreen(),
                       const TodoScreen(),
-                      SvgCleanerScreen()
+                      SvgCleanerScreen(),
+                      const FakerScreen(),
                     ],
                   ),
                 )

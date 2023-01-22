@@ -49,7 +49,7 @@ dependencies:
   just_the_tooltip: ^0.0.12
   pretty_diff_text: ^1.0.0
   smooth_page_indicator: ^1.0.0+2
-  dropdown_button2: ^1.9.2
+  flutter_tags_x: ^1.1.0
 
 
 dev_dependencies:
