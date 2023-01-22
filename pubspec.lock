@@ -411,7 +411,7 @@ packages:
       name: flutter_rust_bridge
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.58.0"
+    version: "1.61.1"
   flutter_smart_dialog:
     dependency: "direct main"
     description:

@@ -33,7 +33,6 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
     Directory executableDir = DevUtils.executableDir;
     LocalStorage storage = LocalStorage();
     print("${executableDir.path}/db_config.toml");
-    await api.createAllDirectory(s: executableDir.path);
     await api.initDatabase(
         confPath: "${executableDir.path}/db_config.toml",
         isFirstTime: await storage.getFirst());
