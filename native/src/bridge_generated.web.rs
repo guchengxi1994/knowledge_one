@@ -87,6 +87,16 @@ pub fn wire_clean_svg_string(port_: MessagePort, content: String) {
     wire_clean_svg_string_impl(port_, content)
 }
 
+#[wasm_bindgen]
+pub fn wire_insert_a_new_log(port_: MessagePort, log: JsValue) {
+    wire_insert_a_new_log_impl(port_, log)
+}
+
+#[wasm_bindgen]
+pub fn wire_query_all_operation_logs(port_: MessagePort) {
+    wire_query_all_operation_logs_impl(port_)
+}
+
 // Section: allocate functions
 
 // Section: related functions
@@ -133,6 +143,21 @@ impl Wire2Api<NativeFileSummary> for JsValue {
             file_path: self_.get(1).wire2api(),
             file_hash: self_.get(2).wire2api(),
             version_control: self_.get(3).wire2api(),
+        }
+    }
+}
+impl Wire2Api<OperationLogSummary> for JsValue {
+    fn wire2api(self) -> OperationLogSummary {
+        let self_ = self.dyn_into::<JsArray>().unwrap();
+        assert_eq!(
+            self_.length(),
+            2,
+            "Expected 2 elements, got {}",
+            self_.length()
+        );
+        OperationLogSummary {
+            operation_content: self_.get(0).wire2api(),
+            operation_name: self_.get(1).wire2api(),
         }
     }
 }

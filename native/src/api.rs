@@ -1,6 +1,13 @@
 use crate::{
     constants::*,
-    database::{engine::create_tables, load_config::load_config, model},
+    database::{
+        engine::create_tables,
+        load_config::load_config,
+        model::{
+            self,
+            operation_log::{OperationLog, OperationLogSummary},
+        },
+    },
     storage,
     svg::{file_cleaner, string_cleaner, CleanerResult},
 };
@@ -149,4 +156,13 @@ pub fn clean_svg_file(file_path: String) -> Option<CleanerResult> {
 /// svg_cleaner for string
 pub fn clean_svg_string(content: String) -> Option<CleanerResult> {
     string_cleaner(content)
+}
+
+/// operation logs
+pub fn insert_a_new_log(mut log: OperationLogSummary) -> i64 {
+    log.insert_new_log()
+}
+
+pub fn query_all_operation_logs() -> Vec<OperationLog> {
+    OperationLog::get_all_operation_logs()
 }
