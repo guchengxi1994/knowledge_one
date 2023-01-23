@@ -3,13 +3,13 @@ import grpc
 import time
 from concurrent import futures
 
-from file_diff.file_diff_impl import get_diff
-from file_diff.file_diff_pb2_grpc import FileDiffServicer, add_FileDiffServicer_to_server
-from file_diff.file_diff_pb2 import GenerateDiffResponse
+from file_changelog.file_diff.file_diff_impl import get_diff
+from file_changelog.file_diff.file_diff_pb2_grpc import FileDiffServicer, add_FileDiffServicer_to_server
+from file_changelog.file_diff.file_diff_pb2 import GenerateDiffResponse
 
-from file_restore.file_restore_impl import restore_from_file
-from file_restore.file_restore_pb2_grpc import FileRestoreServicer,add_FileRestoreServicer_to_server
-from file_restore.file_restore_pb2 import RestoreResponse
+from file_changelog.file_restore.file_restore_impl import restore_from_file
+from file_changelog.file_restore.file_restore_pb2_grpc import FileRestoreServicer,add_FileRestoreServicer_to_server
+from file_changelog.file_restore.file_restore_pb2 import RestoreResponse
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 _HOST = "localhost"
