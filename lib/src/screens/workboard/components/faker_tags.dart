@@ -6,21 +6,21 @@ import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 
 enum FakerTypes {
   address,
-  automotive,
+  // automotive,
   bank,
   barcode,
   color,
   company,
   creditCard,
   currency,
-  datetime,
+  // datetime,
   file,
   geo,
   internet,
   isbn,
   job,
   lorem,
-  misc,
+  // misc,
   person,
   phoneNum,
   ssn,
@@ -31,8 +31,8 @@ FakerTypes? fromString(String s) {
   switch (s) {
     case "address":
       return FakerTypes.address;
-    case "automotive":
-      return FakerTypes.automotive;
+    // case "automotive":
+    //   return FakerTypes.automotive;
     case "bank":
       return FakerTypes.bank;
     case "barcode":
@@ -45,8 +45,8 @@ FakerTypes? fromString(String s) {
       return FakerTypes.creditCard;
     case "currency":
       return FakerTypes.currency;
-    case "datetime":
-      return FakerTypes.datetime;
+    // case "datetime":
+    //   return FakerTypes.datetime;
     case "file":
       return FakerTypes.file;
     case "geo":
@@ -59,8 +59,8 @@ FakerTypes? fromString(String s) {
       return FakerTypes.job;
     case "lorem":
       return FakerTypes.lorem;
-    case "misc":
-      return FakerTypes.misc;
+    // case "misc":
+    //   return FakerTypes.misc;
     case "person":
       return FakerTypes.person;
     case "phoneNum":
@@ -80,8 +80,8 @@ extension Conversion on FakerTypes {
     switch (this) {
       case FakerTypes.address:
         return "address";
-      case FakerTypes.automotive:
-        return "automotive";
+      // case FakerTypes.automotive:
+      //   return "automotive";
       case FakerTypes.bank:
         return "bank";
       case FakerTypes.barcode:
@@ -94,8 +94,8 @@ extension Conversion on FakerTypes {
         return "creditCard";
       case FakerTypes.currency:
         return "currency";
-      case FakerTypes.datetime:
-        return "datetime";
+      // case FakerTypes.datetime:
+      //   return "datetime";
       case FakerTypes.file:
         return "file";
       case FakerTypes.geo:
@@ -108,8 +108,8 @@ extension Conversion on FakerTypes {
         return "job";
       case FakerTypes.lorem:
         return "lorem";
-      case FakerTypes.misc:
-        return "misc";
+      // case FakerTypes.misc:
+      //   return "misc";
       case FakerTypes.person:
         return "person";
       case FakerTypes.phoneNum:

@@ -33,16 +33,22 @@ __providers__ = {
 }
 
 
+class ProviderMap:
+    def __init__(self, key: str, value: str) -> None:
+        self.key = key
+        self.value = value
+
+
 class FakerGenerator:
     def __init__(self,
-                 providers: List[str] = [],
+                 providers: List[ProviderMap] = [],
                  locale: str = "zh_CN",
                  **kwargs) -> None:
         self.f = Faker(locale)
-        self.keys = providers
+        self.pm = providers
 
-        for i in providers:
-            __p = __providers__.get(i, None)
+        for i in self.pm:
+            __p = __providers__.get(i.value, None)
             if __p is not None:
                 self.f.add_provider(__p)
 
@@ -54,75 +60,88 @@ class FakerGenerator:
             raise CountCannotBeNegtiveException("次数需为正数")
         result = {}
         result['data'] = []
-        for i in range(0, times):
+        for _ in range(0, times):
             __d = {}
-            for j in self.keys:
-                __d[j] = self.__generate(j)
+            for j in self.pm:
+                __d[j.key] = generate(self, j.value)
             result["data"].append(__d)
         return result
 
-    def __generate(self, c: str) -> str:
-        if c == "person":
-            if not hasattr(self, "__gender"):
-                self.__gender = "unknow"
+    @staticmethod
+    def quick_fake(
+        provider: str,
+        locale: str = "zh_CN",
+    ) -> str:
+        __f = Faker(locale=locale)
+        __p = __providers__.get(provider, None)
+        __f.add_provider(__p)
+        return generate(__f, provider)
 
-            if self.__gender == "unknow":
-                return self.f.name()
 
-            if self.__gender == "male":
-                return self.f.name_male()
+def generate(f: FakerGenerator, c: str) -> str:
+    if c == "person":
+        if not hasattr(f, "__gender"):
+            __gender = "unknow"
+        else:
+            __gender = f.__gender
 
-            if self.__gender == "female":
-                return self.f.name_female()
+        if __gender == "unknow":
+            return f.f.name()
 
-            return "张三"
+        if __gender == "male":
+            return f.f.name_male()
 
-        if c == "address":
-            return self.f.address()
+        if __gender == "female":
+            return f.f.name_female()
 
-        if c == "bank":
-            return self.f.aba()
+        return "张三"
 
-        if c == "barcode":
-            return self.f.ean13()
+    if c == "address":
+        return f.f.address()
 
-        if c == "color":
-            return self.f.color_name()
+    if c == "bank":
+        return f.f.aba()
 
-        if c == "company":
-            return self.f.company()
+    if c == "barcode":
+        return f.f.ean13()
 
-        if c == "credit_card":
-            return self.f.credit_card_number()
+    if c == "color":
+        return f.f.color_name()
 
-        if c == "currency":
-            return str(self.f.currency())
+    if c == "company":
+        return f.f.company()
 
-        if c == "file":
-            return self.f.file_name()
+    if c == "credit_card":
+        return f.f.credit_card_number()
 
-        if c == "geo":
-            return "{},{}".format(self.f.latitude(), self.longitude())
+    if c == "currency":
+        return str(f.f.currency())
 
-        if c == "internet":
-            return self.f.ipv4()
+    if c == "file":
+        return f.f.file_name()
 
-        if c == "isbn":
-            return self.f.isbn13()
+    if c == "geo":
+        return "{},{}".format(f.f.latitude(), f.f.longitude())
 
-        if c == "job":
-            return self.f.job()
+    if c == "internet":
+        return f.f.ipv4()
 
-        if c == "lorem":
-            return self.f.sentence()
+    if c == "isbn":
+        return f.f.isbn13()
 
-        if c == "phone_number":
-            return self.f.phone_number()
+    if c == "job":
+        return f.f.job()
 
-        if c == "ssn":
-            return self.f.ssn()
+    if c == "lorem":
+        return f.f.sentence()
 
-        if c == "user_agent":
-            return self.f.chrome()
+    if c == "phone_number":
+        return f.f.phone_number()
 
-        return "???"
+    if c == "ssn":
+        return f.f.ssn()
+
+    if c == "user_agent":
+        return f.f.chrome()
+
+    return "???"
