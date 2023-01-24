@@ -19,3 +19,9 @@ flutter 版本是3.3.10
 - [ ] 根目录下创建新文件夹，进入新文件夹下(文件夹为空)右键无效(**found:2022/12/29**)
 - [ ] 开启版本控制的文件，重新编译/打开app，图标没有改变(**found:2022/12/29**)
 
+## Todo list
+
+- [ ] faker gui
+- [ ] grpc gui
+- [ ] code generator gui
+- [ ] svg cleaner gui
