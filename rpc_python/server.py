@@ -1,3 +1,4 @@
+import traceback
 import grpc
 import json
 import time
@@ -24,10 +25,13 @@ class Fake(FakerServicer):
     def QuickFake(self, request, context):
         locale = request.locale
         provider = request.provider
+        # print(locale)
+        # print(provider)
         try:
             result = FakerGenerator.quick_fake(provider, locale)
             return QuickFakeResponse(result=result)
         except:
+            traceback.print_exc()
             return QuickFakeResponse(result="")
 
     def BatchFake(self, request, context):

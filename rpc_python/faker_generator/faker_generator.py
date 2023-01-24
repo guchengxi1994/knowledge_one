@@ -34,12 +34,14 @@ __providers__ = {
 
 
 class ProviderMap:
+
     def __init__(self, key: str, value: str) -> None:
         self.key = key
         self.value = value
 
 
 class FakerGenerator:
+
     def __init__(self,
                  providers: List[ProviderMap] = [],
                  locale: str = "zh_CN",
@@ -72,9 +74,9 @@ class FakerGenerator:
         provider: str,
         locale: str = "zh_CN",
     ) -> str:
-        __f = Faker(locale=locale)
+        __f = FakerGenerator(providers=[ProviderMap("test", provider)])
         __p = __providers__.get(provider, None)
-        __f.add_provider(__p)
+        __f.f.add_provider(__p)
         return generate(__f, provider)
 
 

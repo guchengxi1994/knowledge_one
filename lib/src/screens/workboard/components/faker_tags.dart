@@ -1,8 +1,12 @@
-// ignore_for_file: avoid_init_to_null
+// ignore_for_file: avoid_init_to_null, use_build_context_synchronously
 
+import 'package:crea_radio_button/crea_radio_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tags_x/flutter_tags_x.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
+import 'package:grpc/grpc.dart';
+import 'package:knowledge_one/src/rpc/faker.pbgrpc.dart';
 
 enum FakerTypes {
   address,
@@ -135,6 +139,14 @@ class FakerTagsState extends State<FakerTags> {
   List<Item> tagItems = [];
   int currentTagIndex = 1;
 
+  final channel = ClientChannel(
+    'localhost',
+    port: 15556,
+    options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+  );
+
+  late final stub = FakerClient(channel);
+
   @override
   void initState() {
     super.initState();
@@ -175,6 +187,7 @@ class FakerTagsState extends State<FakerTags> {
                   tagItems.insert(
                       tagItems.length - 1,
                       Item(
+                          customData: r,
                           index: currentTagIndex,
                           title: "${r.key} : ${r.fakerType!.toStr()}"));
                   currentTagIndex += 1;
@@ -185,6 +198,8 @@ class FakerTagsState extends State<FakerTags> {
         }
 
         return ItemTags(
+          customData: tagItems[index].customData,
+          // customData: NewFakerItem(fakerType: ),
           activeColor: Colors.blueAccent,
           color: Colors.blueAccent,
           highlightColor: Colors.blueAccent,
@@ -201,8 +216,29 @@ class FakerTagsState extends State<FakerTags> {
               return true;
             },
           ),
-          onPressed: (i) {
-            print(i.title);
+          onPressed: (i) async {
+            // print(i.title);
+            try {
+              var response = await stub.quickFake(QuickFakeRequest()
+                ..provider = (i.customData as NewFakerItem).fakerType!.toStr()
+                ..locale = (i.customData as NewFakerItem).locale);
+
+              // print(response.toString());
+              if (response.result != "") {
+                showGeneralDialog(
+                    context: context,
+                    pageBuilder: ((context, animation, secondaryAnimation) {
+                      return Center(
+                        child: _FakerPreviewDialog(
+                          content: response.result,
+                          item: i.customData,
+                        ),
+                      );
+                    }));
+              }
+            } catch (e) {
+              print(e.toString());
+            }
           },
         );
       },
@@ -230,6 +266,7 @@ class _CreateFakerTagDialogState extends State<CreateFakerTagDialog> {
   String? selectedType = null;
   String? selectedLang = null;
   final TextEditingController keyController = TextEditingController();
+  String radioButtonInput = "";
   @override
   void dispose() {
     keyController.dispose();
@@ -248,27 +285,50 @@ class _CreateFakerTagDialogState extends State<CreateFakerTagDialog> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SimpleDropdownButton(
-              buttonWidth: 280,
-              style: const TextStyle(
-                  color: Color.fromARGB(255, 159, 159, 159), fontSize: 10),
-              hintStyle: const TextStyle(
-                  color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color.fromARGB(255, 232, 232, 232)),
-              buttonHeight: 30,
-              buttonDecoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(9)),
-                  border: Border.all(
-                      color: const Color.fromARGB(255, 232, 232, 232))),
-              hint: "选择类型",
-              value: selectedType,
-              dropdownItems: FakerTypes.values.map((e) => e.toStr()).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedType = value;
-                });
-              }),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SimpleDropdownButton(
+                  buttonWidth: selectedType == "person" ? 148 : 280,
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 159, 159, 159), fontSize: 10),
+                  hintStyle: const TextStyle(
+                      color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
+                  icon: const Icon(Icons.arrow_drop_down,
+                      color: Color.fromARGB(255, 232, 232, 232)),
+                  buttonHeight: 30,
+                  buttonDecoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(9)),
+                      border: Border.all(
+                          color: const Color.fromARGB(255, 232, 232, 232))),
+                  hint: "选择类型",
+                  value: selectedType,
+                  dropdownItems:
+                      FakerTypes.values.map((e) => e.toStr()).toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedType = value;
+                      if (keyController.text == "") {
+                        keyController.text = value ?? "";
+                      }
+                    });
+                  }),
+              Visibility(
+                  visible: selectedType == "person",
+                  child: RadioButtonGroup(
+                      buttonHeight: 30,
+                      buttonWidth: 50,
+                      options: [
+                        RadioOption("Male", "男"),
+                        RadioOption("Female", "女"),
+                      ],
+                      callback: (v) {
+                        setState(() {
+                          radioButtonInput = v.value;
+                        });
+                      })),
+            ],
+          ),
           const SizedBox(
             height: 5,
           ),
@@ -372,6 +432,99 @@ class _CreateFakerTagDialogState extends State<CreateFakerTagDialog> {
                     )),
               ],
             ),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class _FakerPreviewDialog extends StatefulWidget {
+  const _FakerPreviewDialog(
+      {Key? key, required this.content, required this.item})
+      : super(key: key);
+  final String content;
+  final NewFakerItem item;
+
+  @override
+  State<_FakerPreviewDialog> createState() => __FakerPreviewDialogState();
+}
+
+class __FakerPreviewDialogState extends State<_FakerPreviewDialog> {
+  late String content = widget.content;
+  final channel = ClientChannel(
+    'localhost',
+    port: 15556,
+    options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
+  );
+
+  late final stub = FakerClient(channel);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: Colors.blueAccent),
+          borderRadius: BorderRadius.circular(7)),
+      width: 280,
+      height: 150,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: SelectableText(content)),
+          Row(
+            children: [
+              const Expanded(child: SizedBox()),
+              InkWell(
+                  onTap: () async {
+                    // Navigator.of(context).pop();
+                    var response = await stub.quickFake(QuickFakeRequest()
+                      ..provider = widget.item.fakerType!.toStr()
+                      ..locale = widget.item.locale);
+
+                    setState(() {
+                      content = response.result;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(bottom: 1),
+                    width: 73,
+                    height: 21,
+                    decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(7)),
+                    child: const Center(
+                      child: Text(
+                        "Again",
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ),
+                  )),
+              const SizedBox(
+                width: 10,
+              ),
+              InkWell(
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(text: content));
+                    Navigator.of(context).pop();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(bottom: 1),
+                    width: 73,
+                    height: 21,
+                    decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(7)),
+                    child: const Center(
+                      child: Text(
+                        "确定",
+                        style: TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ),
+                  )),
+            ],
           )
         ],
       ),

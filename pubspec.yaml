@@ -50,6 +50,8 @@ dependencies:
   pretty_diff_text: ^1.0.0
   smooth_page_indicator: ^1.0.0+2
   flutter_tags_x: ^1.1.0
+  crea_radio_button: ^0.6.0
+  pluto_grid: ^5.4.9
 
 
 dev_dependencies:
