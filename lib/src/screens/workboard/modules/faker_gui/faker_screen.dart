@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_init_to_null, no_leading_underscores_for_local_identifiers, depend_on_referenced_packages
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:fixnum/fixnum.dart';
 import 'package:grpc/grpc.dart';
@@ -11,6 +12,8 @@ import 'package:knowledge_one/src/screens/workboard/modules/main/providers/app_c
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
+import 'package:csvwriter/csvwriter.dart';
+import 'package:open_file/open_file.dart';
 
 import 'faker_tags.dart';
 import '../../base_sub_screens.dart';
@@ -276,7 +279,26 @@ class __DataGridState extends State<_DataGrid> {
                 width: 10,
               ),
               InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    final p = DevUtils.executableDir.path;
+                    final name = "${DateTime.now().millisecondsSinceEpoch}.csv";
+                    File f = File("$p/_private/$name");
+                    var csv =
+                        CsvWriter.withHeaders(f.openWrite(), data.first.keys);
+
+                    try {
+                      for (final i in data) {
+                        csv.writeData(data: i);
+                      }
+                    } catch (e) {
+                      debugPrint(e.toString());
+                      SmartDialogUtils.error("生成csv失败");
+                      return;
+                    } finally {
+                      await csv.close();
+                      OpenFile.open("$p/_private/$name");
+                    }
+                  },
                   child: Container(
                     padding: const EdgeInsets.only(bottom: 1),
                     width: 100,
@@ -295,7 +317,15 @@ class __DataGridState extends State<_DataGrid> {
                 width: 10,
               ),
               InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    final p = DevUtils.executableDir.path;
+                    final name = "${DateTime.now().millisecondsSinceEpoch}.sql";
+                    File f = File("$p/_private/$name");
+                    String s = toSql(data.first.keys.toList(), data);
+                    await f.writeAsString(s);
+
+                    OpenFile.open("$p/_private/$name");
+                  },
                   child: Container(
                     padding: const EdgeInsets.only(bottom: 1),
                     width: 100,
@@ -316,4 +346,18 @@ class __DataGridState extends State<_DataGrid> {
       ),
     );
   }
+}
+
+String toSql(List<String> titles, List<Map<String, dynamic>> data) {
+  final t = "(${titles.map((e) => "'$e'").toList().join(",")})";
+  String values = "";
+  for (final i in data) {
+    values = "$values(${i.values.map((e) => "'$e'").toList().join(',')}),";
+  }
+
+  values = values.replaceRange(values.length - 1, null, "");
+
+  String result = "INSERT INTO table $t values $values;";
+
+  return result;
 }

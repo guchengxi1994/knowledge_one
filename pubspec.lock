@@ -164,6 +164,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.17.2"
+  csvwriter:
+    dependency: "direct main"
+    description:
+      name: csvwriter
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.0"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -681,6 +688,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.0"
+  open_file:
+    dependency: "direct main"
+    description:
+      name: open_file
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.2.1"
   package_config:
     dependency: transitive
     description:
