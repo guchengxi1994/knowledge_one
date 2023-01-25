@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import file_diff.file_diff_pb2 as file__diff__pb2
+import file_changelog.file_diff.file_diff_pb2 as file__diff__pb2
 
 
 class FileDiffStub(object):

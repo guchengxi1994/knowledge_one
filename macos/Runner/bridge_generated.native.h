@@ -3,6 +3,26 @@
 #include <stdlib.h>
 typedef struct _Dart_Handle* Dart_Handle;
 
+#define DATABASE_INIT_OK 10000
+
+#define DATABASE_INIT_FILE_NOT_FOUND 10001
+
+#define DATABASE_INIT_CREATE_FAILED 10002
+
+#define DATABASE_INIT_OTHER_ERROR 10004
+
+#define DATABASE_TABLE_CREATION_SUCCESS 11000
+
+#define DATABASE_TABLE_CREATION_FAIL 11001
+
+#define FILE_ALREADY_EXISTS_WHEN_CREATION -500
+
+#define FILE_DETAILS_ALREADY_EXISTS_WHEN_CREATION -501
+
+#define OPERATION_LOG_INSERT_ERROR 20001
+
+#define OPERATION_LOG_INSERT_OK 20000
+
 typedef struct DartCObject DartCObject;
 
 typedef int64_t DartPort;
@@ -30,6 +50,11 @@ typedef struct wire_NativeFileSummary {
   struct wire_uint_8_list *file_hash;
   int64_t version_control;
 } wire_NativeFileSummary;
+
+typedef struct wire_OperationLogSummary {
+  struct wire_uint_8_list *operation_content;
+  struct wire_uint_8_list *operation_name;
+} wire_OperationLogSummary;
 
 typedef struct DartCObject *WireSyncReturn;
 
@@ -65,7 +90,7 @@ void wire_change_file_hash_by_id(int64_t port_,
                                  int64_t file_id,
                                  struct wire_uint_8_list *diff_path);
 
-void wire_init_mysql(int64_t port_, struct wire_uint_8_list *conf_path);
+void wire_init_database(int64_t port_, struct wire_uint_8_list *conf_path, bool is_first_time);
 
 void wire_get_status_types(int64_t port_);
 
@@ -79,9 +104,15 @@ void wire_clean_svg_file(int64_t port_, struct wire_uint_8_list *file_path);
 
 void wire_clean_svg_string(int64_t port_, struct wire_uint_8_list *content);
 
+void wire_insert_a_new_log(int64_t port_, struct wire_OperationLogSummary *log);
+
+void wire_query_all_operation_logs(int64_t port_);
+
 struct wire_NativeFileNewVersion *new_box_autoadd_native_file_new_version_0(void);
 
 struct wire_NativeFileSummary *new_box_autoadd_native_file_summary_0(void);
+
+struct wire_OperationLogSummary *new_box_autoadd_operation_log_summary_0(void);
 
 struct wire_uint_8_list *new_uint_8_list_0(int32_t len);
 
@@ -98,15 +129,18 @@ static int64_t dummy_method_to_enforce_bundling(void) {
     dummy_var ^= ((int64_t) (void*) wire_create_new_disk_file);
     dummy_var ^= ((int64_t) (void*) wire_get_file_logs);
     dummy_var ^= ((int64_t) (void*) wire_change_file_hash_by_id);
-    dummy_var ^= ((int64_t) (void*) wire_init_mysql);
+    dummy_var ^= ((int64_t) (void*) wire_init_database);
     dummy_var ^= ((int64_t) (void*) wire_get_status_types);
     dummy_var ^= ((int64_t) (void*) wire_get_todos);
     dummy_var ^= ((int64_t) (void*) wire_get_files);
     dummy_var ^= ((int64_t) (void*) wire_new_file);
     dummy_var ^= ((int64_t) (void*) wire_clean_svg_file);
     dummy_var ^= ((int64_t) (void*) wire_clean_svg_string);
+    dummy_var ^= ((int64_t) (void*) wire_insert_a_new_log);
+    dummy_var ^= ((int64_t) (void*) wire_query_all_operation_logs);
     dummy_var ^= ((int64_t) (void*) new_box_autoadd_native_file_new_version_0);
     dummy_var ^= ((int64_t) (void*) new_box_autoadd_native_file_summary_0);
+    dummy_var ^= ((int64_t) (void*) new_box_autoadd_operation_log_summary_0);
     dummy_var ^= ((int64_t) (void*) new_uint_8_list_0);
     dummy_var ^= ((int64_t) (void*) free_WireSyncReturn);
     dummy_var ^= ((int64_t) (void*) store_dart_post_cobject);

@@ -6,21 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:knowledge_one/routers.dart';
 import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
-import 'native.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'native.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initApp();
-  runApp(const MyApp());
-}
-
-Future<void> initApp() async {
   Directory executableDir = DevUtils.executableDir;
-  print("${executableDir.path}/db_config.toml");
   await api.createAllDirectory(s: executableDir.path);
-  await api.initMysql(confPath: "${executableDir.path}/db_config.toml");
+  runApp(const MyApp());
 }
 
 class CustomScrollBehavior extends MaterialScrollBehavior {

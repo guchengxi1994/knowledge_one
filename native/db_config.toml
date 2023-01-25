@@ -1,5 +1,7 @@
 title = "toml config file"
 
+db_type = "mysql"
+
 [database]
 name = "knowledge_one"
 address = "localhost"

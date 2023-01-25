@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
 import 'package:knowledge_one/routers.dart';
+import 'package:knowledge_one/utils/local_storage.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 /// modified from
@@ -128,12 +129,34 @@ class _SplashBodyState extends State<SplashBody> {
 }
 
 class SplashPage extends StatelessWidget {
-  const SplashPage({Key? key}) : super(key: key);
+  SplashPage({Key? key}) : super(key: key);
+  final LocalStorage storage = LocalStorage();
 
   @override
   Widget build(BuildContext context) {
-    return SplashBody(
-      routerName: Routers.mainScreen,
-    );
+    return FutureBuilder<bool>(
+        future: storage.getFirst(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == true) {
+              return SplashBody(
+                routerName: Routers.mainScreen,
+              );
+            } else {
+              return SplashBody(
+                routerName: Routers.initialScreen,
+                duration: 1500,
+              );
+            }
+          } else {
+            return const Center(
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: LoadingIndicator(indicatorType: Indicator.lineScale),
+              ),
+            );
+          }
+        });
   }
 }

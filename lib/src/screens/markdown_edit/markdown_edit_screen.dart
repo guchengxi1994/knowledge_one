@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:knowledge_one/src/screens/workboard/components/tools_overlay.dart';
+import 'package:knowledge_one/src/common/tools_overlay.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'markdown_edit_controller.dart';

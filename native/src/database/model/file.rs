@@ -3,7 +3,10 @@ use std::fs;
 use serde::{Deserialize, Serialize};
 use sqlx::{types::chrono, MySql};
 
-use crate::storage::file_hash::get_file_hash;
+use crate::{
+    constants::{FILE_ALREADY_EXISTS_WHEN_CREATION, FILE_DETAILS_ALREADY_EXISTS_WHEN_CREATION},
+    storage::file_hash::get_file_hash,
+};
 
 use super::changelog::FileChangelog;
 
@@ -212,7 +215,7 @@ impl NativeFileSummary {
                     .unwrap();
 
                     if logs.len() > 0 {
-                        return -500;
+                        return FILE_ALREADY_EXISTS_WHEN_CREATION;
                     }
 
                     let results = sqlx::query_as::<sqlx::MySql, FileDetails>(
@@ -224,7 +227,7 @@ impl NativeFileSummary {
                     match results {
                         Ok(result) => {
                             if result.len() > 0 {
-                                return -1;
+                                return FILE_DETAILS_ALREADY_EXISTS_WHEN_CREATION;
                             } else {
                                 let sql = sqlx::query(
                                     r#"INSERT INTO file (file_name,file_path,file_hash) VALUES(?,?,?) "#,

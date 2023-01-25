@@ -12,8 +12,9 @@ fn main() {
         wasm: true,
         dart_decl_output: Some("../lib/src/native/bridge_definitions.dart".into()),
         c_output: Some(vec![
-            "../ios/Runner/bridge_generated.native.h".into(),
-            "../macos/Runner/bridge_generated.native.h".into(),
+            // "../ios/Runner/bridge_generated.native.h".into(),
+            // "../macos/Runner/bridge_generated.native.h".into(),
+            "../windows/Runner/bridge_generated.native.h".into(),
         ]),
         ..Default::default()
     });

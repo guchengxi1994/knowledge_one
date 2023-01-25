@@ -7,6 +7,16 @@ pub fn wire_create_all_directory(port_: MessagePort, s: String) {
 }
 
 #[wasm_bindgen]
+pub fn wire_get_faker_locale(port_: MessagePort, config_path: String) {
+    wire_get_faker_locale_impl(port_, config_path)
+}
+
+#[wasm_bindgen]
+pub fn wire_get_app_config(port_: MessagePort, config_path: String) {
+    wire_get_app_config_impl(port_, config_path)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_changelog_from_id(port_: MessagePort, id: i64, file_hash: String) {
     wire_get_changelog_from_id_impl(port_, id, file_hash)
 }
@@ -53,8 +63,8 @@ pub fn wire_change_file_hash_by_id(
 }
 
 #[wasm_bindgen]
-pub fn wire_init_mysql(port_: MessagePort, conf_path: String) {
-    wire_init_mysql_impl(port_, conf_path)
+pub fn wire_init_database(port_: MessagePort, conf_path: String, is_first_time: bool) {
+    wire_init_database_impl(port_, conf_path, is_first_time)
 }
 
 #[wasm_bindgen]
@@ -85,6 +95,16 @@ pub fn wire_clean_svg_file(port_: MessagePort, file_path: String) {
 #[wasm_bindgen]
 pub fn wire_clean_svg_string(port_: MessagePort, content: String) {
     wire_clean_svg_string_impl(port_, content)
+}
+
+#[wasm_bindgen]
+pub fn wire_insert_a_new_log(port_: MessagePort, log: JsValue) {
+    wire_insert_a_new_log_impl(port_, log)
+}
+
+#[wasm_bindgen]
+pub fn wire_query_all_operation_logs(port_: MessagePort) {
+    wire_query_all_operation_logs_impl(port_)
 }
 
 // Section: allocate functions
@@ -136,6 +156,21 @@ impl Wire2Api<NativeFileSummary> for JsValue {
         }
     }
 }
+impl Wire2Api<OperationLogSummary> for JsValue {
+    fn wire2api(self) -> OperationLogSummary {
+        let self_ = self.dyn_into::<JsArray>().unwrap();
+        assert_eq!(
+            self_.length(),
+            2,
+            "Expected 2 elements, got {}",
+            self_.length()
+        );
+        OperationLogSummary {
+            operation_content: self_.get(0).wire2api(),
+            operation_name: self_.get(1).wire2api(),
+        }
+    }
+}
 impl Wire2Api<Option<String>> for Option<String> {
     fn wire2api(self) -> Option<String> {
         self.map(Wire2Api::wire2api)
@@ -152,6 +187,11 @@ impl Wire2Api<Vec<u8>> for Box<[u8]> {
 impl Wire2Api<String> for JsValue {
     fn wire2api(self) -> String {
         self.as_string().expect("non-UTF-8 string, or not a string")
+    }
+}
+impl Wire2Api<bool> for JsValue {
+    fn wire2api(self) -> bool {
+        self.is_truthy()
     }
 }
 impl Wire2Api<i64> for JsValue {
