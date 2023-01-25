@@ -19,6 +19,7 @@ use std::sync::Arc;
 
 // Section: imports
 
+use crate::database::load_config::AppConfig;
 use crate::database::model::changelog::FileChangelog;
 use crate::database::model::changelog::NativeFileNewVersion;
 use crate::database::model::file::FileDetails;
@@ -41,6 +42,32 @@ fn wire_create_all_directory_impl(port_: MessagePort, s: impl Wire2Api<String> +
         move || {
             let api_s = s.wire2api();
             move |task_callback| Ok(create_all_directory(api_s))
+        },
+    )
+}
+fn wire_get_faker_locale_impl(port_: MessagePort, config_path: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_faker_locale",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_config_path = config_path.wire2api();
+            move |task_callback| Ok(get_faker_locale(api_config_path))
+        },
+    )
+}
+fn wire_get_app_config_impl(port_: MessagePort, config_path: impl Wire2Api<String> + UnwindSafe) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_app_config",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || {
+            let api_config_path = config_path.wire2api();
+            move |task_callback| Ok(get_app_config(api_config_path))
         },
     )
 }
@@ -336,6 +363,13 @@ impl Wire2Api<u8> for u8 {
 }
 
 // Section: impl IntoDart
+
+impl support::IntoDart for AppConfig {
+    fn into_dart(self) -> support::DartAbi {
+        vec![self.faker_supported_locales.into_dart()].into_dart()
+    }
+}
+impl support::IntoDartExceptPrimitive for AppConfig {}
 
 impl support::IntoDart for CleanerResult {
     fn into_dart(self) -> support::DartAbi {

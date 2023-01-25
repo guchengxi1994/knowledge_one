@@ -7,8 +7,10 @@ import 'package:grpc/grpc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:knowledge_one/src/rpc/faker.pbgrpc.dart';
+import 'package:knowledge_one/src/screens/workboard/providers/app_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:provider/provider.dart';
 
 import '../components/faker_tags.dart';
 import 'base_sub_screens.dart';
@@ -50,6 +52,7 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
             ),
             FakerTags(
               key: tagKey,
+              locale: selectedLang,
             ),
             const SizedBox(
               height: 15,
@@ -61,6 +64,11 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
                 const Expanded(child: SizedBox()),
                 InkWell(
                     onTap: () async {
+                      if (selectedLang == null || selectedTimes == null) {
+                        SmartDialogUtils.warning("请选择次数及语言");
+                        return;
+                      }
+
                       final tagItems = tagKey.currentState!.tagItems;
                       if (tagItems.length == 1) {
                         SmartDialogUtils.warning("未创建condition");
@@ -82,12 +90,10 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
                       }
 
                       try {
-                        var response = await stub.batchFake(
-                            BatchFakeRequest(providerMaps: items)
+                        var response = await stub
+                            .batchFake(BatchFakeRequest(providerMaps: items)
                               ..count = Int64.parseInt(count.toString())
-                              ..locale =
-                                  (tagItems.first.customData as NewFakerItem)
-                                      .locale);
+                              ..locale = selectedLang!);
                         // debugPrint(response.result.toString());
                         List<dynamic> d = jsonDecode(response.result)['data'];
 
@@ -112,15 +118,15 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
                     },
                     child: Container(
                       padding: const EdgeInsets.only(bottom: 1),
-                      width: 73,
-                      height: 21,
+                      width: 83,
+                      height: 30,
                       decoration: BoxDecoration(
                           color: Colors.blueAccent,
                           borderRadius: BorderRadius.circular(7)),
                       child: const Center(
                         child: Text(
                           "生成",
-                          style: TextStyle(color: Colors.white, fontSize: 12),
+                          style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ),
                     )),
@@ -133,6 +139,7 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
   }
 
   String? selectedTimes = null;
+  String? selectedLang = null;
 
   Widget _buildConditions() {
     return Wrap(
@@ -159,7 +166,31 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
             });
           },
           value: selectedTimes,
-        )
+        ),
+        SimpleDropdownButton(
+            style: const TextStyle(
+                color: Color.fromARGB(255, 159, 159, 159), fontSize: 10),
+            hintStyle: const TextStyle(
+                color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
+            icon: const Icon(Icons.arrow_drop_down,
+                color: Color.fromARGB(255, 232, 232, 232)),
+            buttonHeight: 30,
+            buttonDecoration: BoxDecoration(
+                borderRadius: const BorderRadius.all(Radius.circular(19)),
+                border: Border.all(
+                    color: const Color.fromARGB(255, 232, 232, 232))),
+            hint: "选择语言",
+            value: selectedLang,
+            dropdownItems: context
+                    .watch<AppConfigController>()
+                    .config
+                    ?.fakerSupportedLocales ??
+                [],
+            onChanged: (value) {
+              setState(() {
+                selectedLang = value;
+              });
+            })
       ],
     );
   }

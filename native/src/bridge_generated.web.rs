@@ -7,6 +7,16 @@ pub fn wire_create_all_directory(port_: MessagePort, s: String) {
 }
 
 #[wasm_bindgen]
+pub fn wire_get_faker_locale(port_: MessagePort, config_path: String) {
+    wire_get_faker_locale_impl(port_, config_path)
+}
+
+#[wasm_bindgen]
+pub fn wire_get_app_config(port_: MessagePort, config_path: String) {
+    wire_get_app_config_impl(port_, config_path)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_changelog_from_id(port_: MessagePort, id: i64, file_hash: String) {
     wire_get_changelog_from_id_impl(port_, id, file_hash)
 }

@@ -7,6 +7,16 @@ pub extern "C" fn wire_create_all_directory(port_: i64, s: *mut wire_uint_8_list
 }
 
 #[no_mangle]
+pub extern "C" fn wire_get_faker_locale(port_: i64, config_path: *mut wire_uint_8_list) {
+    wire_get_faker_locale_impl(port_, config_path)
+}
+
+#[no_mangle]
+pub extern "C" fn wire_get_app_config(port_: i64, config_path: *mut wire_uint_8_list) {
+    wire_get_app_config_impl(port_, config_path)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_get_changelog_from_id(
     port_: i64,
     id: i64,

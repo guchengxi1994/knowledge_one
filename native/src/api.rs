@@ -2,7 +2,7 @@ use crate::{
     constants::*,
     database::{
         engine::create_tables,
-        load_config::load_config,
+        load_config::{load_app_config, load_config, AppConfig},
         model::{
             self,
             operation_log::{OperationLog, OperationLogSummary},
@@ -18,6 +18,25 @@ pub fn create_all_directory(s: String) {
     storage::create_folder::create_diff_dir(s.clone());
     storage::create_folder::create_restore_dir(s.clone());
     storage::create_folder::create_storage_dir(s.clone());
+}
+
+/// 获取faker locale
+#[deprecated]
+pub fn get_faker_locale(config_path: String) -> Vec<String> {
+    let r = load_app_config(config_path);
+    match r {
+        Some(r0) => {
+            return r0.faker_supported_locales;
+        }
+        None => {
+            return Vec::new();
+        }
+    }
+}
+
+/// 获取所有Config
+pub fn get_app_config(config_path: String) -> Option<AppConfig> {
+    load_app_config(config_path)
 }
 
 /// 根据file_id 和hash值获取修改的changelog

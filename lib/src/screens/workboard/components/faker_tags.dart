@@ -7,6 +7,8 @@ import 'package:flutter_tags_x/flutter_tags_x.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/src/rpc/faker.pbgrpc.dart';
+import 'package:knowledge_one/src/screens/workboard/providers/app_controller.dart';
+import 'package:provider/provider.dart';
 
 enum FakerTypes {
   address,
@@ -129,7 +131,8 @@ extension Conversion on FakerTypes {
 }
 
 class FakerTags extends StatefulWidget {
-  const FakerTags({Key? key}) : super(key: key);
+  const FakerTags({Key? key, required this.locale}) : super(key: key);
+  final String? locale;
 
   @override
   State<FakerTags> createState() => FakerTagsState();
@@ -175,8 +178,10 @@ class FakerTagsState extends State<FakerTags> {
               NewFakerItem? r = await showGeneralDialog(
                   context: context,
                   pageBuilder: (context, animation, secondaryAnimation) {
-                    return const Center(
-                      child: CreateFakerTagDialog(),
+                    return Center(
+                      child: CreateFakerTagDialog(
+                        locale: widget.locale,
+                      ),
                     );
                   });
 
@@ -256,7 +261,9 @@ class NewFakerItem {
 }
 
 class CreateFakerTagDialog extends StatefulWidget {
-  const CreateFakerTagDialog({Key? key}) : super(key: key);
+  const CreateFakerTagDialog({Key? key, required this.locale})
+      : super(key: key);
+  final String? locale;
 
   @override
   State<CreateFakerTagDialog> createState() => _CreateFakerTagDialogState();
@@ -332,27 +339,45 @@ class _CreateFakerTagDialogState extends State<CreateFakerTagDialog> {
           const SizedBox(
             height: 5,
           ),
-          SimpleDropdownButton(
-              buttonWidth: 280,
-              style: const TextStyle(
-                  color: Color.fromARGB(255, 159, 159, 159), fontSize: 10),
-              hintStyle: const TextStyle(
-                  color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
-              icon: const Icon(Icons.arrow_drop_down,
-                  color: Color.fromARGB(255, 232, 232, 232)),
-              buttonHeight: 30,
-              buttonDecoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(9)),
-                  border: Border.all(
-                      color: const Color.fromARGB(255, 232, 232, 232))),
-              hint: "选择语言",
-              value: selectedLang,
-              dropdownItems: const ['zh_CN', 'en'],
-              onChanged: (value) {
-                setState(() {
-                  selectedLang = value;
-                });
-              }),
+          widget.locale == null
+              ? SimpleDropdownButton(
+                  buttonWidth: 280,
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 159, 159, 159), fontSize: 10),
+                  hintStyle: const TextStyle(
+                      color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
+                  icon: const Icon(Icons.arrow_drop_down,
+                      color: Color.fromARGB(255, 232, 232, 232)),
+                  buttonHeight: 30,
+                  buttonDecoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(9)),
+                      border: Border.all(
+                          color: const Color.fromARGB(255, 232, 232, 232))),
+                  hint: "选择语言",
+                  value: selectedLang,
+                  // dropdownItems: const ['zh_CN', 'en'],
+                  dropdownItems: context
+                          .watch<AppConfigController>()
+                          .config
+                          ?.fakerSupportedLocales ??
+                      [],
+                  onChanged: (value) {
+                    setState(() {
+                      selectedLang = value;
+                    });
+                  })
+              : SizedBox(
+                  height: 30,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "使用外部locale: ${widget.locale}",
+                      style: const TextStyle(
+                          fontSize: 12,
+                          color: Color.fromARGB(255, 159, 159, 159)),
+                    ),
+                  ),
+                ),
           const SizedBox(
             height: 5,
           ),
@@ -407,6 +432,10 @@ class _CreateFakerTagDialogState extends State<CreateFakerTagDialog> {
                 ),
                 InkWell(
                     onTap: () {
+                      if (widget.locale != null) {
+                        selectedLang = widget.locale;
+                      }
+
                       if (selectedType == null || selectedLang == null) {
                         return;
                       }

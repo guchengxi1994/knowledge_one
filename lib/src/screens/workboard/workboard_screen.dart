@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/native.dart';
+import 'package:knowledge_one/src/screens/workboard/providers/app_controller.dart';
 import 'package:knowledge_one/src/screens/workboard/providers/todo_controller.dart';
 import 'package:knowledge_one/src/screens/workboard/sub_screens/todo_screen.dart';
 import 'package:knowledge_one/utils/utils.dart';
@@ -48,7 +49,8 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
         ChangeNotifierProvider(
             create: (_) => PageChangeController(controller: pageController)),
         ChangeNotifierProvider(create: (_) => FileSystemController()..init()),
-        ChangeNotifierProvider(create: (_) => TodoController()..init())
+        ChangeNotifierProvider(create: (_) => TodoController()..init()),
+        ChangeNotifierProvider(create: (_) => AppConfigController()..init())
       ],
       builder: (context, child) {
         return Container(
