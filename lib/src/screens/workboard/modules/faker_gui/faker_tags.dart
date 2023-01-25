@@ -7,8 +7,6 @@ import 'package:flutter_tags_x/flutter_tags_x.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/src/rpc/faker.pbgrpc.dart';
-import 'package:knowledge_one/src/screens/workboard/providers/app_controller.dart';
-import 'package:provider/provider.dart';
 
 enum FakerTypes {
   address,
@@ -47,7 +45,7 @@ FakerTypes? fromString(String s) {
       return FakerTypes.color;
     case "company":
       return FakerTypes.company;
-    case "creditCard":
+    case "credit_card":
       return FakerTypes.creditCard;
     case "currency":
       return FakerTypes.currency;
@@ -69,11 +67,11 @@ FakerTypes? fromString(String s) {
     //   return FakerTypes.misc;
     case "person":
       return FakerTypes.person;
-    case "phoneNum":
+    case "phone_number":
       return FakerTypes.phoneNum;
     case "ssn":
       return FakerTypes.ssn;
-    case "userAgent":
+    case "user_agent":
       return FakerTypes.userAgent;
 
     default:
@@ -97,7 +95,7 @@ extension Conversion on FakerTypes {
       case FakerTypes.company:
         return "company";
       case FakerTypes.creditCard:
-        return "creditCard";
+        return "credit_card";
       case FakerTypes.currency:
         return "currency";
       // case FakerTypes.datetime:
@@ -119,11 +117,11 @@ extension Conversion on FakerTypes {
       case FakerTypes.person:
         return "person";
       case FakerTypes.phoneNum:
-        return "phoneNum";
+        return "phone_number";
       case FakerTypes.ssn:
         return "ssn";
       case FakerTypes.userAgent:
-        return "userAgent";
+        return "user_agent";
       default:
         return "";
     }
@@ -131,8 +129,11 @@ extension Conversion on FakerTypes {
 }
 
 class FakerTags extends StatefulWidget {
-  const FakerTags({Key? key, required this.locale}) : super(key: key);
+  const FakerTags(
+      {Key? key, required this.locale, required this.supportedLocales})
+      : super(key: key);
   final String? locale;
+  final List<String> supportedLocales;
 
   @override
   State<FakerTags> createState() => FakerTagsState();
@@ -181,6 +182,7 @@ class FakerTagsState extends State<FakerTags> {
                     return Center(
                       child: CreateFakerTagDialog(
                         locale: widget.locale,
+                        supportedLocales: widget.supportedLocales,
                       ),
                     );
                   });
@@ -261,9 +263,11 @@ class NewFakerItem {
 }
 
 class CreateFakerTagDialog extends StatefulWidget {
-  const CreateFakerTagDialog({Key? key, required this.locale})
+  const CreateFakerTagDialog(
+      {Key? key, required this.locale, required this.supportedLocales})
       : super(key: key);
   final String? locale;
+  final List<String> supportedLocales;
 
   @override
   State<CreateFakerTagDialog> createState() => _CreateFakerTagDialogState();
@@ -355,12 +359,12 @@ class _CreateFakerTagDialogState extends State<CreateFakerTagDialog> {
                           color: const Color.fromARGB(255, 232, 232, 232))),
                   hint: "选择语言",
                   value: selectedLang,
-                  // dropdownItems: const ['zh_CN', 'en'],
-                  dropdownItems: context
-                          .watch<AppConfigController>()
-                          .config
-                          ?.fakerSupportedLocales ??
-                      [],
+                  dropdownItems: widget.supportedLocales,
+                  // dropdownItems: context
+                  //         .watch<AppConfigController>()
+                  //         .config
+                  //         ?.fakerSupportedLocales ??
+                  //     [],
                   onChanged: (value) {
                     setState(() {
                       selectedLang = value;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
-import 'package:knowledge_one/src/screens/workboard/providers/page_controller.dart';
+import 'package:knowledge_one/src/screens/workboard/modules/main/providers/page_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 

@@ -5,13 +5,14 @@ import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
-import 'package:knowledge_one/src/screens/workboard/providers/file_system_controller.dart';
+import 'package:knowledge_one/src/screens/workboard/modules/file_management/providers/file_system_controller.dart';
 import 'package:provider/provider.dart';
 
-import '../components/components.dart';
-import '../components/dropdown_search.dart';
-import '../models/models.dart';
-import '../providers/page_controller.dart';
+import '../main/providers/page_controller.dart';
+import 'components/dropdown_search.dart';
+import 'components/file_widget.dart';
+import 'components/folder_widget.dart';
+import 'models/model.dart';
 
 class FileManagementScreen extends StatefulWidget {
   const FileManagementScreen({Key? key}) : super(key: key);

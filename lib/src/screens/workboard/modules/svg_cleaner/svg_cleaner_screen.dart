@@ -10,7 +10,7 @@ import 'package:knowledge_one/native.dart';
 import 'package:knowledge_one/utils/smart_dialog_utils.dart';
 import 'package:pretty_diff_text/pretty_diff_text.dart';
 
-import 'base_sub_screens.dart';
+import '../../base_sub_screens.dart';
 
 class SvgCleanerScreen extends BaseSubScreen {
   SvgCleanerScreen({Key? key})
@@ -213,14 +213,14 @@ class _SvgCleanerScreenState<T> extends BaseSubScreenState<SvgCleanerScreen> {
                 Expanded(
                     flex: 2,
                     child: result == null
-                        ? SizedBox()
+                        ? const SizedBox()
                         : PrettyDiffText(
                             oldText: result!.origin, newText: result!.result)),
                 const Divider(
                   thickness: 1,
                 ),
                 result == null
-                    ? SizedBox()
+                    ? const SizedBox()
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [

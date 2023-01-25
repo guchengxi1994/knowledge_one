@@ -1,7 +1,5 @@
 // ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
-import 'dart:io';
-
 import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/src/extensions/date_time_extension.dart';

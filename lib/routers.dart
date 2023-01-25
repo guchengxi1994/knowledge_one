@@ -3,7 +3,7 @@ import 'package:knowledge_one/src/common/future_builder.dart';
 import 'package:knowledge_one/src/screens/initial/initial_screen.dart'
     deferred as initial;
 import 'package:knowledge_one/src/screens/splash/splash_screen.dart';
-import 'package:knowledge_one/src/screens/workboard/workboard_screen.dart'
+import 'package:knowledge_one/src/screens/workboard/modules/main/workboard_screen.dart'
     deferred as workboard;
 
 class Routers {

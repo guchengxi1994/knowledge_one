@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/native.dart';
 
-import 'package:knowledge_one/src/screens/workboard/models/models.dart';
+import '../models/todo_item_details.dart';
 
 class TodoItem<BaseItemDetails> {
   bool deletable;

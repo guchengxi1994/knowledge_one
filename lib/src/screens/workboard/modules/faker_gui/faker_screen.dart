@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_init_to_null, no_leading_underscores_for_local_identifiers
+// ignore_for_file: avoid_init_to_null, no_leading_underscores_for_local_identifiers, depend_on_referenced_packages
 
 import 'dart:convert';
 
@@ -7,13 +7,13 @@ import 'package:grpc/grpc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:knowledge_one/src/rpc/faker.pbgrpc.dart';
-import 'package:knowledge_one/src/screens/workboard/providers/app_controller.dart';
+import 'package:knowledge_one/src/screens/workboard/modules/main/providers/app_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:provider/provider.dart';
 
-import '../components/faker_tags.dart';
-import 'base_sub_screens.dart';
+import 'faker_tags.dart';
+import '../../base_sub_screens.dart';
 
 class FakerScreen extends BaseSubScreen {
   const FakerScreen({Key? key}) : super(key: key, title: "Faker Screen");
@@ -46,6 +46,14 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text("选择参数"),
+            const SizedBox(
+              height: 15,
+            ),
+            _buildConditions(),
+            const SizedBox(
+              height: 15,
+            ),
             const Text("创建Faker条件"),
             const SizedBox(
               height: 15,
@@ -53,11 +61,10 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
             FakerTags(
               key: tagKey,
               locale: selectedLang,
+              supportedLocales:
+                  context.select<AppConfigController, List<String>>(
+                      (value) => value.config?.fakerSupportedLocales ?? []),
             ),
-            const SizedBox(
-              height: 15,
-            ),
-            _buildConditions(),
             const Expanded(child: SizedBox()),
             Row(
               children: [
@@ -181,11 +188,8 @@ class _FakerScreenState extends BaseSubScreenState<FakerScreen> {
                     color: const Color.fromARGB(255, 232, 232, 232))),
             hint: "选择语言",
             value: selectedLang,
-            dropdownItems: context
-                    .watch<AppConfigController>()
-                    .config
-                    ?.fakerSupportedLocales ??
-                [],
+            dropdownItems: context.select<AppConfigController, List<String>>(
+                (value) => value.config?.fakerSupportedLocales ?? []),
             onChanged: (value) {
               setState(() {
                 selectedLang = value;

@@ -43,21 +43,21 @@ class SideMenu extends StatelessWidget {
             title: "文件管理",
             isSvg: false,
           ),
+          // CustomSidemenuButton(
+          //   iconUrl: null,
+          //   buttonId: 1,
+          //   title: "Todos",
+          //   isSvg: false,
+          // ),
           CustomSidemenuButton(
             iconUrl: null,
             buttonId: 1,
-            title: "Todos",
-            isSvg: false,
-          ),
-          CustomSidemenuButton(
-            iconUrl: null,
-            buttonId: 2,
             title: "Svg cleaner",
             isSvg: false,
           ),
           CustomSidemenuButton(
             iconUrl: null,
-            buttonId: 3,
+            buttonId: 2,
             title: "Faker",
             isSvg: false,
           ),

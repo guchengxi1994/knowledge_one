@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_init_to_null
+// ignore_for_file: avoid_init_to_null, prefer_iterable_wheretype
 
 import 'dart:convert';
 import 'dart:io';
@@ -8,7 +8,7 @@ import 'package:knowledge_one/app_style.dart';
 import 'package:knowledge_one/native.dart';
 import 'package:knowledge_one/utils/utils.dart';
 
-import '../models/models.dart';
+import '../models/model.dart';
 
 class WidgetStatus {
   double dx;

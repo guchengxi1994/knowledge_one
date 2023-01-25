@@ -14,11 +14,12 @@ import 'package:knowledge_one/src/rpc/file_diff.pbgrpc.dart';
 import 'package:knowledge_one/src/screens/markdown_edit/markdown_edit_screen.dart';
 import 'package:knowledge_one/src/screens/pdf_viewer/pdf_viewer_screen.dart';
 import 'package:knowledge_one/src/screens/quill_eidt/quill_edit_screen.dart';
-import 'package:knowledge_one/src/screens/workboard/providers/file_system_controller.dart';
+import 'package:knowledge_one/src/screens/workboard/modules/file_management/providers/file_system_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/models.dart';
+
+import '../models/model.dart';
 import 'base_file_widget.dart';
 import 'flow_graph_dialog.dart';
 import 'preview_dialog.dart';

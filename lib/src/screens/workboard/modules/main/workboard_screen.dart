@@ -2,18 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/native.dart';
-import 'package:knowledge_one/src/screens/workboard/providers/app_controller.dart';
-import 'package:knowledge_one/src/screens/workboard/providers/todo_controller.dart';
-import 'package:knowledge_one/src/screens/workboard/sub_screens/todo_screen.dart';
+import 'package:knowledge_one/src/screens/workboard/modules/main/providers/app_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/file_system_controller.dart';
+import '../file_management/providers/file_system_controller.dart';
 import 'providers/page_controller.dart';
-import 'sub_screens/faker_screen.dart';
-import 'sub_screens/file_management_screen.dart';
+import '../faker_gui/faker_screen.dart';
+import '../file_management/file_management_screen.dart';
 import 'components/sidemenu.dart';
-import 'sub_screens/svg_cleaner_screen.dart';
+import '../svg_cleaner/svg_cleaner_screen.dart';
 
 class WorkboardScreen extends StatefulWidget {
   const WorkboardScreen({Key? key}) : super(key: key);
@@ -48,8 +46,6 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
       providers: [
         ChangeNotifierProvider(
             create: (_) => PageChangeController(controller: pageController)),
-        ChangeNotifierProvider(create: (_) => FileSystemController()..init()),
-        ChangeNotifierProvider(create: (_) => TodoController()..init()),
         ChangeNotifierProvider(create: (_) => AppConfigController()..init())
       ],
       builder: (context, child) {
@@ -66,8 +62,17 @@ class _WorkboardScreenState extends State<WorkboardScreen> {
                     controller: pageController,
                     physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      const FileManagementScreen(),
-                      const TodoScreen(),
+                      // const FileManagementScreen(),
+                      MultiProvider(
+                        providers: [
+                          ChangeNotifierProvider(
+                              create: (_) => FileSystemController()..init()),
+                        ],
+                        builder: (context, child) {
+                          return const FileManagementScreen();
+                        },
+                      ),
+                      // const TodoScreen(),
                       SvgCleanerScreen(),
                       const FakerScreen(),
                     ],

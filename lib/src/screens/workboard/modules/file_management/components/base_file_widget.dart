@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
 
-import '../models/models.dart';
+import '../models/model.dart';
 
 class BaseFileWidget<T extends BaseFileEntity> extends StatelessWidget {
   const BaseFileWidget({Key? key, required this.data, this.message})

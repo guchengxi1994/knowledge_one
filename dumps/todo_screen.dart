@@ -1,9 +1,8 @@
 import 'package:drag_and_drop_lists/drag_and_drop_lists.dart';
 import 'package:flutter/material.dart';
+import 'package:knowledge_one/src/screens/workboard/models/todo_item_details.dart';
 import 'package:knowledge_one/src/screens/workboard/providers/todo_controller.dart';
 import 'package:provider/provider.dart';
-
-import '../models/models.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({Key? key}) : super(key: key);

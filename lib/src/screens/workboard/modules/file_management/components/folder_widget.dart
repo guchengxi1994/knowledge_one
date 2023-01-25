@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:knowledge_one/app_style.dart';
 import 'package:provider/provider.dart';
 
-import '../models/models.dart';
+import '../models/model.dart';
 import '../providers/file_system_controller.dart';
 import 'base_file_widget.dart';
 
