@@ -8,6 +8,7 @@ pub mod svg;
 pub mod constants;
 
 #[macro_use]
+#[deprecated="unused"]
 extern crate lazy_static;
 lazy_static! {
     static ref DATABASE_ADDR: Mutex<String> = Mutex::new(String::new());

@@ -70,6 +70,10 @@ intptr_t init_frb_dart_api_dl(void *obj);
 
 void wire_create_all_directory(int64_t port_, struct wire_uint_8_list *s);
 
+void wire_get_faker_locale(int64_t port_, struct wire_uint_8_list *config_path);
+
+void wire_get_app_config(int64_t port_, struct wire_uint_8_list *config_path);
+
 void wire_get_changelog_from_id(int64_t port_, int64_t id, struct wire_uint_8_list *file_hash);
 
 void wire_get_file_hash(int64_t port_, struct wire_uint_8_list *file_path);
@@ -121,6 +125,8 @@ void free_WireSyncReturn(WireSyncReturn ptr);
 static int64_t dummy_method_to_enforce_bundling(void) {
     int64_t dummy_var = 0;
     dummy_var ^= ((int64_t) (void*) wire_create_all_directory);
+    dummy_var ^= ((int64_t) (void*) wire_get_faker_locale);
+    dummy_var ^= ((int64_t) (void*) wire_get_app_config);
     dummy_var ^= ((int64_t) (void*) wire_get_changelog_from_id);
     dummy_var ^= ((int64_t) (void*) wire_get_file_hash);
     dummy_var ^= ((int64_t) (void*) wire_delete_file_by_file_hash);

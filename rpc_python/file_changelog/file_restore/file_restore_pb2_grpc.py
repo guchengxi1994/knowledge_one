@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import file_restore.file_restore_pb2 as file__restore__pb2
+import file_changelog.file_restore.file_restore_pb2 as file__restore__pb2
 
 
 class FileRestoreStub(object):

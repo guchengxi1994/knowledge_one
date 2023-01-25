@@ -14,6 +14,17 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kCreateAllDirectoryConstMeta;
 
+  /// 获取faker locale
+  Future<List<String>> getFakerLocale(
+      {required String configPath, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetFakerLocaleConstMeta;
+
+  /// 获取所有Config
+  Future<AppConfig?> getAppConfig({required String configPath, dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetAppConfigConstMeta;
+
   /// 根据file_id 和hash值获取修改的changelog
   Future<List<FileChangelog>?> getChangelogFromId(
       {required int id, required String fileHash, dynamic hint});
@@ -107,6 +118,14 @@ abstract class Native {
   Future<List<OperationLog>> queryAllOperationLogs({dynamic hint});
 
   FlutterRustBridgeTaskConstMeta get kQueryAllOperationLogsConstMeta;
+}
+
+class AppConfig {
+  final List<String> fakerSupportedLocales;
+
+  AppConfig({
+    required this.fakerSupportedLocales,
+  });
 }
 
 class CleanerResult {
@@ -290,6 +309,41 @@ class NativeImpl implements Native {
       const FlutterRustBridgeTaskConstMeta(
         debugName: "create_all_directory",
         argNames: ["s"],
+      );
+
+  Future<List<String>> getFakerLocale(
+      {required String configPath, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(configPath);
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_get_faker_locale(port_, arg0),
+      parseSuccessData: _wire2api_StringList,
+      constMeta: kGetFakerLocaleConstMeta,
+      argValues: [configPath],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kGetFakerLocaleConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_faker_locale",
+        argNames: ["configPath"],
+      );
+
+  Future<AppConfig?> getAppConfig({required String configPath, dynamic hint}) {
+    var arg0 = _platform.api2wire_String(configPath);
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_get_app_config(port_, arg0),
+      parseSuccessData: _wire2api_opt_box_autoadd_app_config,
+      constMeta: kGetAppConfigConstMeta,
+      argValues: [configPath],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kGetAppConfigConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_app_config",
+        argNames: ["configPath"],
       );
 
   Future<List<FileChangelog>?> getChangelogFromId(
@@ -611,6 +665,23 @@ class NativeImpl implements Native {
     return raw as String;
   }
 
+  List<String> _wire2api_StringList(dynamic raw) {
+    return (raw as List<dynamic>).cast<String>();
+  }
+
+  AppConfig _wire2api_app_config(dynamic raw) {
+    final arr = raw as List<dynamic>;
+    if (arr.length != 1)
+      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    return AppConfig(
+      fakerSupportedLocales: _wire2api_StringList(arr[0]),
+    );
+  }
+
+  AppConfig _wire2api_box_autoadd_app_config(dynamic raw) {
+    return _wire2api_app_config(raw);
+  }
+
   CleanerResult _wire2api_box_autoadd_cleaner_result(dynamic raw) {
     return _wire2api_cleaner_result(raw);
   }
@@ -703,6 +774,10 @@ class NativeImpl implements Native {
 
   String? _wire2api_opt_String(dynamic raw) {
     return raw == null ? null : _wire2api_String(raw);
+  }
+
+  AppConfig? _wire2api_opt_box_autoadd_app_config(dynamic raw) {
+    return raw == null ? null : _wire2api_box_autoadd_app_config(raw);
   }
 
   CleanerResult? _wire2api_opt_box_autoadd_cleaner_result(dynamic raw) {
@@ -979,6 +1054,40 @@ class NativeWire implements FlutterRustBridgeWireBase {
           ffi.Void Function(ffi.Int64,
               ffi.Pointer<wire_uint_8_list>)>>('wire_create_all_directory');
   late final _wire_create_all_directory = _wire_create_all_directoryPtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_faker_locale(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> config_path,
+  ) {
+    return _wire_get_faker_locale(
+      port_,
+      config_path,
+    );
+  }
+
+  late final _wire_get_faker_localePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_get_faker_locale');
+  late final _wire_get_faker_locale = _wire_get_faker_localePtr
+      .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
+
+  void wire_get_app_config(
+    int port_,
+    ffi.Pointer<wire_uint_8_list> config_path,
+  ) {
+    return _wire_get_app_config(
+      port_,
+      config_path,
+    );
+  }
+
+  late final _wire_get_app_configPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Int64,
+              ffi.Pointer<wire_uint_8_list>)>>('wire_get_app_config');
+  late final _wire_get_app_config = _wire_get_app_configPtr
       .asFunction<void Function(int, ffi.Pointer<wire_uint_8_list>)>();
 
   void wire_get_changelog_from_id(

@@ -1,8 +1,9 @@
+// ignore_for_file: avoid_unnecessary_containers
+
 import 'package:flutter/material.dart';
+import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:knowledge_one/src/screens/initial/initial_controller.dart';
 import 'package:provider/provider.dart';
-
-import 'my_custom_dropdown_button.dart';
 
 class SecondScreen extends StatelessWidget {
   const SecondScreen({Key? key}) : super(key: key);
@@ -15,7 +16,7 @@ class SecondScreen extends StatelessWidget {
         children: [
           _wrapper(
               _name("选择数据库"),
-              MyCustomDropdownButton(
+              SimpleDropdownButton(
                   hintStyle: const TextStyle(
                       color: Color.fromARGB(255, 159, 159, 159), fontSize: 11),
                   icon: const Icon(Icons.arrow_drop_down,
