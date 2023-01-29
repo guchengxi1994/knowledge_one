@@ -178,13 +178,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.5"
-  dart_style:
-    dependency: transitive
-    description:
-      name: dart_style
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.2.4"
   desktop_drop:
     dependency: "direct main"
     description:
@@ -590,13 +583,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.6.4"
-  json_dart_generator:
-    dependency: "direct main"
-    description:
-      name: json_dart_generator
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.1.0+1"
   json_tree_viewer:
     dependency: "direct main"
     description:
@@ -891,6 +877,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.27.7"
+  screen_retriever:
+    dependency: transitive
+    description:
+      name: screen_retriever
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.5"
   screenshot:
     dependency: transitive
     description:
@@ -1239,6 +1232,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.1.3"
+  window_manager:
+    dependency: "direct main"
+    description:
+      name: window_manager
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.3.0"
   xdg_directories:
     dependency: transitive
     description:

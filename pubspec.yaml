@@ -44,7 +44,7 @@ dependencies:
     path: ../flutter_useful_widgets
   file_type:
     path: ../file_type
-  json_dart_generator: ^1.1.0+1
+  # json_dart_generator: ^1.1.0+1
   json_tree_viewer: ^0.0.2
   just_the_tooltip: ^0.0.12
   pretty_diff_text: ^1.0.0
@@ -54,6 +54,7 @@ dependencies:
   pluto_grid: ^5.4.9
   csvwriter: ^1.1.0
   open_file: ^3.2.1
+  window_manager: ^0.3.0
 
 
 dev_dependencies:
