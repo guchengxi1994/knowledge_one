@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/native.dart';
 import 'package:knowledge_one/rpc_controller.dart';
+import 'package:knowledge_one/src/screens/workboard/modules/code_generator/code_generate_screen.dart';
 import 'package:knowledge_one/src/screens/workboard/modules/main/providers/app_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -119,6 +120,7 @@ class _WorkboardScreenState extends State<WorkboardScreen> with WindowListener {
                       // const TodoScreen(),
                       SvgCleanerScreen(),
                       const FakerScreen(),
+                      const CodeGenerateScreen()
                     ],
                   ),
                 )

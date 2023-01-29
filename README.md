@@ -24,5 +24,5 @@ flutter 版本是3.3.10
 
 - [x] faker gui
 - [ ] grpc gui
-- [ ] code generator gui
-- [ ] svg cleaner gui
+- [x] code generator gui [#74](https://github.com/BertrandBev/code_field/issues/74)
+- [x] svg cleaner gui

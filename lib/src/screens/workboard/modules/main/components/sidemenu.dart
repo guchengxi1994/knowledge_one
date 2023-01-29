@@ -61,6 +61,12 @@ class SideMenu extends StatelessWidget {
             title: "Faker",
             isSvg: false,
           ),
+          CustomSidemenuButton(
+            iconUrl: null,
+            buttonId: 3,
+            title: "Class/Struct Generator",
+            isSvg: false,
+          ),
         ],
       ),
     );

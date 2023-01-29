@@ -1,0 +1,1 @@
+protoc --proto_path=. --dart_out=grpc:../lib/src/rpc -Iprotos quicktype.proto

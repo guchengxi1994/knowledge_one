@@ -366,7 +366,11 @@ impl Wire2Api<u8> for u8 {
 
 impl support::IntoDart for AppConfig {
     fn into_dart(self) -> support::DartAbi {
-        vec![self.faker_supported_locales.into_dart()].into_dart()
+        vec![
+            self.faker_supported_locales.into_dart(),
+            self.code_generator_supported_langs.into_dart(),
+        ]
+        .into_dart()
     }
 }
 impl support::IntoDartExceptPrimitive for AppConfig {}
@@ -468,13 +472,6 @@ impl support::IntoDartExceptPrimitive for TodoStatus {}
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
-
-/// cbindgen:ignore
-#[cfg(target_family = "wasm")]
-#[path = "bridge_generated.web.rs"]
-mod web;
-#[cfg(target_family = "wasm")]
-pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]
