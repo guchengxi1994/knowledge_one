@@ -67,6 +67,12 @@ class SideMenu extends StatelessWidget {
             title: "Class/Struct Generator",
             isSvg: false,
           ),
+          CustomSidemenuButton(
+            iconUrl: null,
+            buttonId: 4,
+            title: "Redis Client",
+            isSvg: false,
+          ),
         ],
       ),
     );

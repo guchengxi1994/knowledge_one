@@ -5,10 +5,12 @@ import 'package:knowledge_one/native.dart';
 import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/src/screens/workboard/modules/code_generator/code_generate_screen.dart';
 import 'package:knowledge_one/src/screens/workboard/modules/main/providers/app_controller.dart';
+import 'package:knowledge_one/src/screens/workboard/modules/redis_client/redis_client_screen.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 import '../file_management/providers/file_system_controller.dart';
+import '../redis_client/redis_controller.dart';
 import 'providers/page_controller.dart';
 import '../faker_gui/faker_screen.dart';
 import '../file_management/file_management_screen.dart';
@@ -77,7 +79,7 @@ class _WorkboardScreenState extends State<WorkboardScreen> with WindowListener {
   Future<void> initApp() async {
     Directory executableDir = DevUtils.executableDir;
     LocalStorage storage = LocalStorage();
-    print("${executableDir.path}/db_config.toml");
+    debugPrint("${executableDir.path}/db_config.toml");
     await api.initDatabase(
         confPath: "${executableDir.path}/db_config.toml",
         isFirstTime: await storage.getFirst());
@@ -91,7 +93,8 @@ class _WorkboardScreenState extends State<WorkboardScreen> with WindowListener {
       providers: [
         ChangeNotifierProvider(
             create: (_) => PageChangeController(controller: pageController)),
-        ChangeNotifierProvider(create: (_) => AppConfigController()..init())
+        ChangeNotifierProvider(create: (_) => AppConfigController()..init()),
+        ChangeNotifierProvider(create: (_) => RedisController())
       ],
       builder: (context, child) {
         return Container(
@@ -120,7 +123,8 @@ class _WorkboardScreenState extends State<WorkboardScreen> with WindowListener {
                       // const TodoScreen(),
                       SvgCleanerScreen(),
                       const FakerScreen(),
-                      const CodeGenerateScreen()
+                      const CodeGenerateScreen(),
+                      const RedisClientScreen()
                     ],
                   ),
                 )
