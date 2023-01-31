@@ -1,7 +1,7 @@
 name: knowledge_one
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 0.0.4
+version: 0.0.5
 
 environment:
   sdk: '>=2.18.2 <3.0.0'
@@ -44,7 +44,7 @@ dependencies:
     path: ../flutter_useful_widgets
   file_type:
     path: ../file_type
-  json_dart_generator: ^1.1.0+1
+  # json_dart_generator: ^1.1.0+1
   json_tree_viewer: ^0.0.2
   just_the_tooltip: ^0.0.12
   pretty_diff_text: ^1.0.0
@@ -54,6 +54,8 @@ dependencies:
   pluto_grid: ^5.4.9
   csvwriter: ^1.1.0
   open_file: ^3.2.1
+  window_manager: ^0.3.0
+  code_text_field: ^1.1.0
 
 
 dev_dependencies:
@@ -112,4 +114,41 @@ flutter:
     - family: roboto-mono
       fonts:
         - asset: assets/fonts/RobotoMono-Regular.ttf
+    - family: SourceCode
+      fonts:
+        - asset: assets/fonts/sourceCode/SourceCodePro-Black.ttf
+          weight: 900
+        - asset: assets/fonts/sourceCode/SourceCodePro-BlackItalic.ttf
+          style: italic
+          weight: 900
+        - asset: assets/fonts/sourceCode/SourceCodePro-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/sourceCode/SourceCodePro-BoldItalic.ttf
+          style: italic
+          weight: 700
+        - asset: assets/fonts/sourceCode/SourceCodePro-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/sourceCode/SourceCodePro-SemiBoldItalic.ttf
+          style: italic
+          weight: 600
+        - asset: assets/fonts/sourceCode/SourceCodePro-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/sourceCode/SourceCodePro-MediumItalic.ttf
+          style: italic
+          weight: 500
+        - asset: assets/fonts/sourceCode/SourceCodePro-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/sourceCode/SourceCodePro-Italic.ttf
+          style: italic
+          weight: 400
+        - asset: assets/fonts/sourceCode/SourceCodePro-Light.ttf
+          weight: 300
+        - asset: assets/fonts/sourceCode/SourceCodePro-LightItalic.ttf
+          style: italic
+          weight: 300
+        - asset: assets/fonts/sourceCode/SourceCodePro-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/sourceCode/SourceCodePro-ExtraLightItalic.ttf
+          style: italic
+          weight: 200
 

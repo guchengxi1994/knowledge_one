@@ -3,6 +3,10 @@ from faker.providers import (address, bank, barcode, color, company,
                              credit_card, currency, file, geo, internet, isbn,
                              job, lorem, person, phone_number, ssn, user_agent)
 from faker import Faker
+import ctypes
+
+my_faker_lib = ctypes.CDLL("./faker.dll")
+my_faker_lib.FakeAProfile.restype = ctypes.c_uint64
 
 
 class CountCannotBeNegtiveException(Exception):
@@ -29,19 +33,18 @@ __providers__ = {
     "person": person,
     "phone_number": phone_number,
     "ssn": ssn,
-    "user_agent": user_agent
+    "user_agent": user_agent,
+    "profile": None
 }
 
 
 class ProviderMap:
-
     def __init__(self, key: str, value: str) -> None:
         self.key = key
         self.value = value
 
 
 class FakerGenerator:
-
     def __init__(self,
                  providers: List[ProviderMap] = [],
                  locale: str = "zh_CN",
@@ -54,7 +57,7 @@ class FakerGenerator:
             if __p is not None:
                 self.f.add_provider(__p)
 
-            if i == "person":
+            if i == "person" or i == "profile":
                 self.__gender = kwargs.get("gender", "unknow")
 
     def generate(self, times: int = 1) -> dict:
@@ -74,13 +77,25 @@ class FakerGenerator:
         provider: str,
         locale: str = "zh_CN",
     ) -> str:
-        __f = FakerGenerator(providers=[ProviderMap("test", provider)])
+        __f = FakerGenerator(providers=[ProviderMap("test", provider)],
+                             locale=locale)
         __p = __providers__.get(provider, None)
         __f.f.add_provider(__p)
         return generate(__f, provider)
 
 
 def generate(f: FakerGenerator, c: str) -> str:
+    if c == "profile":
+        if not hasattr(f, "__gender"):
+            __gender = True
+        else:
+            if f.__gender == "male":
+                __gender = True
+            else:
+                __gender = False
+        res = ctypes.string_at(my_faker_lib.FakeAProfile())
+        return res.decode('utf-8')
+
     if c == "person":
         if not hasattr(f, "__gender"):
             __gender = "unknow"

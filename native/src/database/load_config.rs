@@ -22,6 +22,7 @@ pub struct Config {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AppConfig {
     pub faker_supported_locales: Vec<String>,
+    pub code_generator_supported_langs: Vec<String>
 }
 
 pub fn load_config(conf_path: &str) -> Option<Config> {

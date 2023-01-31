@@ -22,8 +22,10 @@ class CustomSidemenuButton extends StatelessWidget {
     final bool isSelected =
         context.watch<PageChangeController>().currentPageIndex == buttonId;
     return Container(
-      width: 122,
-      height: 38,
+      // width: 122,
+      // // height: 38,
+      constraints: const BoxConstraints(
+          maxWidth: 122, maxHeight: 60, minHeight: 38, minWidth: 122),
       margin: const EdgeInsets.only(top: 1),
       decoration: BoxDecoration(
           color: isSelected ? Colors.white : Colors.transparent,
@@ -36,6 +38,7 @@ class CustomSidemenuButton extends StatelessWidget {
           padding: const EdgeInsets.only(left: 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               iconUrl == null
                   ? Icon(
@@ -66,12 +69,15 @@ class CustomSidemenuButton extends StatelessWidget {
               const SizedBox(
                 width: 5,
               ),
-              Text(
+              Expanded(
+                  child: Text(
                 title,
+                maxLines: null,
+                softWrap: true,
                 style: isSelected
                     ? AppStyle.sidebarSelectedTextStyle
                     : AppStyle.sidebarUnSelectedTextStyle,
-              )
+              ))
             ],
           ),
         ),
