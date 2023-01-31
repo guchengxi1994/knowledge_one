@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/src/rpc/quicktype.pbgrpc.dart';
@@ -235,7 +236,7 @@ class _CodeGenerateScreenState extends BaseSubScreenState<CodeGenerateScreen> {
                 child: Container(
                   padding: const EdgeInsets.only(bottom: 1),
                   width: 73,
-                  height: 21,
+                  height: 30,
                   decoration: BoxDecoration(
                       color: Colors.blueAccent,
                       borderRadius: BorderRadius.circular(7)),
@@ -246,9 +247,36 @@ class _CodeGenerateScreenState extends BaseSubScreenState<CodeGenerateScreen> {
                     ),
                   ),
                 )),
-            const SizedBox(
-              width: 10,
+            Visibility(
+              visible: codes != "",
+              child: const SizedBox(
+                width: 10,
+              ),
             ),
+            Visibility(
+                visible: codes != "",
+                child: InkWell(
+                    onTap: () async {
+                      await Clipboard.setData(ClipboardData(text: codes));
+                      SmartDialogUtils.message("已复制到剪切板");
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.only(bottom: 1),
+                      width: 73,
+                      height: 30,
+                      decoration: BoxDecoration(
+                          color: Colors.blueAccent,
+                          borderRadius: BorderRadius.circular(7)),
+                      child: const Center(
+                        child: Text(
+                          "复制代码",
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                    ))),
+            // const SizedBox(
+            //   width: 10,
+            // ),
           ],
         ),
         const SizedBox(
