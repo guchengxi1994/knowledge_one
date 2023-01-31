@@ -1,3 +1,19 @@
 faker_supported_locales:
   - zh_CN
   - en
+
+code_generator_supported_langs:
+  - Ruby
+  - JavaScript
+  - Rust
+  - Kotlin
+  - Dart
+  - Python
+  - C#
+  - Go 
+  - C++
+  - Java 
+  - TypeScript
+  - Swift
+  - Objective-C
+  - Haskell

@@ -10,6 +10,7 @@ flutter 版本是3.3.10
 
 ## changelogs
 
+* 0.0.5 [details](./changelogs/0_0_5.md)
 * 0.0.4 [details](./changelogs/0_0_4.md)
 * 0.0.3 [details](./changelogs/0_0_3.md)
 * 0.0.2 [details](./changelogs/0_0_2.md)
@@ -24,5 +25,5 @@ flutter 版本是3.3.10
 
 - [x] faker gui
 - [ ] grpc gui
-- [ ] code generator gui
-- [ ] svg cleaner gui
+- [x] code generator gui [#74](https://github.com/BertrandBev/code_field/issues/74)
+- [x] svg cleaner gui

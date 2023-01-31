@@ -366,7 +366,11 @@ impl Wire2Api<u8> for u8 {
 
 impl support::IntoDart for AppConfig {
     fn into_dart(self) -> support::DartAbi {
-        vec![self.faker_supported_locales.into_dart()].into_dart()
+        vec![
+            self.faker_supported_locales.into_dart(),
+            self.code_generator_supported_langs.into_dart(),
+        ]
+        .into_dart()
     }
 }
 impl support::IntoDartExceptPrimitive for AppConfig {}

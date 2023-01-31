@@ -122,9 +122,11 @@ abstract class Native {
 
 class AppConfig {
   final List<String> fakerSupportedLocales;
+  final List<String> codeGeneratorSupportedLangs;
 
   AppConfig({
     required this.fakerSupportedLocales,
+    required this.codeGeneratorSupportedLangs,
   });
 }
 
@@ -671,10 +673,11 @@ class NativeImpl implements Native {
 
   AppConfig _wire2api_app_config(dynamic raw) {
     final arr = raw as List<dynamic>;
-    if (arr.length != 1)
-      throw Exception('unexpected arr length: expect 1 but see ${arr.length}');
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
     return AppConfig(
       fakerSupportedLocales: _wire2api_StringList(arr[0]),
+      codeGeneratorSupportedLangs: _wire2api_StringList(arr[1]),
     );
   }
 
