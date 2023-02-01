@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
+import 'package:flutter_useful_widgets/datatable/simple_datatable2.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:knowledge_one/src/screens/workboard/modules/redis_client/redis_controller.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +53,8 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
 
   String bottomText = "";
 
+  int currentOffset = 0;
+
   @override
   void dispose() {
     urlController.dispose();
@@ -72,32 +75,24 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
     return await context.read<RedisController>().getVal(s);
   }
 
+  dynamic _getType(String s) async {
+    return await context.read<RedisController>().getValType(s);
+  }
+
   Widget _buildContent() {
     if (results.isEmpty) {
       return const SizedBox();
     }
     dataProvider = SimpleDataProvider(initial: () async {
-      if (results.length < 10) {
-        return results.sublist(0).mapIndexed((i, e) {
-          RedisModel model = RedisModel(key: e.toString());
-          return RedisData(
-            index: i,
-            model: model,
-            onValueGet: () async {
-              model.value = await _getVal(e.toString());
-              setState(() {});
-            },
-          );
-        }).toList();
-      }
-
-      return results.sublist(0, 10).mapIndexed((i, e) {
-        RedisModel model = RedisModel(key: e.toString());
+      return results.mapIndexed((i, e) {
+        var key = e.first.toString();
+        RedisModel model = RedisModel(key: key);
         return RedisData(
           index: i,
           model: model,
           onValueGet: () async {
-            model.value = await _getVal(e.toString());
+            model.value = await _getVal(key);
+            model.valueType = await _getType(key);
             setState(() {});
           },
         );
@@ -107,20 +102,40 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
     }, onFilter: (conditions) async {
       return [];
     }, onPageChanged: (index) async {
+      final d1 = DateTime.now();
       List keys;
-      if (results.length < index * 10) {
-        keys = results.sublist((index - 1) * 10);
+      if (index == 1) {
+        setState(() {
+          currentOffset = 0;
+        });
+        keys = await context.read<RedisController>().getRangeKeys(0);
+        keys.removeAt(0);
+      } else if (currentOffset == 0) {
+        keys = [];
       } else {
-        keys = results.sublist((index - 1) * 10 + 10);
+        keys =
+            await context.read<RedisController>().getRangeKeys(currentOffset);
+        setState(() {
+          currentOffset = int.tryParse(keys.removeAt(0)) ?? 0;
+        });
       }
 
+      final d2 = DateTime.now();
+      final duration = d2.difference(d1).inSeconds;
+
+      setState(() {
+        bottomText = "在$duration秒中获取了${keys.length}条记录";
+      });
+
       return keys.mapIndexed((i, e) {
-        RedisModel model = RedisModel(key: e.toString());
+        var key = e.first.toString();
+        RedisModel model = RedisModel(key: key);
         return RedisData(
           index: i,
           model: model,
           onValueGet: () async {
-            model.value = await _getVal(e.toString());
+            model.value = await _getVal(key);
+            model.valueType = await _getType(key);
             setState(() {});
           },
         );
@@ -129,18 +144,15 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
       return [];
     });
 
-    late int pagecount;
-    if (results.length % 10 == 0) {
-      pagecount = results.length ~/ 10;
-    } else {
-      pagecount = results.length ~/ 10 + 1;
-    }
-
-    return UsefulSimpleDatatable(
-      columns: const ["编号", "key", "value"],
-      columnWidth: const [indexColumnWidth, keyColumnWidth, valueColumnWidth],
+    return UsefulSimpleDatatable2(
+      columns: const ["编号", "key", "value", "值类型"],
+      columnWidth: const [
+        indexColumnWidth,
+        keyColumnWidth,
+        valueColumnWidth,
+        typeColumnWidth
+      ],
       dataProvider: dataProvider,
-      pageCount: pagecount,
     );
   }
 
@@ -282,7 +294,14 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
         InkWell(
             onTap: () async {
               final d1 = DateTime.now();
-              results = await context.read<RedisController>().getAllKeys();
+              // results = await context.read<RedisController>().getAllKeys();
+              results = await context
+                  .read<RedisController>()
+                  .getRangeKeys(currentOffset);
+
+              int offset = int.tryParse(results.removeAt(0)) ?? 0;
+              currentOffset = offset;
+
               final d2 = DateTime.now();
               final duration = d2.difference(d1).inSeconds;
               setState(() {

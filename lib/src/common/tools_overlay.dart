@@ -26,7 +26,7 @@ mixin OverlayStateMixin<T extends StatefulWidget> on State<T> {
       builder: (_) => _dismissibleOverlay(child),
     );
 
-    Overlay.of(context)?.insert(_overlayEntry!);
+    Overlay.of(context).insert(_overlayEntry!);
   }
 
   @override

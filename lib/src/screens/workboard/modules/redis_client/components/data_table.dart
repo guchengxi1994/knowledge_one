@@ -7,10 +7,12 @@ import 'package:flutter_useful_widgets/flutter_useful_widgets.dart'
 const double keyColumnWidth = 100;
 const double valueColumnWidth = 300;
 const double indexColumnWidth = 50;
+const double typeColumnWidth = 75;
 
 class RedisModel {
   final dynamic key;
   dynamic value = null;
+  dynamic valueType = null;
   RedisModel({required this.key});
 }
 
@@ -48,7 +50,13 @@ class RedisData extends BaseData {
                 child: const Text("***"),
               )
             : Text(model.value.toString()),
-      )
+      ),
+      SizedBox(
+        width: typeColumnWidth,
+        child: model.value == null
+            ? const Text("***")
+            : Text(model.valueType.toString()),
+      ),
     ];
   }
 }

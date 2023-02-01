@@ -23,6 +23,7 @@ class RedisController extends ChangeNotifier {
     port = p;
   }
 
+  @Deprecated("获取所有keys，性能会有问题")
   Future<List<dynamic>> getAllKeys() async {
     List<dynamic> results = [];
     await conn.connect(url, port).then((Command command) async {
@@ -34,11 +35,36 @@ class RedisController extends ChangeNotifier {
     return results;
   }
 
+  Future<List<dynamic>> getRangeKeys(int offset, {String pattern = "*"}) async {
+    List<dynamic> results = [];
+    await conn.connect(url, port).then((Command command) async {
+      results = await command.send_object(["SCAN", offset, "match", pattern]);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("redis 连接异常");
+    });
+
+    return results;
+  }
+
   Future<dynamic> getVal(String s) async {
     var res = null;
 
     await conn.connect(url, port).then((Command command) async {
       res = await command.send_object(["GET", s]);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("redis 连接异常");
+    });
+
+    return res;
+  }
+
+  Future<dynamic> getValType(String s) async {
+    var res = null;
+
+    await conn.connect(url, port).then((Command command) async {
+      res = await command.send_object(["TYPE", s]);
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
