@@ -26,7 +26,7 @@ def restore_from_file(filePath: str, diffs: list, fileSize: list,
 
 
 def _load_file_by_numpy(p: str) -> list:
-    array = np.fromfile(p, dtype=np.uint8)
+    array = np.fromfile(p, dtype=np.int32)
     return array.tolist()
 
 
@@ -49,7 +49,7 @@ def _restore_from_mtx(mtx: str,
         height = int(len(f) / MATRIX_WIDTH) + 1
         _zeroLength = height * MATRIX_WIDTH - len(f)
         f.extend(_zeros)
-        mat = np.reshape(np.array(f, dtype=np.uint8), (height, MATRIX_WIDTH))
+        mat = np.reshape(np.array(f, dtype=np.int32), (height, MATRIX_WIDTH))
         diffHeight = mat.shape[0] - diffMatShape[0]
         diffMat = np.vstack((diffMat, np.zeros((diffHeight, MATRIX_WIDTH))))
 
@@ -59,15 +59,15 @@ def _restore_from_mtx(mtx: str,
         _zeroLength = height * MATRIX_WIDTH - len(f)
         _zeros = [0 for _ in range(_zeroLength)]
         f.extend(_zeros)
-        mat = np.reshape(np.array(f, dtype=np.uint8), (height, MATRIX_WIDTH))
+        mat = np.reshape(np.array(f, dtype=np.int32), (height, MATRIX_WIDTH))
 
     mat = mat - diffMat
-    mat = mat.astype(np.uint8)
+    mat = mat.astype(np.int32)
     _list = mat.flatten().tolist()
     fileData = _list[:fileLen]
     with open(savePath, 'wb') as f:
         for i in fileData:
-            f.write(i.to_bytes(1, 'little', signed=False))
+            f.write(i.to_bytes(4, 'little', signed=True))
 
 
 # if __name__ == "__main__":
@@ -77,8 +77,8 @@ def _restore_from_mtx(mtx: str,
 #         "C:\\Users\\xiaoshuyui\\Desktop\\我的图片 - 副本.png",
 #         diffs=[
 #             "",
-#             "D:/github_repo/knowledge_one/build/windows/runner/Debug/_diff/1668146100212.mtx",
+#             r"D:\github_repo\knowledge_one\rpc_python\file_changelog\file_diff\diff.mtx",
 #         ],
 #         fileSize=[1066708, 1138771],
 #         saveDir=
-#         "D:/github_repo/knowledge_one/build/windows/runner/Debug/_restore")
+#         "D:/github_repo/knowledge_one/rpc_python/file_changelog/file_diff/")

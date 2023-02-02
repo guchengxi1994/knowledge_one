@@ -8,7 +8,7 @@ def dump_file(p: str, f):
         pickle.dump(f, fi)
 
 def _load_file_by_numpy(p: str) -> list:
-    array = np.fromfile(p, dtype=np.uint8)
+    array = np.fromfile(p, dtype=np.int32)
     return array.tolist()
 
 
@@ -19,7 +19,7 @@ def _format(a: list) -> np.ndarray:
     _zeros = [0 for _ in range(_zeroLength)]
     # r = np.hstack((a, _zeros))
     a.extend(_zeros)
-    mat = np.reshape(np.array(a, dtype=np.uint8), (height, MATRIX_WIDTH))
+    mat = np.reshape(np.array(a, dtype=np.int32), (height, MATRIX_WIDTH))
     return mat
 
 
@@ -43,9 +43,6 @@ def get_diff(p1: str, p2: str,save_path="diff.mtx"):
     mat2 = _format(a2)
 
     mat1, mat2 = _normalize(mat1, mat2)
-
-    mat1 = mat1.astype(np.int16)
-    mat2 = mat2.astype(np.int16)
 
     diff = mat2 - mat1
     # print(np.min(diff))
