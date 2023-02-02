@@ -3,13 +3,13 @@ import 'dart:ui';
 
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:knowledge_one/routers.dart';
-import 'package:knowledge_one/rpc_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'native.dart';
+import 'bridge/native.dart';
+import 'common/routers.dart';
+import 'common/rpc_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
