@@ -68,15 +68,18 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
           ],
           elevation: 0,
           backgroundColor: Colors.white,
-          leading: IconButton(
-              onPressed: () {
-                context.read<FileSystemController>().backToParentFolder();
-              },
-              icon: const Icon(
-                Icons.chevron_left_outlined,
-                color: Colors.black,
-                size: 30,
-              )),
+          leading: context.watch<FileSystemController>().currentDirPath !=
+                  "root/"
+              ? IconButton(
+                  onPressed: () {
+                    context.read<FileSystemController>().backToParentFolder();
+                  },
+                  icon: const Icon(
+                    Icons.chevron_left_outlined,
+                    color: Colors.black,
+                    size: 30,
+                  ))
+              : null,
           centerTitle: true,
           title: SizedBox(
             width: 0.5 * AppStyle.appMinWidth,
@@ -117,7 +120,12 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
             decoration: BoxDecoration(
                 border: Border(
                     top: BorderSide(color: Colors.grey[200]!, width: 2))),
-            width: MediaQuery.of(context).size.width - AppStyle.sideMenuWidth,
+            // width: MediaQuery.of(context).size.width - AppStyle.sideMenuWidth,
+            width: context.select<PageChangeController, bool>(
+                    (value) => value.collapse)
+                ? MediaQuery.of(context).size.width -
+                    AppStyle.sideMenuWidthCollapse
+                : MediaQuery.of(context).size.width - AppStyle.sideMenuWidth,
             padding: const EdgeInsets.only(bottom: 10, top: 10),
             height: MediaQuery.of(context).size.height - AppStyle.appbarHeight,
             child: SingleChildScrollView(

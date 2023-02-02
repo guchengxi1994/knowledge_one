@@ -19,7 +19,7 @@ class AppStyle {
 
   // 侧边栏宽度
   static const double sideMenuWidth = 200;
-  static const double sideMenuWidthCollapse = 50;
+  static const double sideMenuWidthCollapse = 70;
 
   /// 侧边栏字体
   static TextStyle sidebarSelectedTextStyle =

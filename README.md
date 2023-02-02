@@ -4,7 +4,7 @@
 
 ![image](./images/intro.png)
 
-flutter 版本是3.7.0
+flutter 版本是3.7.1
 
 数据库mysql,创建数据库sql可以[参考](./knowledge_one.sql)
 
