@@ -4,7 +4,7 @@
 
 ![image](./images/intro.png)
 
-flutter 版本是3.3.10
+flutter 版本是3.7.1
 
 数据库mysql,创建数据库sql可以[参考](./knowledge_one.sql)
 
@@ -27,3 +27,4 @@ flutter 版本是3.3.10
 - [ ] grpc gui
 - [x] code generator gui [#74](https://github.com/BertrandBev/code_field/issues/74)
 - [x] svg cleaner gui
+- [ ] redis client

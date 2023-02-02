@@ -1,5 +1,5 @@
 import 'package:grpc/grpc.dart';
-import 'package:knowledge_one/src/rpc/file_diff.pbgrpc.dart';
+import 'package:knowledge_one/rpc/file_diff.pbgrpc.dart';
 
 void main() async {
   const name1 = "C:/Users/xiaoshuyui/Desktop/我的图片 - 副本.png";

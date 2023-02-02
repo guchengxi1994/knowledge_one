@@ -1,0 +1,1 @@
+`flutter_rust_bridge` 生成的代码
