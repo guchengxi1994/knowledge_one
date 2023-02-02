@@ -6,6 +6,8 @@ class PageChangeController extends ChangeNotifier {
   PageChangeController({required this.controller});
   final GlobalKey<DropDownSearchState> dropdownKey = GlobalKey();
 
+  bool collapse = false;
+
   int currentPageIndex = 0;
   changeIndex(int id) {
     try {
@@ -14,6 +16,11 @@ class PageChangeController extends ChangeNotifier {
 
     currentPageIndex = id;
     controller.jumpToPage(id);
+    notifyListeners();
+  }
+
+  changeCollapse() {
+    collapse = !collapse;
     notifyListeners();
   }
 }

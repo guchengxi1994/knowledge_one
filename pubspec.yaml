@@ -80,6 +80,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/icons/sidemenu/
     - assets/icons/file.png
     - assets/icons/version.png
     - assets/icons/vc_file.png
