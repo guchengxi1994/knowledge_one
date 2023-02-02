@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 
 import '../common/base_sub_screens.dart';
+import 'components/create_k_v_dialog.dart';
 import 'components/data_table.dart';
 import 'components/tls_switch.dart';
 
@@ -75,9 +76,9 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
     return await context.read<RedisController>().getVal(s);
   }
 
-  dynamic _getType(String s) async {
-    return await context.read<RedisController>().getValType(s);
-  }
+  // dynamic _getType(String s) async {
+  //   return await context.read<RedisController>().getValType(s);
+  // }
 
   Widget _buildContent() {
     if (results.isEmpty) {
@@ -85,15 +86,18 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
     }
     dataProvider = SimpleDataProvider(initial: () async {
       return results.mapIndexed((i, e) {
-        var key = e.first.toString();
+        var key = e.toString();
         RedisModel model = RedisModel(key: key);
         return RedisData(
-          index: i,
+          index: i + 1,
           model: model,
           onValueGet: () async {
-            model.value = await _getVal(key);
-            model.valueType = await _getType(key);
-            setState(() {});
+            var res = await _getVal(key);
+            if (res.isNotEmpty) {
+              model.value = res[1];
+              model.valueType = res[0];
+              setState(() {});
+            }
           },
         );
       }).toList();
@@ -108,15 +112,20 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
         setState(() {
           currentOffset = 0;
         });
-        keys = await context.read<RedisController>().getRangeKeys(0);
-        keys.removeAt(0);
+        var res =
+            await context.read<RedisController>().getRangeKeys(currentOffset);
+        keys = res[1];
+        setState(() {
+          currentOffset = int.tryParse(res.removeAt(0)) ?? 0;
+        });
       } else if (currentOffset == 0) {
         keys = [];
       } else {
-        keys =
+        var res =
             await context.read<RedisController>().getRangeKeys(currentOffset);
+        keys = res[1];
         setState(() {
-          currentOffset = int.tryParse(keys.removeAt(0)) ?? 0;
+          currentOffset = int.tryParse(res.removeAt(0)) ?? 0;
         });
       }
 
@@ -128,15 +137,18 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
       });
 
       return keys.mapIndexed((i, e) {
-        var key = e.first.toString();
+        var key = e.toString();
         RedisModel model = RedisModel(key: key);
         return RedisData(
-          index: i,
+          index: i + 1,
           model: model,
           onValueGet: () async {
-            model.value = await _getVal(key);
-            model.valueType = await _getType(key);
-            setState(() {});
+            var res = await _getVal(key);
+            if (res.isNotEmpty()) {
+              model.value = res[1];
+              model.valueType = res[0];
+              setState(() {});
+            }
           },
         );
       }).toList();
@@ -295,11 +307,12 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
             onTap: () async {
               final d1 = DateTime.now();
               // results = await context.read<RedisController>().getAllKeys();
-              results = await context
+              var res = await context
                   .read<RedisController>()
                   .getRangeKeys(currentOffset);
 
-              int offset = int.tryParse(results.removeAt(0)) ?? 0;
+              int offset = int.tryParse(res.removeAt(0)) ?? 0;
+              results = res[0];
               currentOffset = offset;
 
               final d2 = DateTime.now();
@@ -318,6 +331,32 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
               child: const Center(
                 child: Text(
                   "获取所有key",
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ),
+            )),
+        InkWell(
+            onTap: () async {
+              await showGeneralDialog(
+                  context: context,
+                  pageBuilder: (ctx, animition, builder) {
+                    return Center(
+                      child: CreateRedisKeyValueDialog(
+                        ctx: context,
+                      ),
+                    );
+                  });
+            },
+            child: Container(
+              padding: const EdgeInsets.only(bottom: 1),
+              width: 80,
+              height: 30,
+              decoration: BoxDecoration(
+                  color: Colors.blueAccent,
+                  borderRadius: BorderRadius.circular(7)),
+              child: const Center(
+                child: Text(
+                  "创建新数据",
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ),

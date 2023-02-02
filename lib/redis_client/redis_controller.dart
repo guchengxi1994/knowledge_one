@@ -48,10 +48,23 @@ class RedisController extends ChangeNotifier {
   }
 
   Future<dynamic> getVal(String s) async {
-    var res = null;
+    // var res = null;
+    List res = [];
 
     await conn.connect(url, port).then((Command command) async {
-      res = await command.send_object(["GET", s]);
+      String type = await getValType(s);
+      switch (type) {
+        case "string":
+          var val = await command.send_object(["GET", s]);
+          res = [type, val];
+          break;
+        case "list":
+          var val = await command.send_object(["LLEN", s]);
+          res = [type, "为长度为$val的数组"];
+          break;
+        default:
+          res = [];
+      }
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
@@ -82,5 +95,96 @@ class RedisController extends ChangeNotifier {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
     });
+  }
+
+  Future expiredInSecond(String key, int time) async {
+    await conn.connect(url, port).then((Command command) async {
+      await command.send_object(["EXPIRE", key, time]);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("设置过期时间失败");
+    });
+  }
+
+  Future expiredInMillisecond(String key, int time) async {
+    await conn.connect(url, port).then((Command command) async {
+      await command.send_object(["PEXPIRE", key, time]);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("设置过期时间失败");
+    });
+  }
+
+  Future expiredInTimestamp(String key, int time) async {
+    await conn.connect(url, port).then((Command command) async {
+      await command.send_object(["EXPIREAT", key, time]);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("设置过期时间失败");
+    });
+  }
+
+  Future expiredInMilliTimestamp(String key, int time) async {
+    await conn.connect(url, port).then((Command command) async {
+      await command.send_object(["PEXPIREAT", key, time]);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("设置过期时间失败");
+    });
+  }
+
+  Future<int> setNewKV(String key, String val, String valType) async {
+    int res = 1;
+    await conn.connect(url, port).then((Command command) async {
+      if (valType == 'string') {
+        await command.send_object(["SET", key, val]);
+        return;
+      }
+      if (valType == 'list') {
+        List<String> vals = val.split(";");
+        for (final i in vals) {
+          await command.send_object(["LPUSH", key, i]);
+        }
+        return;
+      }
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("新建失败");
+      res = -1;
+    });
+    return res;
+  }
+
+  Future<int> setExpire(String key, int time, String expireType) async {
+    if (time == -1) {
+      return 1;
+    }
+
+    int res = 1;
+
+    await conn.connect(url, port).then((Command command) async {
+      if (expireType == 'seconds') {
+        await expiredInSecond(key, time);
+        return;
+      }
+      if (expireType == 'milliseconds') {
+        await expiredInMillisecond(key, time);
+        return;
+      }
+      if (expireType == 'timestamp') {
+        await expiredInTimestamp(key, time);
+        return;
+      }
+      if (expireType == 'milli-timestamp') {
+        await expiredInMilliTimestamp(key, time);
+        return;
+      }
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("设置时间失败");
+      res = -1;
+    });
+
+    return res;
   }
 }

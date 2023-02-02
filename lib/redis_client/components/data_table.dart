@@ -44,10 +44,17 @@ class RedisData extends BaseData {
         width: valueColumnWidth,
         child: model.value == null
             ? InkWell(
+                focusColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                splashColor: Colors.transparent,
                 onTap: () {
                   onValueGet();
                 },
-                child: const Text("***"),
+                child: const Text(
+                  "***",
+                  style: TextStyle(color: Colors.blueAccent),
+                ),
               )
             : Text(model.value.toString()),
       ),
