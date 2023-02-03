@@ -10,7 +10,6 @@ import 'package:knowledge_one/file_management/providers/file_system_controller.d
 import 'package:provider/provider.dart';
 
 import '../main/providers/page_controller.dart';
-import 'components/dropdown_search.dart';
 import 'components/file_widget.dart';
 import 'components/folder_widget.dart';
 import 'models/model.dart';
@@ -43,18 +42,18 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
     super.dispose();
   }
 
-  _buildSearchBar() {
-    final names = context.read<FileSystemController>().getCurrentFileNames();
-    if (names.isEmpty) {
-      return Container();
-    }
-    return DropDownSearch(
-      hintText: "Search",
-      key: context.watch<PageChangeController>().dropdownKey,
-      datas: names,
-      initialString: names.first,
-    );
-  }
+  // _buildSearchBar() {
+  //   final names = context.read<FileSystemController>().getCurrentFileNames();
+  //   if (names.isEmpty) {
+  //     return Container();
+  //   }
+  //   return DropDownSearch(
+  //     hintText: "Search",
+  //     key: context.watch<PageChangeController>().dropdownKey,
+  //     datas: names,
+  //     initialString: names.first,
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -63,9 +62,9 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(AppStyle.appbarHeight),
         child: AppBar(
-          actions: [
-            _buildSearchBar(),
-          ],
+          // actions: [
+          //   _buildSearchBar(),
+          // ],
           elevation: 0,
           backgroundColor: Colors.white,
           leading: context.watch<FileSystemController>().currentDirPath !=
@@ -102,13 +101,13 @@ class _FileManagementScreenState extends State<FileManagementScreen> {
               FileEntity(fileName: fileName, path: filePath, fileId: -1));
         },
         child: GestureDetector(
-          onTapUp: (details) {
-            context
-                .read<PageChangeController>()
-                .dropdownKey
-                .currentState
-                ?.hideOverlay();
-          },
+          // onTapUp: (details) {
+          //   context
+          //       .read<PageChangeController>()
+          //       .dropdownKey
+          //       .currentState
+          //       ?.hideOverlay();
+          // },
           behavior: HitTestBehavior.opaque,
           onSecondaryTapDown: (details) {
             if (context.read<FileSystemController>().currentWidgetId == -1) {

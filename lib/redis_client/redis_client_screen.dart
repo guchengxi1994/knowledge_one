@@ -1,9 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, avoid_init_to_null
 
 import 'package:flutter/material.dart';
-import 'package:flutter_useful_widgets/datatable/simple_datatable2.dart';
-import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:knowledge_one/redis_client/redis_controller.dart';
+import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 
@@ -47,14 +46,12 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
   final TextEditingController portController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  late SimpleDataProvider dataProvider;
+  final TextEditingController fuzzController = TextEditingController();
 
   bool enableTls = false;
-  List<dynamic> results = [];
 
   String bottomText = "";
-
-  int currentOffset = 0;
+  bool hasQueried = false;
 
   @override
   void dispose() {
@@ -62,6 +59,7 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
     portController.dispose();
     usernameController.dispose();
     passwordController.dispose();
+    fuzzController.dispose();
     super.dispose();
   }
 
@@ -72,102 +70,45 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
     portController.text = "6379";
   }
 
-  dynamic _getVal(String s) async {
-    return await context.read<RedisController>().getVal(s);
-  }
-
-  // dynamic _getType(String s) async {
-  //   return await context.read<RedisController>().getValType(s);
-  // }
-
   Widget _buildContent() {
-    if (results.isEmpty) {
+    if (!hasQueried) {
       return const SizedBox();
     }
-    dataProvider = SimpleDataProvider(initial: () async {
-      return results.mapIndexed((i, e) {
-        var key = e.toString();
-        RedisModel model = RedisModel(key: key);
+
+    return RedisDataTable(
+      onPageChanged: (index) async {
+        fuzzController.text = "";
+
+        if (context.read<RedisController>().couldQuery) {
+          final d1 = DateTime.now();
+
+          await context.read<RedisController>().getRangeKeys();
+          final d2 = DateTime.now();
+          final duration = d2.difference(d1).inSeconds;
+          setState(() {
+            bottomText =
+                "在$duration秒中获取了${context.read<RedisController>().listCount}条记录";
+          });
+        } else {
+          if (index == 1) {
+            context.read<RedisController>().refresh();
+            await context.read<RedisController>().getRangeKeys();
+          } else {
+            SmartDialogUtils.warning("已无内容");
+          }
+        }
+      },
+      data:
+          context.read<RedisController>().currentQueriedKeys.mapIndexed((i, e) {
         return RedisData(
           index: i + 1,
-          model: model,
+          model: e,
           onValueGet: () async {
-            var res = await _getVal(key);
-            if (res.isNotEmpty) {
-              model.value = res[1];
-              model.valueType = res[0];
-              model.ttl = res[2];
-              setState(() {});
-            }
+            await context.read<RedisController>().changeModel(i, e);
+            setState(() {});
           },
         );
-      }).toList();
-    }, onLoadMore: () async {
-      return [];
-    }, onFilter: (conditions) async {
-      return [];
-    }, onPageChanged: (index) async {
-      final d1 = DateTime.now();
-      List keys;
-      if (index == 1) {
-        setState(() {
-          currentOffset = 0;
-        });
-        var res =
-            await context.read<RedisController>().getRangeKeys(currentOffset);
-        keys = res[1];
-        setState(() {
-          currentOffset = int.tryParse(res.removeAt(0)) ?? 0;
-        });
-      } else if (currentOffset == 0) {
-        keys = [];
-      } else {
-        var res =
-            await context.read<RedisController>().getRangeKeys(currentOffset);
-        keys = res[1];
-        setState(() {
-          currentOffset = int.tryParse(res.removeAt(0)) ?? 0;
-        });
-      }
-
-      final d2 = DateTime.now();
-      final duration = d2.difference(d1).inSeconds;
-
-      setState(() {
-        bottomText = "在$duration秒中获取了${keys.length}条记录";
-      });
-
-      return keys.mapIndexed((i, e) {
-        var key = e.toString();
-        RedisModel model = RedisModel(key: key);
-        return RedisData(
-          index: i + 1,
-          model: model,
-          onValueGet: () async {
-            var res = await _getVal(key);
-            if (res.isNotEmpty()) {
-              model.value = res[1];
-              model.valueType = res[0];
-              model.ttl = res[2];
-              setState(() {});
-            }
-          },
-        );
-      }).toList();
-    }, onReset: () async {
-      return [];
-    });
-
-    return UsefulSimpleDatatable2(
-      columns: const ["编号", "key", "value", "值类型", "TTL"],
-      columnWidth: const [
-        indexColumnWidth,
-        keyColumnWidth,
-        valueColumnWidth,
-        typeColumnWidth,
-        ttlColumnWidth
-      ],
-      dataProvider: dataProvider,
+      }).toList(),
     );
   }
 
@@ -223,6 +164,29 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
             decoration: const InputDecoration(
               contentPadding: EdgeInsets.only(bottom: 19.0),
               hintText: "输入端口号",
+              hintStyle: TextStyle(
+                  color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+        Container(
+          width: 80,
+          padding: const EdgeInsets.only(left: 5),
+          height: 30,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.all(Radius.circular(9)),
+            border: Border.all(
+                color: const Color.fromARGB(255, 232, 232, 232), width: 1),
+          ),
+          child: TextField(
+            style: const TextStyle(
+                fontSize: 12, color: Color.fromARGB(255, 159, 159, 159)),
+            controller: fuzzController,
+            decoration: const InputDecoration(
+              contentPadding: EdgeInsets.only(bottom: 19.0),
+              hintText: "模糊查询",
               hintStyle: TextStyle(
                   color: Color.fromARGB(255, 159, 159, 159), fontSize: 12),
               border: InputBorder.none,
@@ -310,18 +274,21 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
             onTap: () async {
               final d1 = DateTime.now();
               // results = await context.read<RedisController>().getAllKeys();
-              var res = await context
-                  .read<RedisController>()
-                  .getRangeKeys(currentOffset);
 
-              int offset = int.tryParse(res.removeAt(0)) ?? 0;
-              results = res[0];
-              currentOffset = offset;
+              if (fuzzController.text == "") {
+                await context.read<RedisController>().getRangeKeys();
+              } else {
+                await context
+                    .read<RedisController>()
+                    .getProperKeys(fuzzController.text);
+              }
 
               final d2 = DateTime.now();
               final duration = d2.difference(d1).inSeconds;
               setState(() {
-                bottomText = "在$duration秒中获取了${results.length}条记录";
+                hasQueried = true;
+                bottomText =
+                    "在$duration秒中获取了${context.read<RedisController>().listCount}条记录";
               });
             },
             child: Container(

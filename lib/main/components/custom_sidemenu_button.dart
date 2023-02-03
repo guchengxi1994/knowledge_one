@@ -33,6 +33,7 @@ class CustomSidemenuButton extends StatelessWidget {
                 color: isSelected ? Colors.white : Colors.transparent,
                 borderRadius: const BorderRadius.all(Radius.circular(5))),
             child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
               onTap: () {
                 context.read<PageChangeController>().changeIndex(buttonId);
               },
@@ -73,6 +74,7 @@ class CustomSidemenuButton extends StatelessWidget {
                 color: isSelected ? Colors.white : Colors.transparent,
                 borderRadius: const BorderRadius.all(Radius.circular(5))),
             child: InkWell(
+              borderRadius: const BorderRadius.all(Radius.circular(5)),
               onTap: () {
                 context.read<PageChangeController>().changeIndex(buttonId);
               },

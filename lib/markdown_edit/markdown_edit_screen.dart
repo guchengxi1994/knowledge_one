@@ -177,8 +177,8 @@ class _MarkdownScreenState extends State<MarkdownScreen>
                     key: const ValueKey<String>("md_editor"),
                     maxLines: null,
                     controller: textEditingController,
-                    toolbarOptions: const ToolbarOptions(
-                        copy: true, paste: true, cut: true, selectAll: true),
+                    // toolbarOptions: const ToolbarOptions(
+                    //     copy: true, paste: true, cut: true, selectAll: true),
                     decoration:
                         const InputDecoration.collapsed(hintText: "请输入")),
               ),

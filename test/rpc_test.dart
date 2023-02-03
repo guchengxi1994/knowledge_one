@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:grpc/grpc.dart';
 import 'package:knowledge_one/rpc/file_diff.pbgrpc.dart';
 

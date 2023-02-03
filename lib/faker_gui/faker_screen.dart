@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_init_to_null, no_leading_underscores_for_local_identifiers, depend_on_referenced_packages
+// ignore_for_file: avoid_init_to_null, no_leading_underscores_for_local_identifiers, depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 

@@ -88,19 +88,18 @@ class _MyHomePageState extends State<MyHomePage> {
                         _expandedAll = true;
                       });
                     },
-                    icon: Icon(Icons.unfold_more)),
+                    icon: const Icon(Icons.unfold_more)),
                 IconButton(
                     onPressed: () {
                       setState(() {
                         _expandedAll = false;
                       });
                     },
-                    icon: Icon(Icons.unfold_less)),
+                    icon: const Icon(Icons.unfold_less)),
                 const SizedBox(
                   width: 16,
                 ),
                 ToggleButtons(
-                  children: [Text('Object'), Text('Array')],
                   isSelected: _toggleObject,
                   onPressed: (index) {
                     setState(() {
@@ -116,6 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       }
                     });
                   },
+                  children: const [Text('Object'), Text('Array')],
                 )
               ],
             ),

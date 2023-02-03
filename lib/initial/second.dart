@@ -28,7 +28,7 @@ class SecondScreen extends StatelessWidget {
                           color: const Color.fromARGB(255, 232, 232, 232))),
                   hint: "选择状态",
                   value: context.watch<InitialController>().selectedDbType,
-                  dropdownItems: ["mysql"],
+                  dropdownItems: const ["mysql"],
                   onChanged: (v) {
                     context.read<InitialController>().changeSelectedDbType(v);
                   }),

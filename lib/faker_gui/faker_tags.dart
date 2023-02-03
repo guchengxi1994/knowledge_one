@@ -244,7 +244,7 @@ class FakerTagsState extends State<FakerTags> {
                     }));
               }
             } catch (e) {
-              print(e.toString());
+              debugPrint(e.toString());
             }
           },
         );
