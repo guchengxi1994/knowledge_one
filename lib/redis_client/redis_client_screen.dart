@@ -96,6 +96,7 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
             if (res.isNotEmpty) {
               model.value = res[1];
               model.valueType = res[0];
+              model.ttl = res[2];
               setState(() {});
             }
           },
@@ -147,6 +148,7 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
             if (res.isNotEmpty()) {
               model.value = res[1];
               model.valueType = res[0];
+              model.ttl = res[2];
               setState(() {});
             }
           },
@@ -157,12 +159,13 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
     });
 
     return UsefulSimpleDatatable2(
-      columns: const ["编号", "key", "value", "值类型"],
+      columns: const ["编号", "key", "value", "值类型", "TTL"],
       columnWidth: const [
         indexColumnWidth,
         keyColumnWidth,
         valueColumnWidth,
-        typeColumnWidth
+        typeColumnWidth,
+        ttlColumnWidth
       ],
       dataProvider: dataProvider,
     );

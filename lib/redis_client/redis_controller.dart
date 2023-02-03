@@ -53,14 +53,15 @@ class RedisController extends ChangeNotifier {
 
     await conn.connect(url, port).then((Command command) async {
       String type = await getValType(s);
+      String ttl = (await getTTL(s)).toString();
       switch (type) {
         case "string":
           var val = await command.send_object(["GET", s]);
-          res = [type, val];
+          res = [type, val, ttl];
           break;
         case "list":
           var val = await command.send_object(["LLEN", s]);
-          res = [type, "为长度为$val的数组"];
+          res = [type, "为长度为$val的数组", ttl];
           break;
         default:
           res = [];
@@ -78,6 +79,19 @@ class RedisController extends ChangeNotifier {
 
     await conn.connect(url, port).then((Command command) async {
       res = await command.send_object(["TYPE", s]);
+    }).onError((error, stackTrace) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("redis 连接异常");
+    });
+
+    return res;
+  }
+
+  Future<dynamic> getTTL(String s) async {
+    var res = null;
+
+    await conn.connect(url, port).then((Command command) async {
+      res = await command.send_object(["TTL", s]);
     }).onError((error, stackTrace) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
