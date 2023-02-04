@@ -71,7 +71,13 @@ class _CreateRedisKeyValueDialogState extends State<CreateRedisKeyValueDialog> {
                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                     border: Border.all(
                         color: const Color.fromARGB(255, 232, 232, 232))),
-                dropdownItems: const ["string", "list"],
+                dropdownItems: const [
+                  "string",
+                  "list",
+                  "set",
+                  "hashes",
+                  "sorted_set"
+                ],
                 hint: '选择数据类型',
                 onChanged: (String? value) {
                   setState(() {
@@ -79,7 +85,10 @@ class _CreateRedisKeyValueDialogState extends State<CreateRedisKeyValueDialog> {
                     if (value == "string") {
                       height = 330;
                     }
-                    if (value == "list") {
+                    if (value == "list" ||
+                        value == "set" ||
+                        value == "hashes" ||
+                        value == "sorted_set") {
                       height = 400;
                     }
                   });
@@ -213,7 +222,10 @@ class _CreateRedisKeyValueDialogState extends State<CreateRedisKeyValueDialog> {
   Widget _valueRegion() {
     if (selectedType == null || selectedType == 'string') {
       return _textFieldWrapper("输入value", valController);
-    } else if (selectedType == 'list') {
+    } else if (selectedType == 'list' ||
+        selectedType == 'set' ||
+        selectedType == 'hashes' ||
+        selectedType == "sorted_set") {
       return Container(
           width: buttonWidth,
           height: 100,

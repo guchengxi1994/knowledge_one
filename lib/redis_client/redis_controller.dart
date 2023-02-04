@@ -8,6 +8,7 @@ import 'components/data_table.dart';
 
 class RedisController extends ChangeNotifier {
   late RedisConnection conn = RedisConnection();
+  late Command? command = null;
 
   /// default url and port
   String url = "localhost";
@@ -22,6 +23,9 @@ class RedisController extends ChangeNotifier {
   void updateRedisInfo(String u, int p) {
     url = u;
     port = p;
+    if (command != null) {
+      command = null;
+    }
   }
 
   List<RedisModel> currentQueriedKeys = [];
@@ -40,15 +44,17 @@ class RedisController extends ChangeNotifier {
   }
 
   Future<void> getProperKeys(String condition) async {
+    command ??= await conn.connect(url, port);
+
     List<dynamic> results = [];
     couldQuery = true;
     _currentOffset = 0;
-    await conn.connect(url, port).then((Command command) async {
-      results = await command.send_object(["KEYS", "$condition*"]);
-    }).onError((error, stackTrace) {
+    try {
+      results = await command!.send_object(["KEYS", "$condition*"]);
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
-    });
+    }
     // return results;
     currentQueriedKeys =
         results.map((e) => RedisModel(key: e.toString())).toList();
@@ -64,9 +70,11 @@ class RedisController extends ChangeNotifier {
   bool couldQuery = true;
 
   Future getRangeKeys({String pattern = "*"}) async {
-    await conn.connect(url, port).then((Command command) async {
-      final results =
-          await command.send_object(["SCAN", _currentOffset, "match", pattern]);
+    command ??= await conn.connect(url, port);
+
+    try {
+      final results = await command!
+          .send_object(["SCAN", _currentOffset, "match", pattern]);
       _currentOffset = int.tryParse(results.removeAt(0)) ?? 0;
       if (_currentOffset == 0) {
         couldQuery = false;
@@ -76,11 +84,11 @@ class RedisController extends ChangeNotifier {
       }).toList();
 
       notifyListeners();
-    }).onError((error, stackTrace) {
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
       return;
-    });
+    }
   }
 
   int get listCount => currentQueriedKeys.length;
@@ -98,124 +106,163 @@ class RedisController extends ChangeNotifier {
   }
 
   Future<dynamic> getVal(String s) async {
-    // var res = null;
+    command ??= await conn.connect(url, port);
     List res = [];
 
-    await conn.connect(url, port).then((Command command) async {
+    try {
       String type = await getValType(s);
       String ttl = (await getTTL(s)).toString();
       switch (type) {
         case "string":
-          var val = await command.send_object(["GET", s]);
+          var val = await command!.send_object(["GET", s]);
           res = [type, val, ttl];
           break;
         case "list":
-          var val = await command.send_object(["LLEN", s]);
+          var val = await command!.send_object(["LLEN", s]);
           res = [type, "长度为$val的数组", ttl];
+          break;
+        case "set":
+          var val = await command!.send_object(["SCARD", s]);
+          res = [type, "长度为$val的集合", ttl];
+          break;
+        case "hash":
+          var val = await command!.send_object(["HLEN", s]);
+          res = [type, "长度为$val的hash集合", ttl];
+          break;
+        case "sorted_set":
+          var val = await command!.send_object(["ZCARD", s]);
+          res = [type, "长度为$val的sorted set", ttl];
           break;
         default:
           res = [];
       }
-    }).onError((error, stackTrace) {
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
-    });
+    }
 
     return res;
   }
 
   Future<dynamic> getValType(String s) async {
+    command ??= await conn.connect(url, port);
     var res = null;
 
-    await conn.connect(url, port).then((Command command) async {
-      res = await command.send_object(["TYPE", s]);
-    }).onError((error, stackTrace) {
+    try {
+      res = await command!.send_object(["TYPE", s]);
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
-    });
+    }
 
     return res;
   }
 
   Future<dynamic> getTTL(String s) async {
+    command ??= await conn.connect(url, port);
     var res = null;
 
-    await conn.connect(url, port).then((Command command) async {
-      res = await command.send_object(["TTL", s]);
-    }).onError((error, stackTrace) {
+    try {
+      res = await command!.send_object(["TTL", s]);
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
-    });
+    }
 
     return res;
   }
 
   Future testConnection() async {
     debugPrint("[redis]: url=> $url, port=> $port");
-    await conn.connect(url, port).then((Command command) async {
-      await command.send_nothing();
+    if (command != null) {
+      print("aaa");
       SmartDialogUtils.message("连接成功");
-    }).onError((error, stackTrace) {
-      debugPrint(error.toString());
-      SmartDialogUtils.error("redis 连接异常");
-    });
+    } else {
+      try {
+        command = await conn.connect(url, port);
+        SmartDialogUtils.message("连接成功");
+      } catch (e) {
+        SmartDialogUtils.error("redis 连接异常");
+      }
+    }
   }
 
   Future expiredInSecond(String key, int time) async {
-    await conn.connect(url, port).then((Command command) async {
-      await command.send_object(["EXPIRE", key, time]);
-    }).onError((error, stackTrace) {
+    command ??= await conn.connect(url, port);
+    try {
+      await command!.send_object(["EXPIRE", key, time]);
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("设置过期时间失败");
-    });
+    }
   }
 
   Future expiredInMillisecond(String key, int time) async {
-    await conn.connect(url, port).then((Command command) async {
-      await command.send_object(["PEXPIRE", key, time]);
-    }).onError((error, stackTrace) {
+    command ??= await conn.connect(url, port);
+    try {
+      await command!.send_object(["PEXPIRE", key, time]);
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("设置过期时间失败");
-    });
+    }
   }
 
   Future expiredInTimestamp(String key, int time) async {
-    await conn.connect(url, port).then((Command command) async {
-      await command.send_object(["EXPIREAT", key, time]);
-    }).onError((error, stackTrace) {
+    command ??= await conn.connect(url, port);
+    try {
+      await command!.send_object(["EXPIREAT", key, time]);
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("设置过期时间失败");
-    });
+    }
   }
 
   Future expiredInMilliTimestamp(String key, int time) async {
-    await conn.connect(url, port).then((Command command) async {
-      await command.send_object(["PEXPIREAT", key, time]);
-    }).onError((error, stackTrace) {
+    command ??= await conn.connect(url, port);
+    try {
+      await command!.send_object(["PEXPIREAT", key, time]);
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("设置过期时间失败");
-    });
+    }
   }
 
   Future<int> setNewKV(String key, String val, String valType) async {
+    command ??= await conn.connect(url, port);
     int res = 1;
-    await conn.connect(url, port).then((Command command) async {
+    try {
       if (valType == 'string') {
-        await command.send_object(["SET", key, val]);
-        return;
+        await command!.send_object(["SET", key, val]);
       }
       if (valType == 'list') {
         List<String> vals = val.split(";");
         for (final i in vals) {
-          await command.send_object(["LPUSH", key, i]);
+          await command!.send_object(["LPUSH", key, i]);
         }
-        return;
       }
-    }).onError((error, stackTrace) {
+      if (valType == 'set') {
+        List<String> vals = val.split(";");
+        for (final i in vals) {
+          await command!.send_object(["SADD", key, i]);
+        }
+      }
+      if (valType == 'hashes') {
+        List<String> vals = val.split(";");
+        for (final i in vals) {
+          await command!.send_object(["HSET", key, i.toString()]);
+        }
+      }
+      if (valType == 'sorted_set') {
+        List<String> vals = val.split(";");
+        for (final i in vals) {
+          await command!.send_object(["ZSET", key, i]);
+        }
+      }
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("新建失败");
       res = -1;
-    });
+    }
     return res;
   }
 
@@ -224,31 +271,41 @@ class RedisController extends ChangeNotifier {
       return 1;
     }
 
+    command ??= await conn.connect(url, port);
+
     int res = 1;
 
-    await conn.connect(url, port).then((Command command) async {
+    try {
       if (expireType == 'seconds') {
         await expiredInSecond(key, time);
-        return;
       }
       if (expireType == 'milliseconds') {
         await expiredInMillisecond(key, time);
-        return;
       }
       if (expireType == 'timestamp') {
         await expiredInTimestamp(key, time);
-        return;
       }
       if (expireType == 'milli-timestamp') {
         await expiredInMilliTimestamp(key, time);
-        return;
       }
-    }).onError((error, stackTrace) {
+    } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("设置时间失败");
       res = -1;
-    });
+    }
 
     return res;
+  }
+
+  Future delete(RedisModel model) async {
+    command ??= await conn.connect(url, port);
+    try {
+      await command!.send_object(["DEL", model.key.toString()]);
+      currentQueriedKeys.remove(model);
+      notifyListeners();
+    } catch (error) {
+      debugPrint(error.toString());
+      SmartDialogUtils.error("删除失败");
+    }
   }
 }

@@ -35,6 +35,14 @@ class AppStyle {
   static Color appGreen = const Color.fromARGB(255, 40, 255, 115);
 
   static const double fileWidgetSize = 70;
+
+  static const Map<String, Color> redisTypeColorMap = {
+    "list": Colors.greenAccent,
+    "string": Colors.purpleAccent,
+    "hash": Colors.blueAccent,
+    "set": Colors.brown,
+    "default": Colors.blueGrey
+  };
 }
 
 class HexColor extends Color {

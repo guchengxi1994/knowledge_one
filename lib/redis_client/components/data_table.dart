@@ -9,6 +9,8 @@ import 'package:knowledge_one/utils/extensions/date_time_extension.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
+import 'simple_tag.dart';
+
 const double keyColumnWidth = 100;
 const double valueColumnWidth = 300;
 const double indexColumnWidth = 50;
@@ -31,12 +33,13 @@ class RedisModel {
 class RedisData {
   final int index;
   RedisModel model;
-  RedisData(
-      {required this.index,
-      required this.model,
-      this.onKeyModified,
-      required this.onValueGet,
-      this.onValueModified});
+  RedisData({
+    required this.index,
+    required this.model,
+    this.onKeyModified,
+    required this.onValueGet,
+    this.onValueModified,
+  });
   final VoidCallback? onKeyModified;
   final VoidCallback? onValueModified;
   final VoidCallback onValueGet;
@@ -78,9 +81,9 @@ class RedisData {
       ),
       SizedBox(
         width: typeColumnWidth,
-        child: model.value == null
-            ? const Text("***")
-            : Text(model.valueType.toString()),
+        child: SimpleTag(
+          value: model.valueType,
+        ),
       ),
       SizedBox(
         width: ttlColumnWidth,
