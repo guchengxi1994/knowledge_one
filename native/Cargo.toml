@@ -26,6 +26,8 @@ sqlx = { version = "0.6", features = [ "runtime-tokio-native-tls" ,"sqlite" ,"my
 structopt = "0.3"
 tokio = { version = "1", features = ["full"] }
 svgcleaner = "0.9.5"  # svg清理
+sysinfo = "0.27.7"
+
 
 [build-dependencies]
 flutter_rust_bridge_codegen = "1"

@@ -12,6 +12,11 @@ pub fn wire_get_faker_locale(port_: MessagePort, config_path: String) {
 }
 
 #[wasm_bindgen]
+pub fn wire_get_redis_memory(port_: MessagePort) {
+    wire_get_redis_memory_impl(port_)
+}
+
+#[wasm_bindgen]
 pub fn wire_get_app_config(port_: MessagePort, config_path: String) {
     wire_get_app_config_impl(port_, config_path)
 }

@@ -6,6 +6,7 @@ mod database;
 mod storage;
 pub mod svg;
 pub mod constants;
+pub mod native_sysinfo;
 
 #[macro_use]
 #[deprecated="unused"]

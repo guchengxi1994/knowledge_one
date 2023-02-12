@@ -9,7 +9,7 @@ use crate::{
         },
     },
     storage,
-    svg::{file_cleaner, string_cleaner, CleanerResult},
+    svg::{file_cleaner, string_cleaner, CleanerResult}, native_sysinfo::get_redis_server_memory,
 };
 use futures::executor::block_on;
 
@@ -32,6 +32,11 @@ pub fn get_faker_locale(config_path: String) -> Vec<String> {
             return Vec::new();
         }
     }
+}
+
+/// 获取redis 占用的内存
+pub fn get_redis_memory()->String{
+    get_redis_server_memory()
 }
 
 /// 获取所有Config

@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
-import 'package:code_text_field/code_text_field.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
 
 import 'package:highlight/languages/all.dart' as lang;
 import 'package:flutter_highlight/themes/vs2015.dart';
@@ -39,7 +39,7 @@ class CodePreviewState extends State<CodePreview> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
         child: CodeTheme(
-      data: const CodeThemeData(styles: vs2015Theme),
+      data: CodeThemeData(styles: vs2015Theme),
       child: CodeField(
           maxLines: null,
           controller: _codeController!,

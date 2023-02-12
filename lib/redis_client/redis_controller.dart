@@ -1,10 +1,52 @@
 // ignore_for_file: avoid_init_to_null
 
+import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
+import 'package:knowledge_one/bridge/native.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:redis/redis.dart';
 
 import 'components/data_table.dart';
+
+class RedisConnectionDetails {
+  int connectedClients;
+  int clientLongestOutputList;
+  int clientBiggestInputBuf;
+  int blockedClients;
+
+  RedisConnectionDetails(
+      {required this.blockedClients,
+      required this.clientBiggestInputBuf,
+      required this.clientLongestOutputList,
+      required this.connectedClients});
+
+  static RedisConnectionDetails fromList(List<String> l) {
+    var l0 = l[1];
+    var l1 = l[2];
+    var l2 = l[3];
+    var l3 = l[4];
+    return RedisConnectionDetails(
+        blockedClients: int.tryParse(l3.split(":").last) ?? 0,
+        clientBiggestInputBuf: int.tryParse(l2.split(":").last) ?? 0,
+        clientLongestOutputList: int.tryParse(l1.split(":").last) ?? 0,
+        connectedClients: int.tryParse(l0.split(":").last) ?? 0);
+  }
+}
+
+class RedisMemoryDetails {
+  String usedMemory;
+  String peakUsedMemory;
+
+  RedisMemoryDetails({required this.peakUsedMemory, required this.usedMemory});
+
+  static RedisMemoryDetails fromList(List<String> l) {
+    var l0 = l[2];
+    var l1 = l[5];
+
+    return RedisMemoryDetails(
+        usedMemory: l0.split(":").last, peakUsedMemory: l1.split(":").last);
+  }
+}
 
 class RedisController extends ChangeNotifier {
   late RedisConnection conn = RedisConnection();
@@ -13,6 +55,8 @@ class RedisController extends ChangeNotifier {
   /// default url and port
   String url = "localhost";
   int port = 6379;
+
+  static const int refreshTime = 5;
 
   /// Tls
   String username = "";
@@ -25,6 +69,81 @@ class RedisController extends ChangeNotifier {
     port = p;
     if (command != null) {
       command = null;
+    }
+  }
+
+  dropConnection() {
+    conn.close();
+  }
+
+  Stream<String> getMemoryUsed() async* {
+    while (true) {
+      if (url != "localhost" && url != "127.0.0.1") {
+        yield "";
+      } else {
+        var s = await api.getRedisMemory();
+        if (s == "") {
+          yield "";
+        } else {
+          yield filesize(s);
+        }
+      }
+      await Future.delayed(const Duration(seconds: refreshTime));
+    }
+  }
+
+  Stream<RedisMemoryDetails> getMemoryDetails() async* {
+    while (true) {
+      try {
+        List<String> res = [];
+        command ??= await conn.connect(url, port);
+        String r = await command!.send_object(["info", "memory"]);
+        // await conn.connect(url, port).then((Command command) async {
+        //   String r = await command.send_object(["info", "clients"]);
+        if (DevUtils.isWindows) {
+          res = r.split("\r\n");
+        } else {
+          res = r.split("\n");
+        }
+        // });
+        // debugPrint(res.toString());
+        if (res.length != 10) {
+          debugPrint(res.length.toString());
+          throw Exception("[RedisMemoryDetails] wrong list length");
+        }
+        yield RedisMemoryDetails.fromList(res);
+      } catch (e) {
+        debugPrint(e.toString());
+      } finally {}
+      await Future.delayed(const Duration(seconds: refreshTime));
+    }
+  }
+
+  /// 获取当前client连接数
+  Stream<RedisConnectionDetails> getClientCount() async* {
+    while (true) {
+      try {
+        List<String> res = [];
+        command ??= await conn.connect(url, port);
+        String r = await command!.send_object(["info", "clients"]);
+        // await conn.connect(url, port).then((Command command) async {
+        //   String r = await command.send_object(["info", "clients"]);
+        if (DevUtils.isWindows) {
+          res = r.split("\r\n");
+        } else {
+          res = r.split("\n");
+        }
+        // });
+        // debugPrint(res.toString());
+        if (res.length != 6) {
+          debugPrint(res.length.toString());
+          throw Exception("[RedisConnectionDetails] wrong list length");
+        }
+        yield RedisConnectionDetails.fromList(res);
+      } catch (e) {
+        debugPrint(e.toString());
+      } finally {}
+      await Future.delayed(const Duration(seconds: refreshTime));
     }
   }
 

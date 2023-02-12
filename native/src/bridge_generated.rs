@@ -58,6 +58,16 @@ fn wire_get_faker_locale_impl(port_: MessagePort, config_path: impl Wire2Api<Str
         },
     )
 }
+fn wire_get_redis_memory_impl(port_: MessagePort) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "get_redis_memory",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || move |task_callback| Ok(get_redis_memory()),
+    )
+}
 fn wire_get_app_config_impl(port_: MessagePort, config_path: impl Wire2Api<String> + UnwindSafe) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap(
         WrapInfo {
@@ -472,6 +482,13 @@ impl support::IntoDartExceptPrimitive for TodoStatus {}
 support::lazy_static! {
     pub static ref FLUTTER_RUST_BRIDGE_HANDLER: support::DefaultHandler = Default::default();
 }
+
+/// cbindgen:ignore
+#[cfg(target_family = "wasm")]
+#[path = "bridge_generated.web.rs"]
+mod web;
+#[cfg(target_family = "wasm")]
+pub use web::*;
 
 #[cfg(not(target_family = "wasm"))]
 #[path = "bridge_generated.io.rs"]

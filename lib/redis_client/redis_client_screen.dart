@@ -34,6 +34,62 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildTitle(),
+            if (hasQueried)
+              Container(
+                margin: const EdgeInsets.only(top: 10, bottom: 10),
+                child: Wrap(
+                  children: [
+                    StreamBuilder(
+                        stream: connectionDetails,
+                        builder: (c, s) {
+                          // return Text((s.data?.connectedClients ?? "").toString());
+                          return Text.rich(TextSpan(children: [
+                            const TextSpan(text: "当前客户端连接数量"),
+                            TextSpan(
+                                text:
+                                    (s.data?.connectedClients ?? "").toString(),
+                                style:
+                                    const TextStyle(color: Colors.blueAccent)),
+                          ]));
+                        }),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    StreamBuilder(
+                        stream: memoryDetails,
+                        builder: (c, s) {
+                          // return Text((s.data?.connectedClients ?? "").toString());
+                          return Text.rich(TextSpan(children: [
+                            const TextSpan(text: "当前使用空间"),
+                            TextSpan(
+                                text: s.data?.usedMemory ?? "",
+                                style:
+                                    const TextStyle(color: Colors.blueAccent)),
+                            const TextSpan(text: "  使用空间峰值"),
+                            TextSpan(
+                                text: s.data?.peakUsedMemory ?? "",
+                                style:
+                                    const TextStyle(color: Colors.blueAccent)),
+                          ]));
+                        }),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    StreamBuilder(
+                        stream: memoryUsed,
+                        builder: (c, s) {
+                          if (s.data == "") {
+                            return const Text("");
+                          }
+                          return Text("当前redis内存占用：${s.data}");
+                        }),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    const Text("刷新间隔5秒", style: TextStyle(color: Colors.green)),
+                  ],
+                ),
+              ),
             Expanded(child: _buildContent()),
             _buildBottom(),
           ],
@@ -52,6 +108,15 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
 
   String bottomText = "";
   bool hasQueried = false;
+
+  late final Stream<RedisConnectionDetails> connectionDetails =
+      context.read<RedisController>().getClientCount();
+
+  late final Stream<RedisMemoryDetails> memoryDetails =
+      context.read<RedisController>().getMemoryDetails();
+
+  late final Stream<String> memoryUsed =
+      context.read<RedisController>().getMemoryUsed();
 
   @override
   void dispose() {
