@@ -1,7 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:pdfx/pdfx.dart';
 
 class PdfViewerScreen extends StatelessWidget {
   const PdfViewerScreen(
@@ -12,6 +10,9 @@ class PdfViewerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final pdfController =
+        PdfController(document: PdfDocument.openFile(filePath));
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -31,7 +32,9 @@ class PdfViewerScreen extends StatelessWidget {
           style: const TextStyle(color: Colors.black),
         ),
       ),
-      body: SfPdfViewer.file(File(filePath)),
+      body: PdfView(
+        controller: pdfController,
+      ),
     );
   }
 }

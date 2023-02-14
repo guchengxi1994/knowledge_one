@@ -175,29 +175,30 @@ class RedisDataTable extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         child: SingleChildScrollView(
                           controller: controller,
-                          child: DataTable(
-                            horizontalMargin: 0,
-                            dividerThickness: 1,
-                            columnSpacing: 0,
-                            rows: data
-                                .map((e) => DataRow(
-                                    cells: e
-                                        .toWidgetList()
-                                        .mapIndexed(
-                                            (i, e1) => DataCell(SizedBox(
-                                                  width: columnWidth[i],
-                                                  child: e1,
-                                                )))
-                                        .toList()))
-                                .toList(),
-                            columns: titles
-                                .mapIndexed((i, e) => DataColumn(
-                                        label: SizedBox(
-                                      width: columnWidth[i],
-                                      child: Text(e),
-                                    )))
-                                .toList(),
-                          ),
+                          // child: DataTable(
+                          //   horizontalMargin: 0,
+                          //   dividerThickness: 1,
+                          //   columnSpacing: 0,
+                          //   rows: data
+                          //       .map((e) => DataRow(
+                          //           cells: e
+                          //               .toWidgetList()
+                          //               .mapIndexed(
+                          //                   (i, e1) => DataCell(SizedBox(
+                          //                         width: columnWidth[i],
+                          //                         child: e1,
+                          //                       )))
+                          //               .toList()))
+                          //       .toList(),
+                          //   columns: titles
+                          //       .mapIndexed((i, e) => DataColumn(
+                          //               label: SizedBox(
+                          //             width: columnWidth[i],
+                          //             child: Text(e),
+                          //           )))
+                          //       .toList(),
+                          // ),
+                          child: _buildTable(),
                         )),
                   )),
         Center(
@@ -207,6 +208,36 @@ class RedisDataTable extends StatelessWidget {
             },
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildTable() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SizedBox(
+          height: 50,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: titles
+                .mapIndexed((i, e) => SizedBox(
+                      width: columnWidth[i],
+                      child: Text(e),
+                    ))
+                .toList(),
+          ),
+        ),
+        ...data
+            .map((e) => Row(
+                children: e
+                    .toWidgetList()
+                    .mapIndexed((i, e1) => SizedBox(
+                          width: columnWidth[i],
+                          child: e1,
+                        ))
+                    .toList()))
+            .toList(),
       ],
     );
   }
