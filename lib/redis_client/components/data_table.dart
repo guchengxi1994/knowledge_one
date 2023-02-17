@@ -2,14 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
-import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:knowledge_one/common/app_style.dart';
 import 'package:knowledge_one/main/providers/page_controller.dart';
 import 'package:knowledge_one/redis_client/redis_controller.dart';
-import 'package:knowledge_one/utils/extensions/date_time_extension.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 
+import '../model.dart';
 import 'simple_tag.dart';
 
 const double keyColumnWidth = 100;
@@ -17,95 +16,6 @@ const double valueColumnWidth = 300;
 const double indexColumnWidth = 50;
 const double typeColumnWidth = 75;
 const double ttlColumnWidth = 125;
-
-class RedisModel {
-  final dynamic key;
-  dynamic value = null;
-  dynamic valueType = null;
-  dynamic ttl = null;
-  RedisModel({required this.key});
-
-  @override
-  String toString() {
-    return "key: $key type:$valueType val:$value";
-  }
-}
-
-class RedisData {
-  final int index;
-  RedisModel model;
-  RedisData({
-    required this.index,
-    required this.model,
-    this.onKeyModified,
-    this.onValueModified,
-  });
-  final VoidCallback? onKeyModified;
-  final VoidCallback? onValueModified;
-  // final VoidCallback onValueGet;
-
-  List<Widget> toWidgetList() {
-    int t;
-    if (model.ttl == null) {
-      t = 0;
-    } else {
-      t = int.tryParse(model.ttl) ?? 0;
-    }
-
-    return [
-      SizedBox(
-        width: indexColumnWidth,
-        child: Text(index.toString()),
-      ),
-      SizedBox(
-        width: typeColumnWidth,
-        child: SimpleTag(
-          value: model.valueType,
-        ),
-      ),
-      SizedBox(
-        width: keyColumnWidth,
-        child: Text(model.key.toString()),
-      ),
-      // SizedBox(
-      //   width: valueColumnWidth,
-      //   child: InkWell(
-      //     onTap: () {
-      //       PageChangeController.drawerKey.currentState!.openEndDrawer();
-      //     },
-      //     child: Text(model.value.toString()),
-      //   ),
-      // ),
-
-      // SizedBox(
-      //   width: ttlColumnWidth,
-      //   child: model.ttl == null
-      //       ? const Text("***")
-      //       : Row(
-      //           children: [
-      //             Text(model.ttl.toString()),
-      //             const Expanded(child: SizedBox()),
-      //             JustTheTooltip(
-      //                 content: Padding(
-      //                   padding: const EdgeInsets.all(10),
-      //                   child: model.ttl == 0
-      //                       ? const Text("无效的时间")
-      //                       : t == -1
-      //                           ? const Text("永久有效")
-      //                           : Text(DateTime.fromMillisecondsSinceEpoch(
-      //                                   t * 1000)
-      //                               .toChinese()),
-      //                 ),
-      //                 child: const Icon(
-      //                   Icons.info,
-      //                   color: Colors.blueAccent,
-      //                 ))
-      //           ],
-      //         ),
-      // ),
-    ];
-  }
-}
 
 typedef OnPageChanged = Future Function(int index);
 
@@ -122,7 +32,7 @@ class RedisDataTable extends StatelessWidget {
 
   late List<String> titles = [
     "编号",
-    "TTL",
+    "类型",
     "key",
   ];
 
@@ -166,39 +76,30 @@ class RedisDataTable extends StatelessWidget {
                 ? const Center(
                     child: Text("暂无内容"),
                   )
-                : Scrollbar(
-                    controller: controller2,
-                    thumbVisibility: true,
-                    child: SingleChildScrollView(
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Scrollbar(
                         controller: controller2,
-                        scrollDirection: Axis.horizontal,
+                        thumbVisibility: true,
                         child: SingleChildScrollView(
-                          controller: controller,
-                          // child: DataTable(
-                          //   horizontalMargin: 0,
-                          //   dividerThickness: 1,
-                          //   columnSpacing: 0,
-                          //   rows: data
-                          //       .map((e) => DataRow(
-                          //           cells: e
-                          //               .toWidgetList()
-                          //               .mapIndexed(
-                          //                   (i, e1) => DataCell(SizedBox(
-                          //                         width: columnWidth[i],
-                          //                         child: e1,
-                          //                       )))
-                          //               .toList()))
-                          //       .toList(),
-                          //   columns: titles
-                          //       .mapIndexed((i, e) => DataColumn(
-                          //               label: SizedBox(
-                          //             width: columnWidth[i],
-                          //             child: Text(e),
-                          //           )))
-                          //       .toList(),
-                          // ),
-                          child: _buildTable(context),
-                        )),
+                            controller: controller2,
+                            scrollDirection: Axis.horizontal,
+                            child: SingleChildScrollView(
+                              controller: controller,
+                              child: _buildTable(context),
+                            )),
+                      ),
+                      Expanded(
+                          child: Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[200]!)),
+                        child: context.watch<RedisController>().valueWidget ??
+                            defaultWidget(),
+                      ))
+                    ],
                   )),
         Center(
           child: UsefulDatatableIndicator2(
@@ -257,8 +158,7 @@ class RedisDataTable extends StatelessWidget {
                                 color: Color.fromARGB(255, 236, 239, 242)))),
                     height: 50,
                     child: Row(
-                        children: e
-                            .toWidgetList()
+                        children: toWidgetList(e, context)
                             .mapIndexed((i, e1) => SizedBox(
                                   width: columnWidth[i],
                                   child: e1,
@@ -271,5 +171,36 @@ class RedisDataTable extends StatelessWidget {
 
       // Expanded(child: Container())
     );
+  }
+
+  List<Widget> toWidgetList(RedisData data, BuildContext ctx) {
+    int t;
+    if (data.model.ttl == null) {
+      t = 0;
+    } else {
+      t = int.tryParse(data.model.ttl) ?? 0;
+    }
+
+    return [
+      SizedBox(
+        width: indexColumnWidth,
+        child: Text(data.index.toString()),
+      ),
+      SizedBox(
+        width: typeColumnWidth,
+        child: SimpleTag(
+          value: data.model.valueType,
+        ),
+      ),
+      SizedBox(
+        width: keyColumnWidth,
+        child: InkWell(
+            onTap: () {
+              // debugPrint(data.model.key);
+              ctx.read<RedisController>().changeValueWidget(data);
+            },
+            child: Text(data.model.key.toString())),
+      ),
+    ];
   }
 }

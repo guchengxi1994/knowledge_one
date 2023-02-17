@@ -7,6 +7,7 @@ import 'package:knowledge_one/utils/utils.dart';
 import 'package:redis/redis.dart';
 
 import 'components/data_table.dart';
+import 'model.dart';
 
 class RedisConnectionDetails {
   int connectedClients;
@@ -309,7 +310,6 @@ class RedisController extends ChangeNotifier {
   Future testConnection() async {
     debugPrint("[redis]: url=> $url, port=> $port");
     if (command != null) {
-      print("aaa");
       SmartDialogUtils.message("连接成功");
     } else {
       try {
@@ -441,5 +441,15 @@ class RedisController extends ChangeNotifier {
       debugPrint(error.toString());
       SmartDialogUtils.error("删除失败");
     }
+  }
+
+  Widget? valueWidget = null;
+
+  changeValueWidget(RedisData data) {
+    valueWidget = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [Text(data.model.value.toString())],
+    );
+    notifyListeners();
   }
 }

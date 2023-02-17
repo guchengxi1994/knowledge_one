@@ -10,6 +10,7 @@ import '../common/base_sub_screens.dart';
 import 'components/create_k_v_dialog.dart';
 import 'components/data_table.dart';
 import 'components/tls_switch.dart';
+import 'model.dart';
 
 class RedisClientScreen extends BaseSubScreen {
   RedisClientScreen({Key? key})
