@@ -126,7 +126,7 @@ class _WorkboardScreenState extends State<WorkboardScreen> with WindowListener {
                       SvgCleanerScreen(),
                       const FakerScreen(),
                       const CodeGenerateScreen(),
-                      const RedisClientScreen()
+                      RedisClientScreen()
                     ],
                   ),
                 )

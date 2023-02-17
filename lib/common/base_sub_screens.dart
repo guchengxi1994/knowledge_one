@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../main/providers/page_controller.dart';
+
 abstract class BaseSubScreen extends StatefulWidget {
   const BaseSubScreen(
-      {Key? key, this.actions = const [], required this.title, this.leading})
+      {Key? key,
+      this.actions = const [],
+      required this.title,
+      this.leading,
+      this.endDrawer})
       : super(key: key);
   final List<Widget> actions;
   final String title;
   final Widget? leading;
+  final Builder? endDrawer;
 
   @override
   State<BaseSubScreen> createState() {
@@ -21,6 +28,9 @@ class BaseSubScreenState<T extends BaseSubScreen> extends State<T> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: PageChangeController.drawerKey,
+      endDrawer: widget.endDrawer,
+      drawerEnableOpenDragGesture: false,
       body: Container(
           decoration: BoxDecoration(
               color: Colors.white,

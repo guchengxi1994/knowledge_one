@@ -7,12 +7,12 @@ class SimpleTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 40),
-      child: value == null
-          ? const Text("***")
-          : Container(
-              width: 50,
+    return value == null
+        ? const Text("***")
+        : Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              width: value!.length * 13.5,
               height: 30,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
@@ -26,6 +26,6 @@ class SimpleTag extends StatelessWidget {
                 ),
               ),
             ),
-    );
+          );
   }
 }

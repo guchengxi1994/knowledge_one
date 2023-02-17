@@ -12,7 +12,16 @@ import 'components/data_table.dart';
 import 'components/tls_switch.dart';
 
 class RedisClientScreen extends BaseSubScreen {
-  const RedisClientScreen({Key? key}) : super(key: key, title: "Redis Client");
+  RedisClientScreen({Key? key})
+      : super(
+            key: key,
+            title: "Redis Client",
+            endDrawer: Builder(
+                builder: (context) => Container(
+                      width: 200,
+                      height: 1000,
+                      color: Colors.blue,
+                    )));
 
   @override
   State<RedisClientScreen> createState() => _RedisClientScreenState();
@@ -168,10 +177,6 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
         return RedisData(
           index: i + 1,
           model: e,
-          onValueGet: () async {
-            await context.read<RedisController>().changeModel(i, e);
-            setState(() {});
-          },
         );
       }).toList(),
     );

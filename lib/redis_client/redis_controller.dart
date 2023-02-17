@@ -52,6 +52,12 @@ class RedisController extends ChangeNotifier {
   late RedisConnection conn = RedisConnection();
   late Command? command = null;
 
+  int currentHoveredRowId = -1;
+  changeCurrentHoveredRowId(int id) {
+    currentHoveredRowId = id;
+    notifyListeners();
+  }
+
   /// default url and port
   String url = "localhost";
   int port = 6379;
@@ -201,6 +207,15 @@ class RedisController extends ChangeNotifier {
       currentQueriedKeys = (results[0] as List).map((e) {
         return RedisModel(key: e.toString());
       }).toList();
+
+      for (final i in currentQueriedKeys) {
+        final val = await getVal(i.key);
+        if (val.isNotEmpty) {
+          i.value = val[1];
+          i.valueType = val[0];
+          i.ttl = val[2];
+        }
+      }
 
       notifyListeners();
     } catch (error) {

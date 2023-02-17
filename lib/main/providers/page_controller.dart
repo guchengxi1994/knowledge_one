@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class PageChangeController extends ChangeNotifier {
   final PageController controller;
   PageChangeController({required this.controller});
+  static GlobalKey<ScaffoldState> drawerKey = GlobalKey();
 
   bool collapse = false;
 

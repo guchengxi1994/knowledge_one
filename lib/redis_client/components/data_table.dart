@@ -5,6 +5,7 @@ import 'package:flutter_useful_widgets/flutter_useful_widgets.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:knowledge_one/common/app_style.dart';
 import 'package:knowledge_one/main/providers/page_controller.dart';
+import 'package:knowledge_one/redis_client/redis_controller.dart';
 import 'package:knowledge_one/utils/extensions/date_time_extension.dart';
 import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
@@ -37,12 +38,11 @@ class RedisData {
     required this.index,
     required this.model,
     this.onKeyModified,
-    required this.onValueGet,
     this.onValueModified,
   });
   final VoidCallback? onKeyModified;
   final VoidCallback? onValueModified;
-  final VoidCallback onValueGet;
+  // final VoidCallback onValueGet;
 
   List<Widget> toWidgetList() {
     int t;
@@ -58,59 +58,51 @@ class RedisData {
         child: Text(index.toString()),
       ),
       SizedBox(
-        width: keyColumnWidth,
-        child: Text(model.key.toString()),
-      ),
-      SizedBox(
-        width: valueColumnWidth,
-        child: model.value == null
-            ? InkWell(
-                focusColor: Colors.transparent,
-                hoverColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                splashColor: Colors.transparent,
-                onTap: () {
-                  onValueGet();
-                },
-                child: const Text(
-                  "***",
-                  style: TextStyle(color: Colors.blueAccent),
-                ),
-              )
-            : Text(model.value.toString()),
-      ),
-      SizedBox(
         width: typeColumnWidth,
         child: SimpleTag(
           value: model.valueType,
         ),
       ),
       SizedBox(
-        width: ttlColumnWidth,
-        child: model.ttl == null
-            ? const Text("***")
-            : Row(
-                children: [
-                  Text(model.ttl.toString()),
-                  const Expanded(child: SizedBox()),
-                  JustTheTooltip(
-                      content: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: model.ttl == 0
-                            ? const Text("无效的时间")
-                            : t == -1
-                                ? const Text("永久有效")
-                                : Text(DateTime.fromMillisecondsSinceEpoch(
-                                        t * 1000)
-                                    .toChinese()),
-                      ),
-                      child: const Icon(
-                        Icons.info,
-                        color: Colors.blueAccent,
-                      ))
-                ],
-              ),
+        width: keyColumnWidth,
+        child: Text(model.key.toString()),
       ),
+      // SizedBox(
+      //   width: valueColumnWidth,
+      //   child: InkWell(
+      //     onTap: () {
+      //       PageChangeController.drawerKey.currentState!.openEndDrawer();
+      //     },
+      //     child: Text(model.value.toString()),
+      //   ),
+      // ),
+
+      // SizedBox(
+      //   width: ttlColumnWidth,
+      //   child: model.ttl == null
+      //       ? const Text("***")
+      //       : Row(
+      //           children: [
+      //             Text(model.ttl.toString()),
+      //             const Expanded(child: SizedBox()),
+      //             JustTheTooltip(
+      //                 content: Padding(
+      //                   padding: const EdgeInsets.all(10),
+      //                   child: model.ttl == 0
+      //                       ? const Text("无效的时间")
+      //                       : t == -1
+      //                           ? const Text("永久有效")
+      //                           : Text(DateTime.fromMillisecondsSinceEpoch(
+      //                                   t * 1000)
+      //                               .toChinese()),
+      //                 ),
+      //                 child: const Icon(
+      //                   Icons.info,
+      //                   color: Colors.blueAccent,
+      //                 ))
+      //           ],
+      //         ),
+      // ),
     ];
   }
 }
@@ -128,37 +120,44 @@ class RedisDataTable extends StatelessWidget {
 
   late List<double> columnWidth = [];
 
-  late List<String> titles = ["编号", "key", "value", "值类型", "TTL"];
+  late List<String> titles = [
+    "编号",
+    "TTL",
+    "key",
+  ];
 
-  static const _width = indexColumnWidth +
-      keyColumnWidth +
-      valueColumnWidth +
-      typeColumnWidth +
-      ttlColumnWidth;
+  static const _width = indexColumnWidth + keyColumnWidth + typeColumnWidth;
+
+  late double total;
 
   @override
   Widget build(BuildContext context) {
     // debugPrint(notifier.value.length.toString());
-    double extra;
+
     if (context.select<PageChangeController, bool>((v) => v.collapse)) {
-      extra = MediaQuery.of(context).size.width -
+      total = (MediaQuery.of(context).size.width -
           50 -
-          AppStyle.sideMenuWidthCollapse;
+          AppStyle.sideMenuWidthCollapse);
     } else {
-      extra = MediaQuery.of(context).size.width - 50 - AppStyle.sideMenuWidth;
+      total = MediaQuery.of(context).size.width - 50 - AppStyle.sideMenuWidth;
     }
+
+    double extra = total * 0.5;
 
     if (extra < _width) {
       extra = _width;
+      columnWidth = [
+        indexColumnWidth / _width * total,
+        typeColumnWidth / _width * total,
+        keyColumnWidth / _width * total,
+      ];
+    } else {
+      columnWidth = [
+        indexColumnWidth / _width * extra,
+        typeColumnWidth / _width * extra,
+        keyColumnWidth / _width * extra,
+      ];
     }
-
-    columnWidth = [
-      indexColumnWidth / _width * extra,
-      keyColumnWidth / _width * extra,
-      valueColumnWidth / _width * extra,
-      typeColumnWidth / _width * extra,
-      ttlColumnWidth / _width * extra,
-    ];
 
     return Column(
       children: [
@@ -198,7 +197,7 @@ class RedisDataTable extends StatelessWidget {
                           //           )))
                           //       .toList(),
                           // ),
-                          child: _buildTable(),
+                          child: _buildTable(context),
                         )),
                   )),
         Center(
@@ -212,7 +211,13 @@ class RedisDataTable extends StatelessWidget {
     );
   }
 
-  Widget _buildTable() {
+  Widget defaultWidget() {
+    return const Center(
+      child: Text("点击key值，展示详细信息"),
+    );
+  }
+
+  Widget _buildTable(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
@@ -229,16 +234,42 @@ class RedisDataTable extends StatelessWidget {
           ),
         ),
         ...data
-            .map((e) => Row(
-                children: e
-                    .toWidgetList()
-                    .mapIndexed((i, e1) => SizedBox(
-                          width: columnWidth[i],
-                          child: e1,
-                        ))
-                    .toList()))
+            .map((e) => MouseRegion(
+                  onEnter: (event) {
+                    context
+                        .read<RedisController>()
+                        .changeCurrentHoveredRowId(e.index);
+                  },
+                  onExit: (event) {
+                    context
+                        .read<RedisController>()
+                        .changeCurrentHoveredRowId(-1);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: context.select<RedisController, bool>(
+                                (v) => v.currentHoveredRowId == e.index)
+                            ? const Color.fromARGB(255, 248, 249, 250)
+                            : Colors.white,
+                        border: const Border(
+                            top: BorderSide(
+                                width: 1,
+                                color: Color.fromARGB(255, 236, 239, 242)))),
+                    height: 50,
+                    child: Row(
+                        children: e
+                            .toWidgetList()
+                            .mapIndexed((i, e1) => SizedBox(
+                                  width: columnWidth[i],
+                                  child: e1,
+                                ))
+                            .toList()),
+                  ),
+                ))
             .toList(),
       ],
+
+      // Expanded(child: Container())
     );
   }
 }
