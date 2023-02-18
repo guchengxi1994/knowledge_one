@@ -94,14 +94,15 @@ class _RedisDataTableState extends State<RedisDataTable> {
                               child: _buildTable(context),
                             )),
                       ),
-                      Expanded(
-                          child: Container(
-                        margin: const EdgeInsets.all(10),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey[200]!)),
-                        child: valueWidget ?? defaultWidget(),
-                      ))
+                      if (extra > _width)
+                        Expanded(
+                            child: Container(
+                          margin: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey[200]!)),
+                          child: valueWidget ?? defaultWidget(),
+                        ))
                     ],
                   )),
         Center(
@@ -204,6 +205,11 @@ class _RedisDataTableState extends State<RedisDataTable> {
               // debugPrint(data.model.key);
               dynamic val =
                   await context.read<RedisController>().getValueFromKey(data);
+
+              if (total * 0.5 < _width) {
+                PageChangeController.drawerKey.currentState!.openEndDrawer();
+                return;
+              }
 
               setState(() {
                 valueWidget = const Center(

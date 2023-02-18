@@ -62,10 +62,20 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
                           //           const TextStyle(color: Colors.blueAccent)),
                           // ]));
                           return SizedBox(
-                            width: 75,
+                            width: 50,
                             child: Row(
                               children: [
-                                Image.asset("assets/icons/client.png"),
+                                Tooltip(
+                                  message: "当前连接数量",
+                                  child: Image.asset(
+                                    "assets/icons/client.png",
+                                    width: 25,
+                                    height: 25,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
                                 Text(
                                     (s.data?.connectedClients ?? "").toString(),
                                     style: const TextStyle(
@@ -80,29 +90,38 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
                     StreamBuilder(
                         stream: memoryDetails,
                         builder: (c, s) {
-                          // return Text((s.data?.connectedClients ?? "").toString());
-                          // return Text.rich(TextSpan(children: [
-                          //   const TextSpan(text: "当前使用空间"),
-                          //   TextSpan(
-                          //       text: s.data?.usedMemory ?? "",
-                          //       style:
-                          //           const TextStyle(color: Colors.blueAccent)),
-                          //   const TextSpan(text: "  使用空间峰值"),
-                          //   TextSpan(
-                          //       text: s.data?.peakUsedMemory ?? "",
-                          //       style:
-                          //           const TextStyle(color: Colors.blueAccent)),
-                          // ]));
-
                           return SizedBox(
                             width: 200,
                             child: Row(
                               children: [
-                                Image.asset("assets/icons/s1.png"),
+                                Tooltip(
+                                  message: "当前存储",
+                                  child: Image.asset(
+                                    "assets/icons/s1.png",
+                                    width: 25,
+                                    height: 25,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
                                 Text((s.data?.usedMemory ?? "").toString(),
                                     style: const TextStyle(
                                         color: Colors.blueAccent)),
-                                Image.asset("assets/icons/s2.png"),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                Tooltip(
+                                  message: "最高占用存储",
+                                  child: Image.asset(
+                                    "assets/icons/s2.png",
+                                    width: 25,
+                                    height: 25,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
                                 Text((s.data?.peakUsedMemory ?? "").toString(),
                                     style: const TextStyle(
                                         color: Colors.blueAccent)),
@@ -124,7 +143,17 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
                             width: 75,
                             child: Row(
                               children: [
-                                Image.asset("assets/icons/ram.png"),
+                                Tooltip(
+                                  message: "内存占用",
+                                  child: Image.asset(
+                                    "assets/icons/ram.png",
+                                    width: 25,
+                                    height: 25,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
                                 Text((s.data).toString(),
                                     style: const TextStyle(
                                         color: Colors.blueAccent)),
@@ -146,7 +175,14 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
                             width: 75,
                             child: Row(
                               children: [
-                                Image.asset("assets/icons/cpu.png"),
+                                Tooltip(
+                                  message: "CPU占用",
+                                  child: Image.asset(
+                                    "assets/icons/cpu.png",
+                                    width: 25,
+                                    height: 25,
+                                  ),
+                                ),
                                 Text((s.data).toString(),
                                     style: const TextStyle(
                                         color: Colors.blueAccent)),
