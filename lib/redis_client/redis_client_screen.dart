@@ -22,6 +22,8 @@ class RedisClientScreen extends BaseSubScreen {
                       width: 200,
                       height: 1000,
                       color: Colors.blue,
+                      child: Text(
+                          context.watch<RedisController>().value.toString()),
                     )));
 
   @override

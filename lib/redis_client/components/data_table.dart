@@ -142,20 +142,59 @@ class _RedisDataTableState extends State<RedisDataTable> {
         ),
         ...widget.data
             .map((e) => MouseRegion(
-                  onEnter: (event) {
+                onEnter: (event) {
+                  context
+                      .read<RedisController>()
+                      .changeCurrentHoveredRowId(e.index);
+                },
+                onExit: (event) {
+                  context.read<RedisController>().changeCurrentHoveredRowId(-1);
+                },
+                child: InkWell(
+                  onTap: () async {
                     context
                         .read<RedisController>()
-                        .changeCurrentHoveredRowId(e.index);
-                  },
-                  onExit: (event) {
-                    context
+                        .changeCurrentSelectedRowId(e.index);
+                    // debugPrint(data.model.key);
+                    dynamic val = await context
                         .read<RedisController>()
-                        .changeCurrentHoveredRowId(-1);
+                        .getValueFromKey(e);
+
+                    if (total * 0.5 < _width) {
+                      PageChangeController.drawerKey.currentState!
+                          .openEndDrawer();
+                      // return;
+                    }
+
+                    setState(() {
+                      valueWidget = const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    });
+                    await Future.delayed(const Duration(milliseconds: 10))
+                        .then((value) => {
+                              if (val is String)
+                                {
+                                  valueWidget = Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [Text(val)],
+                                  )
+                                }
+                              else
+                                {
+                                  valueWidget = context
+                                      .read<RedisController>()
+                                      .buildTableFromVal(val)
+                                }
+                            });
+                    setState(() {});
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                        color: context.select<RedisController, bool>(
-                                (v) => v.currentHoveredRowId == e.index)
+                        color: context.select<RedisController, bool>((v) =>
+                                (v.currentHoveredRowId == e.index) ||
+                                (v.currentSelectedRowId == e.index))
                             ? const Color.fromARGB(255, 248, 249, 250)
                             : Colors.white,
                         border: const Border(
@@ -171,7 +210,7 @@ class _RedisDataTableState extends State<RedisDataTable> {
                                 ))
                             .toList()),
                   ),
-                ))
+                )))
             .toList(),
       ],
 
@@ -190,7 +229,14 @@ class _RedisDataTableState extends State<RedisDataTable> {
     return [
       SizedBox(
         width: indexColumnWidth,
-        child: Text(data.index.toString()),
+        child: context.select<RedisController, bool>(
+                (v) => v.currentSelectedRowId == data.index)
+            ? Text(
+                "${data.index}",
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.lightBlue),
+              )
+            : Text(data.index.toString()),
       ),
       SizedBox(
         width: typeColumnWidth,
@@ -198,54 +244,15 @@ class _RedisDataTableState extends State<RedisDataTable> {
           value: data.model.valueType,
         ),
       ),
-      SizedBox(
-        width: keyColumnWidth,
-        child: InkWell(
-            onTap: () async {
-              // debugPrint(data.model.key);
-              dynamic val =
-                  await context.read<RedisController>().getValueFromKey(data);
-
-              if (total * 0.5 < _width) {
-                PageChangeController.drawerKey.currentState!.openEndDrawer();
-                return;
-              }
-
-              setState(() {
-                valueWidget = const Center(
-                  child: CircularProgressIndicator(),
-                );
-              });
-              await Future.delayed(const Duration(milliseconds: 10))
-                  .then((value) => {
-                        if (val is String)
-                          {
-                            valueWidget = Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [Text(val)],
-                            )
-                          }
-                        else
-                          {
-                            valueWidget = context
-                                .read<RedisController>()
-                                .buildTableFromVal(val)
-                          }
-                      });
-              setState(() {});
-            },
-            child: Text(data.model.key.toString())),
-      ),
+      SizedBox(width: keyColumnWidth, child: Text(data.model.key.toString())),
       SizedBox(
           width: ttlColumnWidth,
-          child: InkWell(
-              onTap: () async {},
-              child: data.model.ttl == "-1"
-                  ? const Text(
-                      "unlimit",
-                      style: TextStyle(color: Colors.lightGreen),
-                    )
-                  : Text(data.model.ttl.toString()))),
+          child: data.model.ttl == "-1"
+              ? const Text(
+                  "No limit",
+                  style: TextStyle(color: Colors.lightGreen),
+                )
+              : Text(data.model.ttl.toString())),
     ];
   }
 }

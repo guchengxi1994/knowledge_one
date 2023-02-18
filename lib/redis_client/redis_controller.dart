@@ -53,9 +53,17 @@ class RedisController extends ChangeNotifier {
   late RedisConnection conn = RedisConnection();
   late Command? command = null;
 
+  /// 悬停的行
   int currentHoveredRowId = -1;
   changeCurrentHoveredRowId(int id) {
     currentHoveredRowId = id;
+    notifyListeners();
+  }
+
+  /// 选中的行
+  int currentSelectedRowId = -1;
+  changeCurrentSelectedRowId(int id) {
+    currentSelectedRowId = id;
     notifyListeners();
   }
 
@@ -436,6 +444,8 @@ class RedisController extends ChangeNotifier {
     }
   }
 
+  late dynamic value = null;
+
   dynamic getValueFromKey(RedisData data) async {
     final s = data.model.key;
     String type = await getValType(s);
@@ -457,16 +467,25 @@ class RedisController extends ChangeNotifier {
         break;
       case "hash":
         // var hashLength = await command!.send_object(["HLEN", s]);
-        val = await command!.send_object(["HGETALL", s]);
+        val = [
+          await command!.send_object(["HGETALL", s])
+        ];
         break;
       case "zset":
         var setSize = await command!.send_object(["ZCARD", s]);
-        val =
+        final doubleList =
             await command!.send_object(["ZRANGE", s, 0, setSize, "WITHSCORES"]);
+
+        val = [];
+        for (int i = 0; i < doubleList.length; i = i + 2) {
+          val.add([doubleList[i], doubleList[i + 1]]);
+        }
+
         break;
       default:
         val = "";
     }
+    value = val;
     return val;
   }
 
