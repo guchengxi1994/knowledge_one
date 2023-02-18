@@ -2,14 +2,14 @@
 
 class RedisModel {
   final dynamic key;
-  dynamic value = null;
+  // dynamic value = null;
   dynamic valueType = null;
   dynamic ttl = null;
   RedisModel({required this.key});
 
   @override
   String toString() {
-    return "key: $key type:$valueType val:$value";
+    return "key: $key type:$valueType";
   }
 }
 

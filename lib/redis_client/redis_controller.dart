@@ -1,12 +1,12 @@
-// ignore_for_file: avoid_init_to_null
+// ignore_for_file: avoid_init_to_null, prefer_typing_uninitialized_variables, depend_on_referenced_packages
 
 import 'package:filesize/filesize.dart';
 import 'package:flutter/material.dart';
 import 'package:knowledge_one/bridge/native.dart';
 import 'package:knowledge_one/utils/utils.dart';
+import 'package:pluto_grid/pluto_grid.dart';
 import 'package:redis/redis.dart';
-
-import 'components/data_table.dart';
+import 'package:collection/collection.dart';
 import 'model.dart';
 
 class RedisConnectionDetails {
@@ -93,6 +93,22 @@ class RedisController extends ChangeNotifier {
           yield "";
         } else {
           yield filesize(s);
+        }
+      }
+      await Future.delayed(const Duration(seconds: refreshTime));
+    }
+  }
+
+  Stream<String> getCpuUsed() async* {
+    while (true) {
+      if (url != "localhost" && url != "127.0.0.1") {
+        yield "";
+      } else {
+        var s = await api.getRedisCpu();
+        if (s == "") {
+          yield "";
+        } else {
+          yield "$s%";
         }
       }
       await Future.delayed(const Duration(seconds: refreshTime));
@@ -212,9 +228,9 @@ class RedisController extends ChangeNotifier {
       for (final i in currentQueriedKeys) {
         final val = await getVal(i.key);
         if (val.isNotEmpty) {
-          i.value = val[1];
+          // i.value = val[1];
           i.valueType = val[0];
-          i.ttl = val[2];
+          i.ttl = val[1];
         }
       }
 
@@ -231,9 +247,9 @@ class RedisController extends ChangeNotifier {
   Future changeModel(int index, RedisModel model) async {
     var res = await getVal(model.key);
     if (res.isNotEmpty) {
-      model.value = res[1];
+      // model.value = res[1];
       model.valueType = res[0];
-      model.ttl = res[2];
+      model.ttl = res[1];
       // debugPrint(model.toString());
       currentQueriedKeys[index] = model;
       notifyListeners();
@@ -247,30 +263,7 @@ class RedisController extends ChangeNotifier {
     try {
       String type = await getValType(s);
       String ttl = (await getTTL(s)).toString();
-      switch (type) {
-        case "string":
-          var val = await command!.send_object(["GET", s]);
-          res = [type, val, ttl];
-          break;
-        case "list":
-          var val = await command!.send_object(["LLEN", s]);
-          res = [type, "长度为$val的数组", ttl];
-          break;
-        case "set":
-          var val = await command!.send_object(["SCARD", s]);
-          res = [type, "长度为$val的集合", ttl];
-          break;
-        case "hash":
-          var val = await command!.send_object(["HLEN", s]);
-          res = [type, "长度为$val的hash集合", ttl];
-          break;
-        case "sorted_set":
-          var val = await command!.send_object(["ZCARD", s]);
-          res = [type, "长度为$val的sorted set", ttl];
-          break;
-        default:
-          res = [];
-      }
+      res = [type, ttl];
     } catch (error) {
       debugPrint(error.toString());
       SmartDialogUtils.error("redis 连接异常");
@@ -443,13 +436,66 @@ class RedisController extends ChangeNotifier {
     }
   }
 
-  Widget? valueWidget = null;
+  dynamic getValueFromKey(RedisData data) async {
+    final s = data.model.key;
+    String type = await getValType(s);
+    var val;
+    switch (type) {
+      case "string":
+        val = await command!.send_object(["GET", s]);
+        // widget = Text(val.toString());
+        break;
+      case "list":
+        var listLength = int.tryParse(
+                (await command!.send_object(["LLEN", s])).toString()) ??
+            0;
+        val = await command!.send_object(["LRANGE", s, 0, listLength]);
+        break;
+      case "set":
+        // var setSize = await command!.send_object(["SCARD", s]);
+        val = await command!.send_object(["SMEMBERS", s]);
+        break;
+      case "hash":
+        // var hashLength = await command!.send_object(["HLEN", s]);
+        val = await command!.send_object(["HGETALL", s]);
+        break;
+      case "zset":
+        var setSize = await command!.send_object(["ZCARD", s]);
+        val =
+            await command!.send_object(["ZRANGE", s, 0, setSize, "WITHSCORES"]);
+        break;
+      default:
+        val = "";
+    }
+    return val;
+  }
 
-  changeValueWidget(RedisData data) {
-    valueWidget = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [Text(data.model.value.toString())],
+  Widget buildTableFromVal(List<dynamic> vals) {
+    List<PlutoColumn> columns = [
+      PlutoColumn(
+          title: "index",
+          field: "number_field",
+          type: PlutoColumnType.number()),
+      PlutoColumn(
+          title: "value", field: "text_field", type: PlutoColumnType.text())
+    ];
+
+    List<PlutoRow> rows = vals
+        .mapIndexed((index, element) => PlutoRow(cells: {
+              'number_field': PlutoCell(value: index),
+              'text_field': PlutoCell(value: element.toString())
+            }))
+        .toList();
+
+    return PlutoGrid(
+      columns: columns,
+      rows: rows,
+      onChanged: (event) {
+        /// TODO
+        ///
+        /// complete event
+        print(event);
+      },
     );
-    notifyListeners();
   }
 }

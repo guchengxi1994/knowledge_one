@@ -17,6 +17,11 @@ pub extern "C" fn wire_get_redis_memory(port_: i64) {
 }
 
 #[no_mangle]
+pub extern "C" fn wire_get_redis_cpu(port_: i64) {
+    wire_get_redis_cpu_impl(port_)
+}
+
+#[no_mangle]
 pub extern "C" fn wire_get_app_config(port_: i64, config_path: *mut wire_uint_8_list) {
     wire_get_app_config_impl(port_, config_path)
 }

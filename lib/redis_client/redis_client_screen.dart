@@ -53,14 +53,26 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
                         stream: connectionDetails,
                         builder: (c, s) {
                           // return Text((s.data?.connectedClients ?? "").toString());
-                          return Text.rich(TextSpan(children: [
-                            const TextSpan(text: "当前客户端连接数量"),
-                            TextSpan(
-                                text:
+                          // return Text.rich(TextSpan(children: [
+                          //   const TextSpan(text: "当前客户端连接数量"),
+                          //   TextSpan(
+                          //       text:
+                          //           (s.data?.connectedClients ?? "").toString(),
+                          //       style:
+                          //           const TextStyle(color: Colors.blueAccent)),
+                          // ]));
+                          return SizedBox(
+                            width: 75,
+                            child: Row(
+                              children: [
+                                Image.asset("assets/icons/client.png"),
+                                Text(
                                     (s.data?.connectedClients ?? "").toString(),
-                                style:
-                                    const TextStyle(color: Colors.blueAccent)),
-                          ]));
+                                    style: const TextStyle(
+                                        color: Colors.blueAccent)),
+                              ],
+                            ),
+                          );
                         }),
                     const SizedBox(
                       width: 20,
@@ -69,18 +81,34 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
                         stream: memoryDetails,
                         builder: (c, s) {
                           // return Text((s.data?.connectedClients ?? "").toString());
-                          return Text.rich(TextSpan(children: [
-                            const TextSpan(text: "当前使用空间"),
-                            TextSpan(
-                                text: s.data?.usedMemory ?? "",
-                                style:
-                                    const TextStyle(color: Colors.blueAccent)),
-                            const TextSpan(text: "  使用空间峰值"),
-                            TextSpan(
-                                text: s.data?.peakUsedMemory ?? "",
-                                style:
-                                    const TextStyle(color: Colors.blueAccent)),
-                          ]));
+                          // return Text.rich(TextSpan(children: [
+                          //   const TextSpan(text: "当前使用空间"),
+                          //   TextSpan(
+                          //       text: s.data?.usedMemory ?? "",
+                          //       style:
+                          //           const TextStyle(color: Colors.blueAccent)),
+                          //   const TextSpan(text: "  使用空间峰值"),
+                          //   TextSpan(
+                          //       text: s.data?.peakUsedMemory ?? "",
+                          //       style:
+                          //           const TextStyle(color: Colors.blueAccent)),
+                          // ]));
+
+                          return SizedBox(
+                            width: 200,
+                            child: Row(
+                              children: [
+                                Image.asset("assets/icons/s1.png"),
+                                Text((s.data?.usedMemory ?? "").toString(),
+                                    style: const TextStyle(
+                                        color: Colors.blueAccent)),
+                                Image.asset("assets/icons/s2.png"),
+                                Text((s.data?.peakUsedMemory ?? "").toString(),
+                                    style: const TextStyle(
+                                        color: Colors.blueAccent)),
+                              ],
+                            ),
+                          );
                         }),
                     const SizedBox(
                       width: 20,
@@ -91,7 +119,40 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
                           if (s.data == "") {
                             return const Text("");
                           }
-                          return Text("当前redis内存占用：${s.data}");
+                          // return Text("当前redis内存占用：${s.data}");
+                          return SizedBox(
+                            width: 75,
+                            child: Row(
+                              children: [
+                                Image.asset("assets/icons/ram.png"),
+                                Text((s.data).toString(),
+                                    style: const TextStyle(
+                                        color: Colors.blueAccent)),
+                              ],
+                            ),
+                          );
+                        }),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    StreamBuilder(
+                        stream: cpuUsed,
+                        builder: (c, s) {
+                          if (s.data == "") {
+                            return const Text("");
+                          }
+                          // return Text("当前redis CPU使用率：${s.data}");
+                          return SizedBox(
+                            width: 75,
+                            child: Row(
+                              children: [
+                                Image.asset("assets/icons/cpu.png"),
+                                Text((s.data).toString(),
+                                    style: const TextStyle(
+                                        color: Colors.blueAccent)),
+                              ],
+                            ),
+                          );
                         }),
                     const SizedBox(
                       width: 20,
@@ -127,6 +188,9 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
 
   late final Stream<String> memoryUsed =
       context.read<RedisController>().getMemoryUsed();
+
+  late final Stream<String> cpuUsed =
+      context.read<RedisController>().getCpuUsed();
 
   @override
   void dispose() {

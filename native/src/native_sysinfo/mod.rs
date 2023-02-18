@@ -37,3 +37,14 @@ pub fn get_redis_server_memory()->String{
 
     return String::new();
 }
+
+pub fn get_redis_server_cpu()->String{
+    let sys = System::new_all();
+    for (_pid, process) in sysinfo::SystemExt::processes(&sys) {
+        if process.name().contains("redis-server") {
+            return process.cpu_usage().to_string();
+        }
+    }
+
+    return String::new();
+}

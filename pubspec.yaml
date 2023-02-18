@@ -46,7 +46,7 @@ dependencies:
   loading_indicator: ^3.1.0
   open_file: ^3.2.1
   pdfx: ^2.3.0
-  pluto_grid: ^5.4.9
+  pluto_grid: ^6.0.2
   pretty_diff_text: ^1.0.0
   provider: ^6.0.3
   protobuf: ^2.1.0
@@ -68,6 +68,7 @@ dev_dependencies:
 dependency_overrides:
   ffi: ^2.0.1
   device_info_plus: ^8.0.0
+  intl: ^0.18.0
 
 deferred-components:
   - name: knowledge_one
@@ -81,13 +82,19 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icons/sidemenu/
+    - assets/emoji.json
+    - assets/icons/sidemenu/  # full dir
+    - assets/icons/client.png
+    - assets/icons/cpu.png
     - assets/icons/file.png
+    - assets/icons/folder.png
+    - assets/icons/ram.png
+    - assets/icons/s1.png
+    - assets/icons/s2.png
+    - assets/icons/switch.png
     - assets/icons/version.png
     - assets/icons/vc_file.png
-    - assets/icons/folder.png
-    - assets/icons/switch.png
-    - assets/emoji.json
+    
 
   fonts:
     - family: 思源

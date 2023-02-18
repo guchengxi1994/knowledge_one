@@ -25,6 +25,10 @@ abstract class Native {
 
   FlutterRustBridgeTaskConstMeta get kGetRedisMemoryConstMeta;
 
+  Future<String> getRedisCpu({dynamic hint});
+
+  FlutterRustBridgeTaskConstMeta get kGetRedisCpuConstMeta;
+
   /// 获取所有Config
   Future<AppConfig?> getAppConfig({required String configPath, dynamic hint});
 
@@ -349,6 +353,22 @@ class NativeImpl implements Native {
   FlutterRustBridgeTaskConstMeta get kGetRedisMemoryConstMeta =>
       const FlutterRustBridgeTaskConstMeta(
         debugName: "get_redis_memory",
+        argNames: [],
+      );
+
+  Future<String> getRedisCpu({dynamic hint}) {
+    return _platform.executeNormal(FlutterRustBridgeTask(
+      callFfi: (port_) => _platform.inner.wire_get_redis_cpu(port_),
+      parseSuccessData: _wire2api_String,
+      constMeta: kGetRedisCpuConstMeta,
+      argValues: [],
+      hint: hint,
+    ));
+  }
+
+  FlutterRustBridgeTaskConstMeta get kGetRedisCpuConstMeta =>
+      const FlutterRustBridgeTaskConstMeta(
+        debugName: "get_redis_cpu",
         argNames: [],
       );
 
@@ -1110,6 +1130,20 @@ class NativeWire implements FlutterRustBridgeWireBase {
           'wire_get_redis_memory');
   late final _wire_get_redis_memory =
       _wire_get_redis_memoryPtr.asFunction<void Function(int)>();
+
+  void wire_get_redis_cpu(
+    int port_,
+  ) {
+    return _wire_get_redis_cpu(
+      port_,
+    );
+  }
+
+  late final _wire_get_redis_cpuPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_get_redis_cpu');
+  late final _wire_get_redis_cpu =
+      _wire_get_redis_cpuPtr.asFunction<void Function(int)>();
 
   void wire_get_app_config(
     int port_,

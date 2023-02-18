@@ -15,28 +15,30 @@ const double keyColumnWidth = 100;
 const double valueColumnWidth = 300;
 const double indexColumnWidth = 50;
 const double typeColumnWidth = 75;
-const double ttlColumnWidth = 125;
+const double ttlColumnWidth = 50;
 
 typedef OnPageChanged = Future Function(int index);
 
-class RedisDataTable extends StatelessWidget {
-  RedisDataTable({Key? key, required this.data, required this.onPageChanged})
-      : super(key: key);
+class RedisDataTable extends StatefulWidget {
+  const RedisDataTable(
+      {super.key, required this.data, required this.onPageChanged});
   final List<RedisData> data;
+  final OnPageChanged onPageChanged;
 
+  @override
+  State<RedisDataTable> createState() => _RedisDataTableState();
+}
+
+class _RedisDataTableState extends State<RedisDataTable> {
   final ScrollController controller = ScrollController();
   final ScrollController controller2 = ScrollController();
-  final OnPageChanged onPageChanged;
 
   late List<double> columnWidth = [];
 
-  late List<String> titles = [
-    "编号",
-    "类型",
-    "key",
-  ];
+  late List<String> titles = ["编号", "类型", "key", "TTL"];
 
-  static const _width = indexColumnWidth + keyColumnWidth + typeColumnWidth;
+  static const _width =
+      indexColumnWidth + keyColumnWidth + typeColumnWidth + ttlColumnWidth;
 
   late double total;
 
@@ -60,19 +62,21 @@ class RedisDataTable extends StatelessWidget {
         indexColumnWidth / _width * total,
         typeColumnWidth / _width * total,
         keyColumnWidth / _width * total,
+        ttlColumnWidth / _width * total,
       ];
     } else {
       columnWidth = [
         indexColumnWidth / _width * extra,
         typeColumnWidth / _width * extra,
         keyColumnWidth / _width * extra,
+        ttlColumnWidth / _width * extra,
       ];
     }
 
     return Column(
       children: [
         Expanded(
-            child: (data.isEmpty)
+            child: (widget.data.isEmpty)
                 ? const Center(
                     child: Text("暂无内容"),
                   )
@@ -96,15 +100,14 @@ class RedisDataTable extends StatelessWidget {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.grey[200]!)),
-                        child: context.watch<RedisController>().valueWidget ??
-                            defaultWidget(),
+                        child: valueWidget ?? defaultWidget(),
                       ))
                     ],
                   )),
         Center(
           child: UsefulDatatableIndicator2(
             whenIndexChanged: (int index) async {
-              await onPageChanged(index);
+              await widget.onPageChanged(index);
             },
           ),
         ),
@@ -117,6 +120,8 @@ class RedisDataTable extends StatelessWidget {
       child: Text("点击key值，展示详细信息"),
     );
   }
+
+  Widget? valueWidget = null;
 
   Widget _buildTable(BuildContext context) {
     return Column(
@@ -134,7 +139,7 @@ class RedisDataTable extends StatelessWidget {
                 .toList(),
           ),
         ),
-        ...data
+        ...widget.data
             .map((e) => MouseRegion(
                   onEnter: (event) {
                     context
@@ -158,7 +163,7 @@ class RedisDataTable extends StatelessWidget {
                                 color: Color.fromARGB(255, 236, 239, 242)))),
                     height: 50,
                     child: Row(
-                        children: toWidgetList(e, context)
+                        children: toWidgetList(e)
                             .mapIndexed((i, e1) => SizedBox(
                                   width: columnWidth[i],
                                   child: e1,
@@ -173,7 +178,7 @@ class RedisDataTable extends StatelessWidget {
     );
   }
 
-  List<Widget> toWidgetList(RedisData data, BuildContext ctx) {
+  List<Widget> toWidgetList(RedisData data) {
     int t;
     if (data.model.ttl == null) {
       t = 0;
@@ -195,12 +200,46 @@ class RedisDataTable extends StatelessWidget {
       SizedBox(
         width: keyColumnWidth,
         child: InkWell(
-            onTap: () {
+            onTap: () async {
               // debugPrint(data.model.key);
-              ctx.read<RedisController>().changeValueWidget(data);
+              dynamic val =
+                  await context.read<RedisController>().getValueFromKey(data);
+
+              setState(() {
+                valueWidget = const Center(
+                  child: CircularProgressIndicator(),
+                );
+              });
+              await Future.delayed(const Duration(milliseconds: 10))
+                  .then((value) => {
+                        if (val is String)
+                          {
+                            valueWidget = Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [Text(val)],
+                            )
+                          }
+                        else
+                          {
+                            valueWidget = context
+                                .read<RedisController>()
+                                .buildTableFromVal(val)
+                          }
+                      });
+              setState(() {});
             },
             child: Text(data.model.key.toString())),
       ),
+      SizedBox(
+          width: ttlColumnWidth,
+          child: InkWell(
+              onTap: () async {},
+              child: data.model.ttl == "-1"
+                  ? const Text(
+                      "unlimit",
+                      style: TextStyle(color: Colors.lightGreen),
+                    )
+                  : Text(data.model.ttl.toString()))),
     ];
   }
 }
