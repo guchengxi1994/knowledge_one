@@ -1,6 +1,6 @@
 use futures::executor::block_on;
 use lazy_static::lazy_static;
-use sqlx::{MySql, MySqlPool, Pool};
+use sqlx::{MySql, MySqlPool, Pool, Sqlite, SqlitePool};
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -27,9 +27,33 @@ impl Default for MyPool {
     }
 }
 
+pub struct MySqlitePool(Option<Pool<Sqlite>>);
+
+impl MySqlitePool {
+    /// 创建连接池
+    pub async fn new() -> Self {
+        let url = String::from("sqlite:data.db");
+        let pool = SqlitePool::connect(url.as_str()).await.unwrap();
+        MySqlitePool(Some(pool))
+    }
+
+    /// 获取连接池
+    pub fn get_pool(&self) -> &Pool<Sqlite> {
+        self.0.as_ref().unwrap()
+    }
+}
+
+/// 实现 Default trait
+impl Default for MySqlitePool {
+    fn default() -> Self {
+        MySqlitePool(None)
+    }
+}
+
 // 声明创建静态连接池
 lazy_static! {
     pub static ref POOL: Arc<RwLock<MyPool>> = Arc::new(RwLock::new(Default::default()));
+    pub static ref POOL_SQLITE: Arc<RwLock<MySqlitePool>> = Arc::new(RwLock::new(Default::default()));
 }
 
 // 初始化静态连接池

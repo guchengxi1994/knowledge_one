@@ -1,5 +1,7 @@
 use crate::constants::{DATABASE_TABLE_CREATION_FAIL, DATABASE_TABLE_CREATION_SUCCESS};
 
+use super::sqlx_connection::{MySqlitePool, POOL_SQLITE};
+
 #[tokio::main]
 pub async fn create_tables(db_type: String) -> i64 {
     if db_type == String::from("mysql") {
@@ -17,23 +19,45 @@ pub async fn create_tables(db_type: String) -> i64 {
                 return DATABASE_TABLE_CREATION_SUCCESS;
             }
             (Ok(_), Err(e)) => {
-                println!("create table failed : {:?}",e);
+                println!("create table failed : {:?}", e);
                 return DATABASE_TABLE_CREATION_FAIL;
             }
             (Err(e), Ok(_)) => {
-                println!("create table failed : {:?}",e);
+                println!("create table failed : {:?}", e);
                 return DATABASE_TABLE_CREATION_FAIL;
             }
             (Err(e1), Err(e2)) => {
-                println!("create table failed : {:?}",e1);
-                println!("create table failed : {:?}",e2);
+                println!("create table failed : {:?}", e1);
+                println!("create table failed : {:?}", e2);
                 return DATABASE_TABLE_CREATION_FAIL;
             }
         }
     }
 
-    if db_type == String::from("sqlite") {}
+    if db_type == String::from("sqlite") {
+        let status_code = crate::storage::create_file::create_file(String::from("data.db"));
 
+        if status_code == 1 || status_code == 500 {
+            return DATABASE_TABLE_CREATION_FAIL;
+        } else {
+            let pool = POOL_SQLITE.clone();
+            let mut pool = pool.write().await;
+            *pool = MySqlitePool::new().await;
+
+            let r = sqlx::query(CREATE_REDIS_STMT_MYSQL)
+                .execute(pool.get_pool())
+                .await;
+
+            match r {
+                Ok(_) => {
+                    return DATABASE_TABLE_CREATION_SUCCESS;
+                }
+                Err(_) => {
+                    return DATABASE_TABLE_CREATION_FAIL;
+                }
+            }
+        }
+    }
     DATABASE_TABLE_CREATION_FAIL
 }
 
@@ -65,4 +89,11 @@ CREATE TABLE  IF NOT EXISTS `file_changelog` (
     `diff_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
     PRIMARY KEY (`changelog_id`) USING BTREE
   ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+";
+
+const CREATE_REDIS_STMT_MYSQL: &'static str = "
+CREATE TABLE IF NOT EXISTS redis_stmt (
+    redis_stmt_id INTEGER NOT NULL COLLATE BINARY PRIMARY KEY AUTOINCREMENT,
+    content TEXT
+  );
 ";

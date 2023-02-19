@@ -50,3 +50,5 @@ ios/
 android/
 lib/src/native
 lib/src
+
+*.db

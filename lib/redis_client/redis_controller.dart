@@ -489,22 +489,55 @@ class RedisController extends ChangeNotifier {
     return val;
   }
 
-  Widget buildTableFromVal(List<dynamic> vals) {
-    List<PlutoColumn> columns = [
-      PlutoColumn(
-          title: "index",
-          field: "number_field",
-          type: PlutoColumnType.number()),
-      PlutoColumn(
-          title: "value", field: "text_field", type: PlutoColumnType.text())
-    ];
-
-    List<PlutoRow> rows = vals
-        .mapIndexed((index, element) => PlutoRow(cells: {
-              'number_field': PlutoCell(value: index),
-              'text_field': PlutoCell(value: element.toString())
-            }))
-        .toList();
+  Widget buildTableFromVal(List<dynamic> vals, {String? valType}) {
+    late List<PlutoColumn> columns;
+    late List<PlutoRow> rows;
+    if (valType == "zset") {
+      columns = [
+        PlutoColumn(
+            title: "member",
+            field: "text_field_1",
+            type: PlutoColumnType.text()),
+        PlutoColumn(
+            title: "score", field: "text_field_2", type: PlutoColumnType.text())
+      ];
+      rows = vals
+          .mapIndexed((index, element) => PlutoRow(cells: {
+                'text_field_1': PlutoCell(value: element[0].toString()),
+                'text_field_2': PlutoCell(value: element[1].toString())
+              }))
+          .toList();
+    } else if (valType == "hash") {
+      columns = [
+        PlutoColumn(
+            title: "field",
+            field: "text_field_1",
+            type: PlutoColumnType.text()),
+        PlutoColumn(
+            title: "value", field: "text_field_2", type: PlutoColumnType.text())
+      ];
+      rows = vals
+          .mapIndexed((index, element) => PlutoRow(cells: {
+                'text_field_1': PlutoCell(value: element[0].toString()),
+                'text_field_2': PlutoCell(value: element[1].toString())
+              }))
+          .toList();
+    } else {
+      columns = [
+        PlutoColumn(
+            title: "index",
+            field: "number_field",
+            type: PlutoColumnType.number()),
+        PlutoColumn(
+            title: "value", field: "text_field", type: PlutoColumnType.text())
+      ];
+      rows = vals
+          .mapIndexed((index, element) => PlutoRow(cells: {
+                'number_field': PlutoCell(value: index),
+                'text_field': PlutoCell(value: element.toString())
+              }))
+          .toList();
+    }
 
     return PlutoGrid(
       columns: columns,

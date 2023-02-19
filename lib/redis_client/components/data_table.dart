@@ -185,7 +185,8 @@ class _RedisDataTableState extends State<RedisDataTable> {
                                 {
                                   valueWidget = context
                                       .read<RedisController>()
-                                      .buildTableFromVal(val)
+                                      .buildTableFromVal(val,
+                                          valType: e.model.valueType)
                                 }
                             });
                     setState(() {});
