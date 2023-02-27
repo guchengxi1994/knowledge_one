@@ -1,6 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, avoid_init_to_null
 
+import 'package:debug_repl/components/repl_window.dart';
 import 'package:flutter/material.dart';
+import 'package:just_the_tooltip/just_the_tooltip.dart';
 import 'package:knowledge_one/redis_client/redis_controller.dart';
 import 'package:knowledge_one/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -201,6 +203,7 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
               ),
             Expanded(child: _buildContent()),
             _buildBottom(),
+            if (bottomText != "") _buildClent()
           ],
         ),
       ),
@@ -290,6 +293,24 @@ class _RedisClientScreenState extends BaseSubScreenState<RedisClientScreen> {
       alignment: Alignment.centerRight,
       child: Text(bottomText),
     );
+  }
+
+  Widget _buildClent() {
+    return JustTheTooltip(
+        tailBuilder: (point1, point2, point3) {
+          return Path()
+            ..moveTo(point1.dx, point1.dy)
+            ..lineTo(point3.dx, point3.dy)
+            ..close();
+        },
+        isModal: true,
+        content: const ReplWindow(
+          prevCommands: ["redis-cli"],
+        ),
+        child: const Align(
+          alignment: Alignment.centerRight,
+          child: Text("cli"),
+        ));
   }
 
   Widget _buildTitle() {
